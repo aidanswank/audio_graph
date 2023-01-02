@@ -27,28 +27,29 @@ struct audio_output : xmodule {
     
     audio_output(int id) : xmodule(id)
     {
-        for(int i = 0; i < 256; i++)
-        {
-            xmodule::audio.push_back(0.0f);
-        }
+//        for(int i = 0; i < 256; i++)
+//        {
+//            xmodule::audio.push_back(0.0f);
+//        }
+        zero_audio(xmodule::audio,256);
     }
     void process(std::vector<xmodule*>& modules) override
     {
     //        std::cout <<  "id " << id << " final output" << std::endl;
 //        xmodule::audio.clear();
         
-//        memcpy(audio.data(), 0.0f, sizeof(float)*256);
-        for(int i = 0 ; i < 256; i++)
-        {
-            xmodule::audio[i] = 0.0f;
-        }
+//        memset(xmodule::audio.data(), 0.0f, sizeof(float)*256);
+        zero_audio(xmodule::audio,256);
         
         for(int i = 0; i < input_ids.size(); i++)
         {
             xmodule *mod = modules[ input_ids[i] ];
-            for(int i = 0; i < mod->audio.size(); i++)
+            // TODO CHANGE FIXED BUFFER
+            for(int i = 0; i < 256; i++)
             {
-                xmodule::audio[i] += mod->audio[i];
+//                xmodule::audio[i] += mod->audio[i];
+                xmodule::audio[0][i] += mod->audio[0][i];
+                xmodule::audio[1][i] += mod->audio[1][i];
             }
 //            mod->audio.clear();
 //            std::cout <<  "summing " << i << " audio size " << mod->audio.size() << std::endl;
@@ -57,7 +58,7 @@ struct audio_output : xmodule {
     };
 };
 
-void DFS(int rootId, std::vector<xmodule*> &xmodules, std::vector<int> &visited)
+void DFS(int rootId, std::vector<xmodule*> &xmodules, std::vector<int> &visited, std::vector<int> &process_order)
 {
     if (find(visited.begin(), visited.end(), rootId) != visited.end())
         return;                // Return if the node has already been visited
@@ -65,13 +66,14 @@ void DFS(int rootId, std::vector<xmodule*> &xmodules, std::vector<int> &visited)
     // process the audio signal for the input xmodules of the current node
     for (int input_id : xmodules[rootId]->input_ids)
     {
-        DFS(input_id, xmodules, visited);
+        DFS(input_id, xmodules, visited, process_order);
     }
     xmodules[rootId]->process(xmodules); // process the audio signal for the current node
+    process_order.push_back(rootId);
     // process the audio signal for the output xmodules of the current node
     for (int output_id : xmodules[rootId]->output_ids)
     {
-        DFS(output_id, xmodules, visited); // Recursively process the audio signal for the output nodes
+        DFS(output_id, xmodules, visited, process_order); // Recursively process the audio signal for the output nodes
     }
 }
 
@@ -86,7 +88,8 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
 //    interface
     
     interface->visited.clear();
-    DFS(3, interface->xmodules, interface->visited);
+    interface->process_order.clear();
+    DFS(3, interface->xmodules, interface->visited, interface->process_order);
 
     float *output = (float*)outputBuffer;
 
@@ -96,8 +99,8 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
 //        output[i * 2] = white*0.01; /* left */
 //        output[i * 2 + 1] = white*0.01;  /* right */
      
-        output[i * 2] = interface->xmodules[3]->audio[i]; /* left */
-        output[i * 2 + 1] = interface->xmodules[3]->audio[i];  /* right */
+        output[i * 2] = interface->xmodules[3]->audio[0][i]; /* left */
+        output[i * 2 + 1] = interface->xmodules[3]->audio[1][i];  /* right */
 //        interface->xmodules[3]->audio.clear();
         
     }
@@ -127,13 +130,8 @@ int main()
     
     // Start the audio signal processing at the root node (in this case, the mixer xmodule)
     std::vector<int> visited;
-//    DFS(3, xmodules, visited);
-    
-//    while(1) {
-//        visited.clear();
-//        DFS(3, xmodules, visited);
-//    };
-//
+    std::vector<int> process_order;
+    DFS(3, xmodules, visited, process_order);
     
     SDL_Window *window = nullptr;
     SDL_Renderer *renderer = nullptr;
@@ -143,7 +141,9 @@ int main()
     window = SDL_CreateWindow("test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     SDL_RenderSetScale(renderer, 2, 2); // retina is 2x scale
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+//    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_RenderSetVSync(renderer, 1);
+
 
     if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
     {
@@ -153,7 +153,7 @@ int main()
     audio_interface interface;
     interface.scan_devices();
     interface.init_devices(44100, 256, 1, 2);  // place device indices here
-    interface.pass_userdata(xmodules, visited);
+    interface.pass_userdata(xmodules, visited, process_order);
     interface.turn_on(audio_callback);
     
     bool is_running = true;
@@ -167,8 +167,15 @@ int main()
                is_running = false;
            }
         }
-//        visited.clear();
-//        DFS(3, xmodules, visited);
+        
+        // if i dont have this cpu spikes to 100%!
+        //sdl2 vsync not working?? https://discourse.libsdl.org/t/high-cpu-usage/14676/20
+        float this_tick = SDL_GetTicks();
+        float next_tick = this_tick + (1000/60); // 60 fps
+        if ( this_tick < next_tick )
+        {
+            SDL_Delay(next_tick-this_tick);
+        }
     }
 
     return 0;

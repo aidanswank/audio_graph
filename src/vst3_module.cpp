@@ -6,10 +6,11 @@ vst3_midi_instrument::vst3_midi_instrument(int id) : xmodule(id)
     ///Library/Audio/Plug-Ins/VST3/Surge XT.vst3
     /////////////// vst setup TODO CLEAN !!!!
     //
-    for(int i = 0; i < 256; i++)
-    {
-        xmodule::audio.push_back(0.0f);
-    }
+//    for(int i = 0; i < 256; i++)
+//    {
+//        xmodule::audio.push_back(0.0f);
+//    }
+    zero_audio(xmodule::audio,256);
     
     if (!vst.init("/Library/Audio/Plug-Ins/VST3/Surge XT.vst3", 44100, 256, Steinberg::Vst::kSample32, true))
     {
@@ -45,7 +46,7 @@ vst3_midi_instrument::vst3_midi_instrument(int id) : xmodule(id)
 void vst3_midi_instrument::process(std::vector<xmodule*>& modules)
 {
     
-    rt_midi_in *midi_in_module = (rt_midi_in*)modules[ input_ids[0] ];
+    xmodule *midi_in_module = (xmodule*)modules[ input_ids[0] ];
     
     int SAMPLE_RATE = 44100;
     int TEMPO = 120;
@@ -108,25 +109,29 @@ void vst3_midi_instrument::process(std::vector<xmodule*>& modules)
     eventList->clear();
     
     float *left = vst.channelBuffer32(Steinberg::Vst::kOutput, 0);
-//    float *right = module_data->vst.channelBuffer32(Steinberg::Vst::kOutput, 0);
+    float *right = vst.channelBuffer32(Steinberg::Vst::kOutput, 1);
     
     
-    float *audio_output = xmodule::audio.data();
-    
+//    float *audio_output = xmodule::audio.data();
+//    zero_audio(xmodule::audio,256);
+    float *audio_output_left = xmodule::audio[0].data();
+    float *audio_output_right = xmodule::audio[1].data();
+
 //    for(int i = 0; i < 10; i++)
 //    {
 //        std::cout << left[i] << std::endl;
 //    }
     
-    for (unsigned long i = 0; i < 256; ++i) {
-        audio_output[i] = 0.0f;
-    }
-    
+//    for (unsigned long i = 0; i < 256; ++i) {
+//        audio_output[i] = 0.0f;
+//    }
+//
     for (unsigned long i = 0; i < 256; ++i) {
 //        outputBuffer[i * 2 + 0] = left[i];
 //            outputBuffer[i * 2 + 1] = right[i];
         
-        audio_output[i] = left[i];
+        audio_output_left[i] = left[i];
+        audio_output_right[i] = right[i];
     }
 //    xmodule::audio.clear();
     

@@ -9,6 +9,11 @@ struct MidiNoteMessage
     bool isNoteOn = false;
 };
 
+// multichannel audio
+typedef std::vector<std::vector<float>> STEREO_AUDIO;
+
+void zero_audio(STEREO_AUDIO &audio, int len);
+
 struct xmodule
 {
     // Constructor
@@ -29,6 +34,9 @@ struct xmodule
 
     // process the audio signal
     virtual void process(std::vector<xmodule*>& modules) = 0;
+    
+    // show user interface
+//    virtual void show() = 0;
 
     // ~xmodule() {};
 
@@ -44,5 +52,6 @@ struct xmodule
     
     //todo seperate
     std::vector<MidiNoteMessage> notes;
-    std::vector<float> audio;
+    STEREO_AUDIO audio;
+//    std::vector<std::vector<float>> audio;
 };

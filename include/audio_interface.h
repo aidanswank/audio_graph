@@ -16,10 +16,12 @@ public:
     
     std::vector<xmodule*> xmodules;
     std::vector<int> visited;
-    void pass_userdata(std::vector<xmodule*>& p_xmodules, std::vector<int>& p_visited)
+    std::vector<int> process_order;
+    void pass_userdata(std::vector<xmodule*>& p_xmodules, std::vector<int>& p_visited, std::vector<int>& p_process_order)
     {
         xmodules = p_xmodules;
         visited = p_visited;
+        visited = p_process_order;
     };
 
 private:
