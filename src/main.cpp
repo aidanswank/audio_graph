@@ -2,7 +2,7 @@
 #include <vector>
 #include "SDL2/SDL.h"
 
-#include "audio_interface.h"
+//#include "audio_interface.h"
 #include "xmodule.h"
 #include "midi_in_module.h"
 #include "vst3_module.h"
@@ -24,44 +24,46 @@
 //    };
 //};
 
-struct audio_output : xmodule {
-    
-    audio_output(int id) : xmodule(id)
-    {
-//        for(int i = 0; i < 256; i++)
+//struct audio_output : xmodule {
+//    
+//    audio_output(int id) : xmodule(id)
+//    {
+////        for(int i = 0; i < 256; i++)
+////        {
+////            xmodule::audio.push_back(0.0f);
+////        }
+//        zero_audio(xmodule::audio,256);
+//    }
+//    
+//    void show() override {};
+//    void poll() override {};
+//    
+//    void process(std::vector<xmodule*>& modules) override
+//    {
+//    //        std::cout <<  "id " << id << " final output" << std::endl;
+////        xmodule::audio.clear();
+//        
+////        memset(xmodule::audio.data(), 0.0f, sizeof(float)*256);
+//        zero_audio(xmodule::audio,256);
+//        
+//        for(int i = 0; i < input_ids.size(); i++)
 //        {
-//            xmodule::audio.push_back(0.0f);
+//            xmodule *mod = modules[ input_ids[i] ];
+//            // TODO CHANGE FIXED BUFFER
+//            for(int i = 0; i < 256; i++)
+//            {
+////                xmodule::audio[i] += mod->audio[i];
+//                xmodule::audio[0][i] += mod->audio[0][i];
+//                xmodule::audio[1][i] += mod->audio[1][i];
+//            }
+////            mod->audio.clear();
+////            std::cout <<  "summing " << i << " audio size " << mod->audio.size() << std::endl;
 //        }
-        zero_audio(xmodule::audio,256);
-    }
-    
-    void show() override {};
-    void poll() override {};
-    
-    void process(std::vector<xmodule*>& modules) override
-    {
-    //        std::cout <<  "id " << id << " final output" << std::endl;
-//        xmodule::audio.clear();
-        
-//        memset(xmodule::audio.data(), 0.0f, sizeof(float)*256);
-        zero_audio(xmodule::audio,256);
-        
-        for(int i = 0; i < input_ids.size(); i++)
-        {
-            xmodule *mod = modules[ input_ids[i] ];
-            // TODO CHANGE FIXED BUFFER
-            for(int i = 0; i < 256; i++)
-            {
-//                xmodule::audio[i] += mod->audio[i];
-                xmodule::audio[0][i] += mod->audio[0][i];
-                xmodule::audio[1][i] += mod->audio[1][i];
-            }
-//            mod->audio.clear();
-//            std::cout <<  "summing " << i << " audio size " << mod->audio.size() << std::endl;
-        }
-    
-    };
-};
+//    
+//    };
+//};
+
+#include "audio_output_module.h"
 
 void DFS(int rootId, std::vector<xmodule*> &xmodules, std::vector<int> &visited, std::vector<int> &process_order)
 {
@@ -81,6 +83,8 @@ void DFS(int rootId, std::vector<xmodule*> &xmodules, std::vector<int> &visited,
         DFS(output_id, xmodules, visited, process_order); // Recursively process the audio signal for the output nodes
     }
 }
+
+#include "audio_interface.h"
 
 static int audio_callback( const void *inputBuffer, void *outputBuffer,
                             unsigned long framesPerBuffer,
@@ -121,6 +125,23 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
 
 int main()
 {
+    SDL_Window *window = nullptr;
+    SDL_Renderer *renderer = nullptr;
+    unsigned int w, h;
+    w = 320 * 2;
+    h = 240 * 2;
+    window = SDL_CreateWindow("test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    SDL_RenderSetScale(renderer, 2, 2); // retina is 2x scale
+//    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+    SDL_RenderSetVSync(renderer, 1);
+
+
+    if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
+    {
+        printf("Couldn't initialize SDL: \n%s\n", SDL_GetError());
+    }
+    
     SDL_Event event;
     
     // Create a vector to store the xmodules
@@ -131,7 +152,7 @@ int main()
     xmodules.push_back(midi_in); // rt midi in
     xmodules.push_back(new vst3_midi_instrument(1,&event)); // vst plug
     xmodules.push_back(new vst3_midi_instrument(2,&event)); // vst plug
-    xmodules.push_back(new audio_output(3)); // output
+    xmodules.push_back(new audio_output_module(3)); // output
     xmodules.push_back(new cjfilter_module(4)); // filter
 
     xmodules[0]->add_output(1);
@@ -149,23 +170,6 @@ int main()
     std::vector<int> visited;
     std::vector<int> process_order;
 //    DFS(3, xmodules, visited, process_order);
-    
-    SDL_Window *window = nullptr;
-    SDL_Renderer *renderer = nullptr;
-    unsigned int w, h;
-    w = 320 * 2;
-    h = 240 * 2;
-    window = SDL_CreateWindow("test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    SDL_RenderSetScale(renderer, 2, 2); // retina is 2x scale
-//    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    SDL_RenderSetVSync(renderer, 1);
-
-
-    if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
-    {
-        printf("Couldn't initialize SDL: \n%s\n", SDL_GetError());
-    }
 //    
     audio_interface interface;
     interface.scan_devices();
