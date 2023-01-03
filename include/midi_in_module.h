@@ -23,4 +23,6 @@ struct rt_midi_in : xmodule {
     
     rt_midi_in(int id);
     void process(std::vector<xmodule*>& modules) override;
+    void show() override {};
+    void poll() override {};
 };

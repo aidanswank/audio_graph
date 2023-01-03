@@ -33,6 +33,10 @@ struct audio_output : xmodule {
 //        }
         zero_audio(xmodule::audio,256);
     }
+    
+    void show() override {};
+    void poll() override {};
+    
     void process(std::vector<xmodule*>& modules) override
     {
     //        std::cout <<  "id " << id << " final output" << std::endl;
@@ -58,7 +62,7 @@ struct audio_output : xmodule {
     };
 };
 
-void DFS(int rootId, std::vector<xmodule*> &xmodules, std::vector<int> &visited, std::vector<int> &process_order)
+void DFS(int rootId, std::vector<xmodule*> &xmodules, std::vector<int> &visited)
 {
     if (find(visited.begin(), visited.end(), rootId) != visited.end())
         return;                // Return if the node has already been visited
@@ -66,14 +70,14 @@ void DFS(int rootId, std::vector<xmodule*> &xmodules, std::vector<int> &visited,
     // process the audio signal for the input xmodules of the current node
     for (int input_id : xmodules[rootId]->input_ids)
     {
-        DFS(input_id, xmodules, visited, process_order);
+        DFS(input_id, xmodules, visited);
     }
     xmodules[rootId]->process(xmodules); // process the audio signal for the current node
-    process_order.push_back(rootId);
+//    process_order.push_back(rootId);
     // process the audio signal for the output xmodules of the current node
     for (int output_id : xmodules[rootId]->output_ids)
     {
-        DFS(output_id, xmodules, visited, process_order); // Recursively process the audio signal for the output nodes
+        DFS(output_id, xmodules, visited); // Recursively process the audio signal for the output nodes
     }
 }
 
@@ -89,18 +93,24 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
     
     interface->visited.clear();
     interface->process_order.clear();
-    DFS(3, interface->xmodules, interface->visited, interface->process_order);
+    DFS(3, interface->xmodules, interface->visited);
+    
+//    for(uint i = 0; i < interface->process_order.size(); ++i)
+//    {
+//        interface->xmodules[i]->process(interface->xmodules);
+//    }
 
     float *output = (float*)outputBuffer;
 
-    for( int i=0; i<framesPerBuffer; i++ )
+    for( uint i=0; i<framesPerBuffer; ++i )
     {
 //        float white = (float)(rand() % 100)/100.0f;
 //        output[i * 2] = white*0.01; /* left */
 //        output[i * 2 + 1] = white*0.01;  /* right */
      
-        output[i * 2] = interface->xmodules[3]->audio[0][i]; /* left */
-        output[i * 2 + 1] = interface->xmodules[3]->audio[1][i];  /* right */
+        uint num_modules = (uint)interface->xmodules.size() - 1;
+        output[i * 2] = interface->xmodules[num_modules]->audio[0][i]; /* left */
+        output[i * 2 + 1] = interface->xmodules[num_modules]->audio[1][i];  /* right */
 //        interface->xmodules[3]->audio.clear();
         
     }
@@ -109,14 +119,16 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
 
 int main()
 {
+    SDL_Event event;
+    
     // Create a vector to store the xmodules
     std::vector<xmodule*> xmodules;
     
     rt_midi_in* midi_in = new rt_midi_in(0);
 //    midi_in->something = 123456789;
     xmodules.push_back(midi_in); // rt midi in
-    xmodules.push_back(new vst3_midi_instrument(1)); // vst plug
-    xmodules.push_back(new vst3_midi_instrument(2)); // vst plug
+    xmodules.push_back(new vst3_midi_instrument(1,&event)); // vst plug
+    xmodules.push_back(new vst3_midi_instrument(2,&event)); // vst plug
     xmodules.push_back(new audio_output(3)); // output
     
     xmodules[0]->add_output(1);
@@ -131,7 +143,7 @@ int main()
     // Start the audio signal processing at the root node (in this case, the mixer xmodule)
     std::vector<int> visited;
     std::vector<int> process_order;
-    DFS(3, xmodules, visited, process_order);
+//    DFS(3, xmodules, visited, process_order);
     
     SDL_Window *window = nullptr;
     SDL_Renderer *renderer = nullptr;
@@ -149,7 +161,7 @@ int main()
     {
         printf("Couldn't initialize SDL: \n%s\n", SDL_GetError());
     }
-    
+//    
     audio_interface interface;
     interface.scan_devices();
     interface.init_devices(44100, 256, 1, 2);  // place device indices here
@@ -157,15 +169,26 @@ int main()
     interface.turn_on(audio_callback);
     
     bool is_running = true;
+    // main window loop
+    
     while (is_running)
     {
-        SDL_Event event;
-        if (SDL_PollEvent(&event))
+        while(SDL_PollEvent(&event))
         {
-           if (event.type == SDL_QUIT)
-           {
+            if (event.type == SDL_QUIT)
+            {
+               print("quitttttt");
                is_running = false;
-           }
+            }
+            for(uint i = 0; i < xmodules.size(); ++i)
+            {
+                xmodules[i]->poll();
+            }
+        }
+        
+        for(uint i = 0; i < xmodules.size(); ++i)
+        {
+            xmodules[i]->show();
         }
         
         // if i dont have this cpu spikes to 100%!

@@ -36,7 +36,10 @@ struct xmodule
     virtual void process(std::vector<xmodule*>& modules) = 0;
     
     // show user interface
-//    virtual void show() = 0;
+    virtual void show() = 0;
+    
+    // poll user input
+    virtual void poll() = 0;
 
     // ~xmodule() {};
 

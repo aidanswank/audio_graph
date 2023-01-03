@@ -1,7 +1,8 @@
 #include "vst3_module.h"
 
-vst3_midi_instrument::vst3_midi_instrument(int id) : xmodule(id)
+vst3_midi_instrument::vst3_midi_instrument(int id, SDL_Event* p_event) : xmodule(id)
 {
+    event = p_event;
 //    audio_output = new float[256]();
     ///Library/Audio/Plug-Ins/VST3/Surge XT.vst3
     /////////////// vst setup TODO CLEAN !!!!
