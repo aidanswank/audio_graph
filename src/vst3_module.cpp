@@ -11,7 +11,7 @@ vst3_midi_instrument::vst3_midi_instrument(int id, SDL_Event* p_event) : xmodule
 //    {
 //        xmodule::audio.push_back(0.0f);
 //    }
-    zero_audio(xmodule::audio,256);
+    zero_audio(xmodule::output_audio,256);
     
     if (!vst.init("/Library/Audio/Plug-Ins/VST3/Surge XT.vst3", 44100, 256, Steinberg::Vst::kSample32, true))
     {
@@ -114,8 +114,8 @@ void vst3_midi_instrument::process(std::vector<xmodule*>& modules)
     
 //    float *audio_output = xmodule::audio.data();
 //    zero_audio(xmodule::audio,256);
-    float *audio_output_left = xmodule::audio[0].data();
-    float *audio_output_right = xmodule::audio[1].data();
+    float *audio_output_left = xmodule::output_audio[0].data();
+    float *audio_output_right = xmodule::output_audio[1].data();
 
 //    for(int i = 0; i < 10; i++)
 //    {

@@ -19,7 +19,7 @@ struct xmodule
     // Constructor
     // xmodule(int p_id, int p_num_inputs, int p_num_outputs) : id(p_id), num_inputs(p_num_inputs), num_ouputs(p_num_outputs) {}
     xmodule(int p_id) : id(p_id) {
-        zero_audio(audio, 256);
+        zero_audio(output_audio, 256);
     }
 
     // Add an input to the xmodule
@@ -57,7 +57,7 @@ struct xmodule
     
     //todo seperate
     std::vector<MidiNoteMessage> notes;
-    STEREO_AUDIO audio;
+    STEREO_AUDIO output_audio;
     STEREO_AUDIO input_audio;
 //    std::vector<std::vector<float>> audio;
 };
