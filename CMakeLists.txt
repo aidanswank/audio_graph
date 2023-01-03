@@ -24,6 +24,7 @@ link_directories(${vst3sdk_path}/build/lib/Debug)
 
 file(GLOB SOURCES 
     src/*.cpp
+	vendor/*.cpp
     vendor/EasyVst/src/window.mm
 	vendor/EasyVst/src/EasyVst.cpp
 	${vst3sdk_path}/public.sdk/source/vst/hosting/connectionproxy.cpp

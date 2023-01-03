@@ -6,6 +6,7 @@
 #include "xmodule.h"
 #include "midi_in_module.h"
 #include "vst3_module.h"
+#include "cjfilter_module.h"
 
 //
 //struct vst_plugin : xmodule {
@@ -62,7 +63,7 @@ struct audio_output : xmodule {
     };
 };
 
-void DFS(int rootId, std::vector<xmodule*> &xmodules, std::vector<int> &visited)
+void DFS(int rootId, std::vector<xmodule*> &xmodules, std::vector<int> &visited, std::vector<int> &process_order)
 {
     if (find(visited.begin(), visited.end(), rootId) != visited.end())
         return;                // Return if the node has already been visited
@@ -70,14 +71,14 @@ void DFS(int rootId, std::vector<xmodule*> &xmodules, std::vector<int> &visited)
     // process the audio signal for the input xmodules of the current node
     for (int input_id : xmodules[rootId]->input_ids)
     {
-        DFS(input_id, xmodules, visited);
+        DFS(input_id, xmodules, visited, process_order);
     }
     xmodules[rootId]->process(xmodules); // process the audio signal for the current node
-//    process_order.push_back(rootId);
+    process_order.push_back(rootId);
     // process the audio signal for the output xmodules of the current node
     for (int output_id : xmodules[rootId]->output_ids)
     {
-        DFS(output_id, xmodules, visited); // Recursively process the audio signal for the output nodes
+        DFS(output_id, xmodules, visited, process_order); // Recursively process the audio signal for the output nodes
     }
 }
 
@@ -93,7 +94,7 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
     
     interface->visited.clear();
     interface->process_order.clear();
-    DFS(3, interface->xmodules, interface->visited);
+    DFS(3, interface->xmodules, interface->visited, interface->process_order);
     
 //    for(uint i = 0; i < interface->process_order.size(); ++i)
 //    {
@@ -108,9 +109,10 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
 //        output[i * 2] = white*0.01; /* left */
 //        output[i * 2 + 1] = white*0.01;  /* right */
      
-        uint num_modules = (uint)interface->xmodules.size() - 1;
-        output[i * 2] = interface->xmodules[num_modules]->audio[0][i]; /* left */
-        output[i * 2 + 1] = interface->xmodules[num_modules]->audio[1][i];  /* right */
+//        uint num_modules = (uint)interface->xmodules.size() - 1;
+        // TODO CHANGE ROOT NODE TO 0 NOT 3 !!
+        output[i * 2] = interface->xmodules[3]->audio[0][i]; /* left */
+        output[i * 2 + 1] = interface->xmodules[3]->audio[1][i];  /* right */
 //        interface->xmodules[3]->audio.clear();
         
     }
@@ -130,16 +132,19 @@ int main()
     xmodules.push_back(new vst3_midi_instrument(1,&event)); // vst plug
     xmodules.push_back(new vst3_midi_instrument(2,&event)); // vst plug
     xmodules.push_back(new audio_output(3)); // output
-    
+    xmodules.push_back(new cjfilter_module(4)); // filter
+
     xmodules[0]->add_output(1);
     xmodules[0]->add_output(2);
     xmodules[1]->add_input(0);
-    xmodules[1]->add_output(3);
+    xmodules[1]->add_output(4);//filter
     xmodules[2]->add_input(0);
     xmodules[2]->add_output(3);
-    xmodules[3]->add_input(1);
+    xmodules[3]->add_input(4);
     xmodules[3]->add_input(2);
-    
+    xmodules[4]->add_input(1);
+    xmodules[4]->add_output(3);
+
     // Start the audio signal processing at the root node (in this case, the mixer xmodule)
     std::vector<int> visited;
     std::vector<int> process_order;
@@ -200,6 +205,8 @@ int main()
             SDL_Delay(next_tick-this_tick);
         }
     }
+    
+    SDL_Quit();
 
     return 0;
 }

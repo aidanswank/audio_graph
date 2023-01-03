@@ -43,7 +43,6 @@ vst3_midi_instrument::vst3_midi_instrument(int id, SDL_Event* p_event) : xmodule
 
 };
 
-#include "midi_in_module.h"
 void vst3_midi_instrument::process(std::vector<xmodule*>& modules)
 {
     
