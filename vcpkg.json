@@ -5,6 +5,10 @@
         "sdl2",
         "portaudio",
         "rtmidi",
-        "concurrentqueue"
+        "concurrentqueue",
+        {
+          "name": "imgui",
+          "features": [ "sdl2-binding", "opengl3-binding", "docking-experimental" ]
+        }
     ]
 }

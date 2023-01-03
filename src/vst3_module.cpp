@@ -3,16 +3,8 @@
 vst3_midi_instrument::vst3_midi_instrument(int id, SDL_Event* p_event) : xmodule(id)
 {
     event = p_event;
-//    audio_output = new float[256]();
-    ///Library/Audio/Plug-Ins/VST3/Surge XT.vst3
-    /////////////// vst setup TODO CLEAN !!!!
-    //
-//    for(int i = 0; i < 256; i++)
-//    {
-//        xmodule::audio.push_back(0.0f);
-//    }
-    zero_audio(xmodule::output_audio,256);
-    
+    // Library/Audio/Plug-Ins/VST3/Surge XT.vst3
+    // vst setup TODO CLEAN !!!!
     if (!vst.init("/Library/Audio/Plug-Ins/VST3/Surge XT.vst3", 44100, 256, Steinberg::Vst::kSample32, true))
     {
         std::cerr << "Failed to initialize VST" << std::endl;
@@ -46,7 +38,7 @@ vst3_midi_instrument::vst3_midi_instrument(int id, SDL_Event* p_event) : xmodule
 void vst3_midi_instrument::process(std::vector<xmodule*>& modules)
 {
     
-    xmodule *midi_in_module = (xmodule*)modules[ input_ids[0] ];
+    xmodule *midi_in_module = (xmodule*)modules[ input_ids[MIDI_IN] ];
     
     int SAMPLE_RATE = 44100;
     int TEMPO = 120;
@@ -116,24 +108,11 @@ void vst3_midi_instrument::process(std::vector<xmodule*>& modules)
 //    zero_audio(xmodule::audio,256);
     float *audio_output_left = xmodule::output_audio[0].data();
     float *audio_output_right = xmodule::output_audio[1].data();
-
-//    for(int i = 0; i < 10; i++)
-//    {
-//        std::cout << left[i] << std::endl;
-//    }
-    
-//    for (unsigned long i = 0; i < 256; ++i) {
-//        audio_output[i] = 0.0f;
-//    }
 //
     for (unsigned long i = 0; i < 256; ++i) {
-//        outputBuffer[i * 2 + 0] = left[i];
-//            outputBuffer[i * 2 + 1] = right[i];
-        
         audio_output_left[i] = left[i];
         audio_output_right[i] = right[i];
     }
-//    xmodule::audio.clear();
     
 }
 

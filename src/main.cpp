@@ -36,27 +36,57 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
     return 0;
 }
 
+#include "im_wrap.h"
+
 int main()
 {
-    SDL_Window *window = nullptr;
-    SDL_Renderer *renderer = nullptr;
-    unsigned int w, h;
-    w = 320 * 2;
-    h = 240 * 2;
-    window = SDL_CreateWindow("test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
-    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    SDL_RenderSetScale(renderer, 2, 2); // retina is 2x scale
-//    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    SDL_RenderSetVSync(renderer, 1);
-    if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
+//    SDL_Window *window = nullptr;
+//    SDL_Renderer *renderer = nullptr;
+//    unsigned int w, h;
+//    w = 320 * 2;
+//    h = 240 * 2;
+//    window = SDL_CreateWindow("test", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w, h, SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
+//    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+////    SDL_GLContext gl_context = SDL_GL_CreateContext(window);
+//    SDL_RenderSetScale(renderer, 2, 2); // retina is 2x scale
+////    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+//    SDL_RenderSetVSync(renderer, 1);
+//    if (SDL_Init(SDL_INIT_EVERYTHING) < 0)
+//    {
+//        printf("Couldn't initialize SDL: \n%s\n", SDL_GetError());
+//    }
+    
+    SDL_Init(SDL_INIT_VIDEO);
+
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // to make macos happy
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+    // uint32_t WindowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
+    uint32_t window_flags = SDL_WINDOW_OPENGL | SDL_RENDERER_PRESENTVSYNC | SDL_WINDOW_RESIZABLE;
+    SDL_Window *window = SDL_CreateWindow("editor", 0, 0, 320, 240, window_flags);
+    // assert(Window);
+    if (window == NULL)
     {
-        printf("Couldn't initialize SDL: \n%s\n", SDL_GetError());
+        printf("failed to create window!");
     }
+
+    SDL_GLContext gl_context = SDL_GL_CreateContext(window);
+
+    SDL_GL_MakeCurrent(window, gl_context);
+    SDL_GL_SetSwapInterval(1); // Enable vsync
+    
     SDL_Event event;
+    
+    im_wrap gui;
+    gui.init(window, gl_context);
     
     // graph that contains xmodule nodes
     audio_graph graph;
-    
+
     graph.xmodules.push_back(new rt_midi_in(0)); // rt midi in
     graph.xmodules.push_back(new vst3_midi_instrument(1,&event)); // vst plug
     graph.xmodules.push_back(new vst3_midi_instrument(2,&event)); // vst plug
@@ -89,6 +119,7 @@ int main()
     {
         while(SDL_PollEvent(&event))
         {
+            ImGui_ImplSDL2_ProcessEvent(&event);
             if (event.type == SDL_QUIT)
             {
                print("quitttttt");
@@ -100,21 +131,26 @@ int main()
             }
         }
         
+        gui.new_frame();
+        gui.update();
+        gui.render();
+        
         for(uint i = 0; i < graph.xmodules.size(); ++i)
         {
             graph.xmodules[i]->show();
         }
-        
-        // if i dont have this cpu spikes to 100%!
-        //sdl2 vsync not working?? https://discourse.libsdl.org/t/high-cpu-usage/14676/20
-        float this_tick = SDL_GetTicks();
-        float next_tick = this_tick + (1000/60); // 60 fps
-        if ( this_tick < next_tick )
-        {
-            SDL_Delay(next_tick-this_tick);
-        }
+//
+////        // if i dont have this cpu spikes to 100%!
+////        //sdl2 vsync not working?? https://discourse.libsdl.org/t/high-cpu-usage/14676/20
+////        float this_tick = SDL_GetTicks();
+////        float next_tick = this_tick + (1000/60); // 60 fps
+////        if ( this_tick < next_tick )
+////        {
+////            SDL_Delay(next_tick-this_tick);
+////        }
     }
     
+    gui.shutdown();
     SDL_Quit();
 
     return 0;

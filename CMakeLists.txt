@@ -18,6 +18,7 @@ find_package(SDL2 CONFIG REQUIRED)
 find_package(portaudio CONFIG REQUIRED)
 find_package(rtmidi CONFIG REQUIRED)
 find_package(unofficial-concurrentqueue CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
 
 include_directories(${CMAKE_SOURCE_DIR} include ${vst3sdk_path})
 link_directories(${vst3sdk_path}/build/lib/Debug)
@@ -41,10 +42,26 @@ file(GLOB SOURCES
 )
 file(GLOB INCLUDES include/*.h vendor/*.h)
 include_directories(vendor/EasyVst/include/ ${vst3sdk_path})
-add_executable(${TARGET_EXE}
+add_executable(
+    ${TARGET_EXE}
     ${SOURCES}
     ${INCLUDES})
-target_link_libraries(${TARGET_EXE} SDL2::SDL2 portaudio_static RtMidi::rtmidi unofficial::concurrentqueue::concurrentqueue base pluginterfaces sdk_common sdk)
+    target_link_libraries(${TARGET_EXE}
+    SDL2::SDL2                                          #app libs
+    portaudio_static
+    RtMidi::rtmidi
+    unofficial::concurrentqueue::concurrentqueue
+    imgui::imgui
+    base                                                #vst stuff
+    pluginterfaces
+    sdk_common
+    sdk
+)
+
+# for imgui
+if (APPLE)
+    target_link_libraries(${TARGET_EXE} "-framework OpenGL")
+endif()
 
 # for xcode generator 
 if(CMAKE_GENERATOR STREQUAL Xcode)

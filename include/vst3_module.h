@@ -9,6 +9,8 @@ struct vst3_midi_instrument : xmodule {
     uint64_t continuousSamples = 0;
     SDL_Event* event;
     
+    enum input_id { MIDI_IN };
+
     vst3_midi_instrument(int id, SDL_Event* p_event);
     void process(std::vector<xmodule*>& modules) override;
     void show() override {
