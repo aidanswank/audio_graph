@@ -21,8 +21,25 @@ struct rt_midi_in : xmodule {
     moodycamel::ConcurrentQueue<MidiNoteMessage> notesQueue;
     std::vector<std::string> port_names;
     
-    rt_midi_in(int id);
-    void process(std::vector<xmodule*>& modules) override;
-    void show() override {};
+    rt_midi_in(int id, std::vector<xmodule*>& modules);
+    void process() override;
+    void show() override {
+        ImNodes::BeginNode(xmodule::id);
+    //        ImGui::Dummy(ImVec2(80.0f, 45.0f));
+    //        print(modules[ input_ids[0] ]->id);
+        ImNodes::BeginNodeTitleBar();
+        ImGui::Text( "%s (%i)", xmodule::name.c_str(), id );
+        ImNodes::EndNodeTitleBar();
+
+//        ImNodes::BeginInputAttribute( xmodule::id );
+//        ImGui::Text("input");
+//        ImNodes::EndInputAttribute();
+        
+        ImNodes::BeginOutputAttribute( xmodule::id );
+        ImGui::Text("output");
+        ImNodes::EndOutputAttribute();
+        
+        ImNodes::EndNode();
+    };
     void poll() override {};
 };

@@ -38,6 +38,73 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
 
 #include "im_wrap.h"
 
+class user_interface
+{
+public:
+    im_wrap ui;
+    audio_graph* graph;
+    
+    user_interface(SDL_Window* window, SDL_GLContext gl_context, audio_graph* p_graph)
+    {
+        graph = p_graph;
+        print("ui init");
+        ui.init(window,gl_context);
+    }
+    ~user_interface()
+    {
+        print("ui shutdown");
+        ui.shutdown();
+    }
+    void update()
+    {
+        ui.new_frame();
+        
+//        ui.update();
+        
+        const int hardcoded_node_id = 1;
+
+        static bool node_editor_active = true;
+        if(node_editor_active)
+        {
+            ImGui::Begin("testing", &node_editor_active, ImGuiWindowFlags_MenuBar);
+            ImNodes::BeginNodeEditor();
+            
+//            ImNodes::BeginNode(hardcoded_node_id);
+//            ImGui::Dummy(ImVec2(80.0f, 45.0f));
+//            ImNodes::EndNode();
+            
+            for(uint i = 0; i < graph->xmodules.size(); ++i)
+            {
+                graph->xmodules[i]->show();
+            }
+            
+            ImNodes::EndNodeEditor();
+            
+            int start_attr, end_attr;
+            if (ImNodes::IsLinkCreated(&start_attr, &end_attr))
+            {
+//              links.push_back(std::make_pair(start_attr, end_attr));
+                print("start", start_attr, "end", end_attr);
+            }
+            
+            ImGui::End();
+        }
+        
+        // Create a window called "My First Tool", with a menu bar.
+        static bool debug_active = true;
+        if(debug_active)
+        {
+            ImGui::Begin("debug", &debug_active);
+            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+                           1000.0f / ImGui::GetIO().Framerate,
+                           ImGui::GetIO().Framerate);
+            ImGui::End();
+        }
+        
+        ui.render();
+    }
+};
+
 int main()
 {
 //    SDL_Window *window = nullptr;
@@ -81,21 +148,29 @@ int main()
     
     SDL_Event event;
     
-    im_wrap gui;
-    gui.init(window, gl_context);
-    
+//    im_wrap gui;
+//    gui.init(window, gl_context);
+
     // graph that contains xmodule nodes
+    
     audio_graph graph;
 
-    graph.xmodules.push_back(new rt_midi_in(0)); // rt midi in
-    graph.xmodules.push_back(new vst3_midi_instrument(1,&event)); // vst plug
-    graph.xmodules.push_back(new vst3_midi_instrument(2,&event)); // vst plug
-    graph.xmodules.push_back(new audio_output_module(3)); // output
-    graph.xmodules.push_back(new cjfilter_module(4)); // filter
+    graph.xmodules.push_back(new rt_midi_in(0,graph.xmodules)); // rt midi in
+    graph.xmodules.push_back(new vst3_midi_instrument(1,&event,graph.xmodules)); // vst plug
+    graph.xmodules.push_back(new vst3_midi_instrument(2,&event,graph.xmodules)); // vst plug
+    graph.xmodules.push_back(new audio_output_module(3,graph.xmodules)); // output
+    graph.xmodules.push_back(new cjfilter_module(4,graph.xmodules)); // filter
+
+    
+    std::vector<std::pair<int, int>> links;
 
     // example patch
     graph.xmodules[0]->add_output(1);
     graph.xmodules[0]->add_output(2);
+    std::pair<int, int> p1{0, 1};
+    links.push_back(p1);
+    std::pair<int, int> p2{0, 2};
+    links.push_back(p2);
     graph.xmodules[1]->add_input(0);
     graph.xmodules[1]->add_output(4);//filter
     graph.xmodules[2]->add_input(0);
@@ -108,9 +183,11 @@ int main()
     // set up audio interface and open stream
     audio_interface interface;
     interface.scan_devices();
-    interface.init_devices(44100, 256, 1, 2);  // place device indices here
+    interface.init_devices(44100, 256, 2, 3);  // place device indices here
     interface.pass_userdata(&graph);
     interface.turn_on(audio_callback);
+    
+    user_interface ui(window, gl_context, &graph);
     
     bool is_running = true;
     
@@ -131,26 +208,27 @@ int main()
             }
         }
         
-        gui.new_frame();
-        gui.update();
-        gui.render();
+//        gui.new_frame();
+//        gui.update();
+//        gui.render();
+        ui.update();
         
-        for(uint i = 0; i < graph.xmodules.size(); ++i)
-        {
-            graph.xmodules[i]->show();
-        }
-//
-////        // if i dont have this cpu spikes to 100%!
-////        //sdl2 vsync not working?? https://discourse.libsdl.org/t/high-cpu-usage/14676/20
-////        float this_tick = SDL_GetTicks();
-////        float next_tick = this_tick + (1000/60); // 60 fps
-////        if ( this_tick < next_tick )
-////        {
-////            SDL_Delay(next_tick-this_tick);
-////        }
+//        for(uint i = 0; i < graph.xmodules.size(); ++i)
+//        {
+//            graph.xmodules[i]->show();
+//        }
+
+        //        // if i dont have this cpu spikes to 100%!
+//        //sdl2 vsync not working?? https://discourse.libsdl.org/t/high-cpu-usage/14676/20
+//        float this_tick = SDL_GetTicks();
+//        float next_tick = this_tick + (1000/60); // 60 fps
+//        if ( this_tick < next_tick )
+//        {
+//            SDL_Delay(next_tick-this_tick);
+//        }
     }
     
-    gui.shutdown();
+//    gui.shutdown();
     SDL_Quit();
 
     return 0;

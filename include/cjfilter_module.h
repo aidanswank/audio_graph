@@ -7,8 +7,8 @@ struct cjfilter_module : xmodule {
     CjFilter filter[2];
     float filterOut[4];
     
-    cjfilter_module(int id);
-    void process(std::vector<xmodule*>& modules) override;
+    cjfilter_module(int p_id, std::vector<xmodule*>& p_modules);
+    void process() override;
     void show() override {};
     void poll() override {};
 };

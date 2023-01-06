@@ -19,6 +19,7 @@ public:
 //    std::vector<int> visited;
 //    std::vector<int> process_order;
     audio_graph *graph;
+//    test<float> *thing;
     void pass_userdata(audio_graph *p_graph)
     {
         graph = p_graph;

@@ -1,7 +1,8 @@
 #include "vst3_module.h"
 
-vst3_midi_instrument::vst3_midi_instrument(int id, SDL_Event* p_event) : xmodule(id)
+vst3_midi_instrument::vst3_midi_instrument(int id, SDL_Event* p_event, std::vector<xmodule*>& modules) : xmodule(id,modules)
 {
+    name = "vst midi instrument";
     event = p_event;
     // Library/Audio/Plug-Ins/VST3/Surge XT.vst3
     // vst setup TODO CLEAN !!!!
@@ -35,10 +36,10 @@ vst3_midi_instrument::vst3_midi_instrument(int id, SDL_Event* p_event) : xmodule
 
 };
 
-void vst3_midi_instrument::process(std::vector<xmodule*>& modules)
+void vst3_midi_instrument::process()
 {
     
-    xmodule *midi_in_module = (xmodule*)modules[ input_ids[MIDI_IN] ];
+    xmodule *midi_in_module = (xmodule*)xmodule::modules[ input_ids[MIDI_IN] ];
     
     int SAMPLE_RATE = 44100;
     int TEMPO = 120;

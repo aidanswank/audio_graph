@@ -1,12 +1,13 @@
 #include "cjfilter_module.h"
 
-cjfilter_module::cjfilter_module(int id) : xmodule(id)
+cjfilter_module::cjfilter_module(int id, std::vector<xmodule*>& modules) : xmodule(id, modules)
 {
+    name = "cjfilter";
     cutoff = 0.1;
     resonance = 0.0;
 }
 
-void cjfilter_module::process(std::vector<xmodule *> &modules)
+void cjfilter_module::process()
 {
     xmodule* input_module = (xmodule*)modules[ input_ids[0] ];
     STEREO_AUDIO input_audio = input_module->output_audio;

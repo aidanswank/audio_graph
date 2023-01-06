@@ -1,6 +1,6 @@
 #include "audio_output_module.h"
 
-void audio_output_module::process(std::vector<xmodule*>& modules)
+void audio_output_module::process()
 {
 //        std::cout <<  "id " << id << " final output" << std::endl;
 //        xmodule::audio.clear();

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include "vprint.h"
+#include "imnodes.h"
 
 struct MidiNoteMessage
 {
@@ -18,8 +20,13 @@ struct xmodule
 {
     // Constructor
     // xmodule(int p_id, int p_num_inputs, int p_num_outputs) : id(p_id), num_inputs(p_num_inputs), num_ouputs(p_num_outputs) {}
-    xmodule(int p_id) : id(p_id) {
+    xmodule(int p_id, std::vector<xmodule*>& p_modules) : id(p_id), modules(p_modules) {
         zero_audio(output_audio, 256);
+        print("module id", p_id);
+//        for(int i = 0; i < input_ids.size(); i++)
+//        {
+//            print("inputs", input_ids[i]);
+//        }
     }
 
     // Add an input to the xmodule
@@ -35,7 +42,7 @@ struct xmodule
     }
 
     // process the audio signal
-    virtual void process(std::vector<xmodule*>& modules) = 0;
+    virtual void process() = 0;
     
     // show user interface
     virtual void show() = 0;
@@ -59,5 +66,9 @@ struct xmodule
     std::vector<MidiNoteMessage> notes;
     STEREO_AUDIO output_audio;
     STEREO_AUDIO input_audio;
+    
+    
+    std::vector<xmodule*>& modules;
+    std::string name;
 //    std::vector<std::vector<float>> audio;
 };

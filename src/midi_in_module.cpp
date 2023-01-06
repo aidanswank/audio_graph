@@ -37,8 +37,10 @@ void midiCallback(double deltaTime, std::vector<unsigned char> *message, void *p
 
 };
 
-rt_midi_in::rt_midi_in(int id) : xmodule(id)
+rt_midi_in::rt_midi_in(int id, std::vector<xmodule*>& modules) : xmodule(id, modules)
 {
+    name = "rt midi in";
+    
      try
      {
          midiin_ptr = new RtMidiIn();
@@ -72,7 +74,7 @@ rt_midi_in::rt_midi_in(int id) : xmodule(id)
      midiin_ptr->setCallback(&midiCallback, this);
 };
 
-void rt_midi_in::process(std::vector<xmodule*>& modules)
+void rt_midi_in::process()
  {
 //     std::cout << "id " << id << " midi in process" << std::endl;
     

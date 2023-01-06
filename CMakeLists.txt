@@ -20,7 +20,7 @@ find_package(rtmidi CONFIG REQUIRED)
 find_package(unofficial-concurrentqueue CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 
-include_directories(${CMAKE_SOURCE_DIR} include ${vst3sdk_path})
+include_directories(${CMAKE_SOURCE_DIR} include vendor ${vst3sdk_path})
 link_directories(${vst3sdk_path}/build/lib/Debug)
 
 file(GLOB SOURCES 
