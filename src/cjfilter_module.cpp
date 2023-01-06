@@ -1,6 +1,6 @@
 #include "cjfilter_module.h"
 
-cjfilter_module::cjfilter_module(int id, std::vector<xmodule*>& modules) : xmodule(id, modules)
+cjfilter_module::cjfilter_module(int id, audio_graph<xmodule*>& graph) : xmodule(id, graph)
 {
     name = "cjfilter";
     cutoff = 0.1;
@@ -9,7 +9,7 @@ cjfilter_module::cjfilter_module(int id, std::vector<xmodule*>& modules) : xmodu
 
 void cjfilter_module::process()
 {
-    xmodule* input_module = (xmodule*)modules[ input_ids[0] ];
+    xmodule* input_module = (xmodule*)graph.xmodules[ input_ids[0] ];
     STEREO_AUDIO input_audio = input_module->output_audio;
 
     for(int i = 0; i < 256; ++i)

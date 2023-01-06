@@ -3,6 +3,7 @@
 #include <vector>
 #include "vprint.h"
 #include "imnodes.h"
+#include "graph.h"
 
 struct MidiNoteMessage
 {
@@ -20,7 +21,7 @@ struct xmodule
 {
     // Constructor
     // xmodule(int p_id, int p_num_inputs, int p_num_outputs) : id(p_id), num_inputs(p_num_inputs), num_ouputs(p_num_outputs) {}
-    xmodule(int p_id, std::vector<xmodule*>& p_modules) : id(p_id), modules(p_modules) {
+    xmodule(int p_id, audio_graph<xmodule*>& p_graph) : id(p_id), graph(p_graph) {
         zero_audio(output_audio, 256);
         print("module id", p_id);
 //        for(int i = 0; i < input_ids.size(); i++)
@@ -33,12 +34,16 @@ struct xmodule
     void add_input(int p_input_id)
     {
         input_ids.push_back(p_input_id);
+//        std::pair<int, int> link{id, p_input_id};
+//        graph.links.push_back(link);
     }
 
     // Add an output to the xmodule
     void add_output(int p_output_id)
     {
         output_ids.push_back(p_output_id);
+        std::pair<int, int> link{id, p_output_id};
+        graph.links.push_back(link);
     }
 
     // process the audio signal
@@ -68,7 +73,8 @@ struct xmodule
     STEREO_AUDIO input_audio;
     
     
-    std::vector<xmodule*>& modules;
+//    std::vector<xmodule*>& modules;
+    audio_graph<xmodule*>& graph;
     std::string name;
 //    std::vector<std::vector<float>> audio;
 };

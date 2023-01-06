@@ -12,7 +12,7 @@ void midiCallback(double deltaTime, std::vector<unsigned char> *message, void *p
     unsigned char noteNum = message->at(1);
     unsigned char velocity = message->at(2);
 
-//    std::cout << (int)command << " " << (int)noteNum << " " << (int)velocity << std::endl;
+    std::cout << (int)command << " " << (int)noteNum << " " << (int)velocity << std::endl;
 
 //    UserData *userData = static_cast<UserData *>(pUserData);
     rt_midi_in *midi_module = static_cast<rt_midi_in *>(pUserData);
@@ -37,7 +37,7 @@ void midiCallback(double deltaTime, std::vector<unsigned char> *message, void *p
 
 };
 
-rt_midi_in::rt_midi_in(int id, std::vector<xmodule*>& modules) : xmodule(id, modules)
+rt_midi_in::rt_midi_in(int id, audio_graph<xmodule*>& graph) : xmodule(id, graph)
 {
     name = "rt midi in";
     
@@ -70,7 +70,7 @@ rt_midi_in::rt_midi_in(int id, std::vector<xmodule*>& modules) : xmodule(id, mod
          std::cout << "  Input Port #" << i+1 << ": " << portName << '\n';
      }
 
-     midiin_ptr->openPort(0);
+     midiin_ptr->openPort(1);
      midiin_ptr->setCallback(&midiCallback, this);
 };
 

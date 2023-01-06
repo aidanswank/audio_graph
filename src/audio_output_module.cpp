@@ -10,7 +10,7 @@ void audio_output_module::process()
     
     for(int i = 0; i < input_ids.size(); i++)
     {
-        xmodule *mod = modules[ input_ids[i] ];
+        xmodule *mod = graph.xmodules[ input_ids[i] ];
         // TODO CHANGE FIXED BUFFER
         for(int i = 0; i < 256; i++)
         {

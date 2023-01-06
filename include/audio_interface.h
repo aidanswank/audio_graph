@@ -2,7 +2,7 @@
 #include "portaudio.h"
 #include <vector>
 #include "xmodule.h"
-#include "graph.h"
+//#include "graph.h"
 
 class audio_interface
 {
@@ -15,14 +15,16 @@ public:
     void turn_on(PaStreamCallback* callback);
     void close_stream();
     
-//    std::vector<xmodule*> xmodules;
-//    std::vector<int> visited;
-//    std::vector<int> process_order;
-    audio_graph *graph;
-//    test<float> *thing;
-    void pass_userdata(audio_graph *p_graph)
+////    std::vector<xmodule*> xmodules;
+////    std::vector<int> visited;
+////    std::vector<int> process_order;
+//    audio_graph *graph;
+////    test<float> *thing;
+    void* data;
+    void pass_userdata(void *p_data)
     {
-        graph = p_graph;
+//        graph = p_graph;
+        data = p_data;
 //        xmodules = p_xmodules;
 //        visited = p_visited;
 //        visited = p_process_order;
