@@ -1,8 +1,10 @@
 #include "cjfilter_module.h"
 
-cjfilter_module::cjfilter_module(int id, audio_graph<xmodule*>& graph) : xmodule(id, graph)
+cjfilter_module::cjfilter_module(audio_graph<xmodule*>& graph) : xmodule(graph)
 {
-    name = "cjfilter";
+//    name = "cjfilter";
+//    graph.push_unique_str(name);
+    config("cjfilter",1,1);
     cutoff = 0.1;
     resonance = 0.0;
 }

@@ -21,29 +21,74 @@ struct xmodule
 {
     // Constructor
     // xmodule(int p_id, int p_num_inputs, int p_num_outputs) : id(p_id), num_inputs(p_num_inputs), num_ouputs(p_num_outputs) {}
-    xmodule(int p_id, audio_graph<xmodule*>& p_graph) : id(p_id), graph(p_graph) {
+    xmodule(audio_graph<xmodule*>& p_graph) : graph(p_graph) {
         zero_audio(output_audio, 256);
-        print("module id", p_id);
-//        for(int i = 0; i < input_ids.size(); i++)
+        id = graph.id_counter;
+        graph.id_counter++;
+//        id = p_id;
+        
+        print("xmodule id", id);
+    
+//        for(int i = 0; i < num_ins; i++)
 //        {
-//            print("inputs", input_ids[i]);
+//            input_attrs.push_back(graph.attr_counter);
+//            graph.attr_counter++;
 //        }
+//
+//        for(int i = 0; i < num_outs; i++)
+//        {
+//            output_attrs.push_back(graph.attr_counter);
+//            graph.attr_counter++;
+//        }
+    }
+    
+    void config(std::string p_name, int p_num_inputs, int p_num_outputs)
+    {
+        name = p_name;
+        graph.push_unique_str(name);
+        num_inputs = p_num_inputs;
+        num_ouputs = p_num_outputs;
+        
+        for(int i = 0; i < num_inputs; i++)
+        {
+            input_attrs.push_back(graph.attr_counter);
+            graph.attr_counter++;
+        }
+        
+        for(int i = 0; i < num_ouputs; i++)
+        {
+            output_attrs.push_back(graph.attr_counter);
+            graph.attr_counter++;
+        }
     }
 
     // Add an input to the xmodule
     void add_input(int p_input_id)
     {
         input_ids.push_back(p_input_id);
+//        input_attrs.push_back(graph.id_counter);
+        print("[xmodule] id",id,"\tinput size ", input_ids.size(),"\tinput id  ",p_input_id,"\tid counter",graph.attr_counter);
 //        std::pair<int, int> link{id, p_input_id};
 //        graph.links.push_back(link);
+//        std::pair<int, int> link{input_attrs[0], output_attrs[0]};
+//        graph.links.push_back(link);
+
+        ///
+//        graph.id_counter++;
     }
 
     // Add an output to the xmodule
     void add_output(int p_output_id)
     {
         output_ids.push_back(p_output_id);
-        std::pair<int, int> link{id, p_output_id};
-        graph.links.push_back(link);
+//        output_attrs.push_back(graph.id_counter);
+//        std::pair<int, int> link{id, p_output_id};
+//        graph.links.push_back(link);
+//        print(input_attrs[0], output_attrs[0]);
+//        std::pair<int, int> link{input_attrs[input_ids.size()-1], output_attrs[output_ids.size()-1]};
+//        graph.links.push_back(link);
+        print("[xmodule] id",id,"\toutput size", output_ids.size(),"\toutput id ",p_output_id,"\tid counter",graph.attr_counter);
+//        graph.id_counter++;
     }
 
     // process the audio signal
@@ -65,8 +110,10 @@ struct xmodule
 
     // The input and output xmodule IDs
     std::vector<int> input_ids;
+    std::vector<int> input_attrs;
     std::vector<int> output_ids;
-    
+    std::vector<int> output_attrs;
+
     //todo seperate
     std::vector<MidiNoteMessage> notes;
     STEREO_AUDIO output_audio;

@@ -13,7 +13,11 @@ struct vst3_midi_instrument : xmodule {
     
     enum input_id { MIDI_IN };
 
-    vst3_midi_instrument(int id, SDL_Event* p_event, audio_graph<xmodule*>& graph);
+    vst3_midi_instrument(SDL_Event* p_event, audio_graph<xmodule*>& graph);
+    vst3_midi_instrument* init(audio_graph<xmodule*>& graph)
+    {
+        return new vst3_midi_instrument(event,graph);
+    };
     void process() override;
     void show() override {
         ImNodes::BeginNode(xmodule::id);
@@ -21,8 +25,13 @@ struct vst3_midi_instrument : xmodule {
         ImNodes::BeginNodeTitleBar();
         ImGui::Text( "%s (%i)", xmodule::name.c_str(), id );
         ImNodes::EndNodeTitleBar();
-
-        ImNodes::BeginInputAttribute( xmodule::id );
+//
+//        ImNodes::BeginInputAttribute( xmodule::id );
+//        ImGui::Text("input");
+//        ImNodes::EndInputAttribute();
+        
+        ImNodes::BeginInputAttribute( input_attrs[ 0 ] );
+//        print(id,input_attrs[0]);
         ImGui::Text("input");
         ImNodes::EndInputAttribute();
         
@@ -34,9 +43,10 @@ struct vst3_midi_instrument : xmodule {
             SDL_RaiseWindow(vst._window);
         }
         
-//        ImNodes::BeginOutputAttribute( xmodule::id << 8 );
-//        ImGui::Text("output");
-//        ImNodes::EndOutputAttribute();
+//        print(id,output_attrs[0]);
+        ImNodes::BeginOutputAttribute( output_attrs[ 0 ] );
+        ImGui::Text("output");
+        ImNodes::EndOutputAttribute();
         
         ImNodes::EndNode();
     };

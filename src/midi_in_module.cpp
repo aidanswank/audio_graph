@@ -37,9 +37,11 @@ void midiCallback(double deltaTime, std::vector<unsigned char> *message, void *p
 
 };
 
-rt_midi_in::rt_midi_in(int id, audio_graph<xmodule*>& graph) : xmodule(id, graph)
+rt_midi_in::rt_midi_in(audio_graph<xmodule*>& graph) : xmodule(graph)
 {
-    name = "rt midi in";
+//    name = "rt midi in";
+//    graph.push_unique_str(name);
+    config("rt midi in",0,1);
     
      try
      {

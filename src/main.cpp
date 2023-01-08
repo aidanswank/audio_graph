@@ -66,15 +66,37 @@ public:
     {
         ui.new_frame();
 
-//        ui.update();
-
-        const int hardcoded_node_id = 1;
+        ui.update();
 
         static bool node_editor_active = true;
         if(node_editor_active)
         {
             ImGui::Begin("testing", &node_editor_active, ImGuiWindowFlags_MenuBar);
             ImNodes::BeginNodeEditor();
+            
+            const bool open_popup = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
+            ImNodes::IsEditorHovered() && ImGui::IsMouseReleased(1);
+
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.f, 8.f));
+            if (!ImGui::IsAnyItemHovered() && open_popup)
+            {
+                ImGui::OpenPopup("add node");
+            }
+
+            if (ImGui::BeginPopup("add node"))
+            {
+                const ImVec2 click_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
+                
+                for(int i = 0; i < graph->module_names.size(); i++)
+                {
+                    if (ImGui::MenuItem(graph->module_names[i].c_str()))
+                    {
+                        print(click_pos.x, click_pos.y, graph->module_names[i]);
+                    }
+                }
+                ImGui::EndPopup();
+            }
+            ImGui::PopStyleVar();
 
 //            ImNodes::BeginNode(hardcoded_node_id);
 //            ImGui::Dummy(ImVec2(80.0f, 45.0f));
@@ -98,8 +120,9 @@ public:
             int start_attr, end_attr;
             if (ImNodes::IsLinkCreated(&start_attr, &end_attr))
             {
-//              links.push_back(std::make_pair(start_attr, end_attr));
                 print("start", start_attr, "end", end_attr);
+                print("attr2id",graph->attr2id(start_attr),graph->attr2id(end_attr));
+                graph->links.push_back(std::make_pair(start_attr, end_attr));
             }
 
             ImGui::End();
@@ -153,17 +176,21 @@ int main()
     // graph that contains xmodule nodes
     
     audio_graph<xmodule*> graph;
+    
+    vst3_midi_instrument* frozen;
+    frozen->event;
+//    frozen->init(graph);
 
-    graph.xmodules.push_back(new rt_midi_in(0,graph)); // rt midi in
-    graph.xmodules.push_back(new vst3_midi_instrument(1,&event,graph)); // vst plug
-    graph.xmodules.push_back(new vst3_midi_instrument(2,&event,graph)); // vst plug
-    graph.xmodules.push_back(new audio_output_module(3,graph)); // output
-    graph.xmodules.push_back(new cjfilter_module(4,graph)); // filter
+    graph.xmodules.push_back(new rt_midi_in(graph)); // rt midi in
+    graph.xmodules.push_back(frozen->init(graph)); // vst plug
+    graph.xmodules.push_back(frozen->init(graph)); // vst plug
+    graph.xmodules.push_back(new audio_output_module(graph)); // output
+    graph.xmodules.push_back(new cjfilter_module(graph)); // filter
 
     
 //    std::vector<std::pair<int, int>> links;
 
-    // example patch
+//     example patch
     graph.xmodules[0]->add_output(1);
     graph.xmodules[0]->add_output(2);
 
@@ -178,7 +205,23 @@ int main()
 
     graph.xmodules[4]->add_input(1);
     graph.xmodules[4]->add_output(3);
- 
+    
+//    std::pair<int, int> link{0, 1};
+//    graph.links.push_back(link);
+//
+//    std::pair<int, int> link2{0, 3};
+//    graph.links.push_back(link2);
+//
+//    std::pair<int, int> link3{2, 6};
+//    graph.links.push_back(link3);
+//
+//    std::pair<int, int> link4{7, 5};
+//    graph.links.push_back(link4);
+//
+//    std::pair<int, int> link5{4, 5};
+//    graph.links.push_back(link5);
+        
+    // another one
 //    graph.xmodules[0]->add_output(1);
 //    graph.xmodules[0]->add_output(2);
 //
@@ -191,7 +234,7 @@ int main()
 //    graph.xmodules[3]->add_input(1);
 //    graph.xmodules[3]->add_input(2);
     
-    graph.DFS(3);
+//    graph.DFS(3);
 
     // set up audio interface and open stream
     audio_interface interface;

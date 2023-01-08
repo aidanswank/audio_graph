@@ -1,8 +1,9 @@
 #include "vst3_module.h"
 
-vst3_midi_instrument::vst3_midi_instrument(int id, SDL_Event* p_event, audio_graph<xmodule*>& graph) : xmodule(id,graph)
+vst3_midi_instrument::vst3_midi_instrument(SDL_Event* p_event, audio_graph<xmodule*>& graph) : xmodule(graph)
 {
-    name = "vst midi instrument";
+    config("vst midi inst",1,1);
+    
     event = p_event;
     // Library/Audio/Plug-Ins/VST3/Surge XT.vst3
     // vst setup TODO CLEAN !!!!

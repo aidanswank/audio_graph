@@ -10,6 +10,42 @@ struct audio_graph
     std::vector<int> process_order;
     std::vector<T> xmodules;
     std::vector<std::pair<int, int>> links;
+    unsigned int attr_counter = 0;
+    unsigned int id_counter = 0;
+//    std::vector<int> id_attrs;
+    std::vector<std::string> module_names;
+    
+    void push_unique_str(std::string str)
+    {
+        if (std::find(module_names.begin(), module_names.end(), str) == module_names.end())
+        {
+          // Element in vector.
+            module_names.push_back(str);
+        }
+    }
+    
+    int attr2id(int io_attr)
+    {
+//        bool found;
+        for(int i = 0; i < xmodules.size(); i++)
+        {
+            for(int j = 0; j < xmodules[i]->input_attrs.size(); j++)
+            {
+                if(xmodules[i]->input_attrs[j]==io_attr)
+                {
+                    return xmodules[i]->id;
+                }
+            }
+            for(int j = 0; j < xmodules[i]->output_attrs.size(); j++)
+            {
+                if(xmodules[i]->output_attrs[j]==io_attr)
+                {
+                    return xmodules[i]->id;
+                }
+            }
+        }
+        return -1;
+    }
     
     void clear()
     {
