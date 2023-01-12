@@ -50,9 +50,11 @@ class user_interface
 public:
     im_wrap ui;
     audio_graph<xmodule*>* graph;
+    std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&)>* factory_map;
 
-    user_interface(SDL_Window* window, SDL_GLContext gl_context, audio_graph<xmodule*>* p_graph)
+    user_interface(SDL_Window* window, SDL_GLContext gl_context, audio_graph<xmodule*>* p_graph, std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&)>* p_factory_map)
     {
+        factory_map = p_factory_map;
         graph = p_graph;
         print("ui init");
         ui.init(window,gl_context);
@@ -87,13 +89,27 @@ public:
             {
                 const ImVec2 click_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
                 
-                for(int i = 0; i < graph->module_names.size(); i++)
-                {
-                    if (ImGui::MenuItem(graph->module_names[i].c_str()))
+//                for(int i = 0; i < graph->module_names.size(); i++)
+//                {
+//                    if (ImGui::MenuItem(graph->module_names[i].c_str()))
+//                    {
+//                        print(click_pos.x, click_pos.y, graph->module_names[i]);
+//                    }
+//                }
+                
+                // UGLY ASF
+                for (std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&)>::iterator it = factory_map->begin(); it != factory_map->end(); ++it) {
+//                    std::cout << it->first << std::endl;
+                    if (ImGui::MenuItem(it->first.c_str()))
                     {
-                        print(click_pos.x, click_pos.y, graph->module_names[i]);
+                        print(click_pos.x, click_pos.y, it->first.c_str());
+                        xmodule* m = factory_map->at(it->first)(*graph);
+                        graph->xmodules.push_back( m );
+//                        graph->xmodules.push_back( factory_map[it->first](graph) ); // filter
+                        
                     }
                 }
+                
                 ImGui::EndPopup();
             }
             ImGui::PopStyleVar();
@@ -122,6 +138,8 @@ public:
             {
                 print("start", start_attr, "end", end_attr);
                 print("attr2id",graph->attr2id(start_attr),graph->attr2id(end_attr));
+                graph->xmodules[graph->attr2id(start_attr)]->add_output(graph->attr2id(end_attr));
+                graph->xmodules[graph->attr2id(end_attr)]->add_input(graph->attr2id(start_attr));
                 graph->links.push_back(std::make_pair(start_attr, end_attr));
             }
 
@@ -142,6 +160,9 @@ public:
         ui.render();
     }
 };
+
+#include <map>
+#include <functional>
 
 int main()
 {
@@ -176,20 +197,23 @@ int main()
     // graph that contains xmodule nodes
     
     audio_graph<xmodule*> graph;
+    // idk just easier right now
+    graph.event = &event;
     
-    vst3_midi_instrument* frozen;
-    frozen->event;
-//    frozen->init(graph);
+    std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&)> factory_map;
+    
+    factory_map[module_audio_output__get_name()] = &module_audio_output__create;
+    factory_map[module_midi_in__get_name()] = &module_midi_in__create;
+    factory_map[module_vst3_instrument__get_name()] = &module_vst3_instrument__create;
+    factory_map[module_cjfilter__get_name()] = &module_cjfilter__create;
 
-    graph.xmodules.push_back(new rt_midi_in(graph)); // rt midi in
-    graph.xmodules.push_back(frozen->init(graph)); // vst plug
-    graph.xmodules.push_back(frozen->init(graph)); // vst plug
-    graph.xmodules.push_back(new audio_output_module(graph)); // output
-    graph.xmodules.push_back(new cjfilter_module(graph)); // filter
+    graph.xmodules.push_back( factory_map[module_midi_in__get_name()](graph) ); // rt midi in
+    graph.xmodules.push_back( factory_map[module_vst3_instrument__get_name()](graph) ); // vst plug
+    graph.xmodules.push_back( factory_map[module_vst3_instrument__get_name()](graph) ); // vst plug
+    graph.xmodules.push_back( factory_map[module_audio_output__get_name()](graph) ); // output
+    graph.xmodules.push_back( factory_map[module_cjfilter__get_name()](graph) ); // filter
 
     
-//    std::vector<std::pair<int, int>> links;
-
 //     example patch
     graph.xmodules[0]->add_output(1);
     graph.xmodules[0]->add_output(2);
@@ -206,21 +230,21 @@ int main()
     graph.xmodules[4]->add_input(1);
     graph.xmodules[4]->add_output(3);
     
-//    std::pair<int, int> link{0, 1};
-//    graph.links.push_back(link);
+    std::pair<int, int> link{0, 1};
+    graph.links.push_back(link);
+
+    std::pair<int, int> link2{0, 3};
+    graph.links.push_back(link2);
+
+    std::pair<int, int> link3{2, 6};
+    graph.links.push_back(link3);
+
+    std::pair<int, int> link4{7, 5};
+    graph.links.push_back(link4);
+
+    std::pair<int, int> link5{4, 5};
+    graph.links.push_back(link5);
 //
-//    std::pair<int, int> link2{0, 3};
-//    graph.links.push_back(link2);
-//
-//    std::pair<int, int> link3{2, 6};
-//    graph.links.push_back(link3);
-//
-//    std::pair<int, int> link4{7, 5};
-//    graph.links.push_back(link4);
-//
-//    std::pair<int, int> link5{4, 5};
-//    graph.links.push_back(link5);
-        
     // another one
 //    graph.xmodules[0]->add_output(1);
 //    graph.xmodules[0]->add_output(2);
@@ -243,7 +267,7 @@ int main()
     interface.pass_userdata(&graph);
     interface.turn_on(audio_callback);
     
-    user_interface ui(window, gl_context, &graph);
+    user_interface ui(window, gl_context, &graph, &factory_map);
     
     bool is_running = true;
     

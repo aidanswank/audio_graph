@@ -15,7 +15,7 @@ void midiCallback(double deltaTime, std::vector<unsigned char> *message, void *p
     std::cout << (int)command << " " << (int)noteNum << " " << (int)velocity << std::endl;
 
 //    UserData *userData = static_cast<UserData *>(pUserData);
-    rt_midi_in *midi_module = static_cast<rt_midi_in *>(pUserData);
+    midi_in_module *midi_module = static_cast<midi_in_module *>(pUserData);
 //
 ////    module_data->notes.clear();
 //
@@ -37,11 +37,10 @@ void midiCallback(double deltaTime, std::vector<unsigned char> *message, void *p
 
 };
 
-rt_midi_in::rt_midi_in(audio_graph<xmodule*>& graph) : xmodule(graph)
+midi_in_module::midi_in_module(audio_graph<xmodule*>& graph) : xmodule(graph)
 {
-//    name = "rt midi in";
-//    graph.push_unique_str(name);
-    config("rt midi in",0,1);
+    name = module_midi_in__get_name();
+    config(0,1);
     
      try
      {
@@ -76,7 +75,7 @@ rt_midi_in::rt_midi_in(audio_graph<xmodule*>& graph) : xmodule(graph)
      midiin_ptr->setCallback(&midiCallback, this);
 };
 
-void rt_midi_in::process()
+void midi_in_module::process()
  {
 //     std::cout << "id " << id << " midi in process" << std::endl;
     
@@ -94,3 +93,13 @@ void rt_midi_in::process()
         
 //    value_stack.push(module_data);
  };
+
+xmodule* module_midi_in__create(audio_graph<xmodule*>& graph)
+{
+    return new midi_in_module(graph);
+}
+
+std::string module_midi_in__get_name()
+{
+    return "midi in";
+}

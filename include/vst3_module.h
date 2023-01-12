@@ -13,11 +13,11 @@ struct vst3_midi_instrument : xmodule {
     
     enum input_id { MIDI_IN };
 
-    vst3_midi_instrument(SDL_Event* p_event, audio_graph<xmodule*>& graph);
-    vst3_midi_instrument* init(audio_graph<xmodule*>& graph)
-    {
-        return new vst3_midi_instrument(event,graph);
-    };
+    vst3_midi_instrument(audio_graph<xmodule*>& graph);
+//    vst3_midi_instrument* init(audio_graph<xmodule*>& graph)
+//    {
+//        return new vst3_midi_instrument(event,graph);
+//    };
     void process() override;
     void show() override {
         ImNodes::BeginNode(xmodule::id);
@@ -56,3 +56,6 @@ struct vst3_midi_instrument : xmodule {
         vst.processSdlEvent(*event);
     };
 };
+
+xmodule* module_vst3_instrument__create(audio_graph<xmodule*>& graph);
+std::string module_vst3_instrument__get_name();

@@ -4,7 +4,8 @@ cjfilter_module::cjfilter_module(audio_graph<xmodule*>& graph) : xmodule(graph)
 {
 //    name = "cjfilter";
 //    graph.push_unique_str(name);
-    config("cjfilter",1,1);
+    name = module_cjfilter__get_name();
+    config(1,1);
     cutoff = 0.1;
     resonance = 0.0;
 }
@@ -22,3 +23,13 @@ void cjfilter_module::process()
         xmodule::output_audio[1][i] = filter[1].filterOut[0]; //todo add another cjfilter class n do stereo
     }
 }
+
+xmodule* module_cjfilter__create(audio_graph<xmodule*>& graph)
+{
+    return new cjfilter_module(graph);
+};
+
+std::string module_cjfilter__get_name()
+{
+    return "cjfilter";
+};

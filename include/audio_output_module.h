@@ -1,9 +1,13 @@
 #include "xmodule.h"
 
+xmodule* module_audio_output__create(audio_graph<xmodule*>& graph);
+std::string module_audio_output__get_name();
+
 struct audio_output_module : xmodule {
     
     audio_output_module(audio_graph<xmodule*>& graph) : xmodule(graph){
-        config("output",1,0);
+        name = module_audio_output__get_name();
+        config(1,0);
     }
     
     void show() override {

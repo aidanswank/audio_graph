@@ -33,3 +33,6 @@ struct cjfilter_module : xmodule {
     };
     void poll() override {};
 };
+
+xmodule* module_cjfilter__create(audio_graph<xmodule*>& graph);
+std::string module_cjfilter__get_name();

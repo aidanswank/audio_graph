@@ -23,3 +23,13 @@ void audio_output_module::process()
     }
 
 };
+
+xmodule* module_audio_output__create(audio_graph<xmodule*>& graph)
+{
+    return new audio_output_module(graph);
+};
+
+std::string module_audio_output__get_name()
+{
+    return "audio output";
+};

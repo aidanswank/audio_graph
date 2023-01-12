@@ -42,10 +42,10 @@ struct xmodule
 //        }
     }
     
-    void config(std::string p_name, int p_num_inputs, int p_num_outputs)
+    void config(int p_num_inputs, int p_num_outputs)
     {
-        name = p_name;
-        graph.push_unique_str(name);
+//        name = p_name;
+//        graph.push_unique_str(name);
         num_inputs = p_num_inputs;
         num_ouputs = p_num_outputs;
         
@@ -125,3 +125,8 @@ struct xmodule
     std::string name;
 //    std::vector<std::vector<float>> audio;
 };
+
+//// the types of the class factories
+//typedef xmodule* create_t(audio_graph<xmodule*>& p_graph);
+//typedef void destroy_t(xmodule*);
+//create_t

@@ -1,5 +1,6 @@
 #include <vector>
 //#include "xmodule.h"
+#include "SDL.h"
 
 // I made this a template because I wanted to be able to pass in graph inside xmodule class
 // but I couldnt do that without creating circular dependencies
@@ -15,14 +16,16 @@ struct audio_graph
 //    std::vector<int> id_attrs;
     std::vector<std::string> module_names;
     
-    void push_unique_str(std::string str)
-    {
-        if (std::find(module_names.begin(), module_names.end(), str) == module_names.end())
-        {
-          // Element in vector.
-            module_names.push_back(str);
-        }
-    }
+    SDL_Event *event;
+    
+//    void push_unique_str(std::string str)
+//    {
+//        if (std::find(module_names.begin(), module_names.end(), str) == module_names.end())
+//        {
+//          // Element in vector.
+//            module_names.push_back(str);
+//        }
+//    }
     
     int attr2id(int io_attr)
     {

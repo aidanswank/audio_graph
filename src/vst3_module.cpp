@@ -1,10 +1,14 @@
 #include "vst3_module.h"
 
-vst3_midi_instrument::vst3_midi_instrument(SDL_Event* p_event, audio_graph<xmodule*>& graph) : xmodule(graph)
+vst3_midi_instrument::vst3_midi_instrument(audio_graph<xmodule*>& graph) : xmodule(graph)
 {
-    config("vst midi inst",1,1);
+    config(1,1);
     
-    event = p_event;
+//    event = p_event;
+    
+    event = graph.event;
+    name = module_vst3_instrument__get_name();
+    
     // Library/Audio/Plug-Ins/VST3/Surge XT.vst3
     // vst setup TODO CLEAN !!!!
     if (!vst.init("/Library/Audio/Plug-Ins/VST3/Surge XT.vst3", 44100, 256, Steinberg::Vst::kSample32, true))
@@ -119,4 +123,11 @@ void vst3_midi_instrument::process()
     
 }
 
+xmodule* module_vst3_instrument__create(audio_graph<xmodule*>& graph)
+{
+    return new vst3_midi_instrument(graph);
+};
 
+std::string module_vst3_instrument__get_name(){
+    return "vst instrument";
+};

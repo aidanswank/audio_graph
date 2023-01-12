@@ -14,14 +14,14 @@
 //    bool isNoteOn = false;
 //};
 
-struct rt_midi_in : xmodule {
+struct midi_in_module : xmodule {
     
     RtMidiIn* midiin_ptr;
 //    std::vector<MidiNoteMessage> notes;
     moodycamel::ConcurrentQueue<MidiNoteMessage> notesQueue;
     std::vector<std::string> port_names;
     
-    rt_midi_in(audio_graph<xmodule*>& graph);
+    midi_in_module(audio_graph<xmodule*>& graph);
     void process() override;
     void show() override {
         ImNodes::BeginNode(xmodule::id);
@@ -43,3 +43,6 @@ struct rt_midi_in : xmodule {
     };
     void poll() override {};
 };
+
+xmodule* module_midi_in__create(audio_graph<xmodule*>& graph);
+std::string module_midi_in__get_name();
