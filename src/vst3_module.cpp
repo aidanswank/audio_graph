@@ -1,4 +1,5 @@
 #include "vst3_module.h"
+#include "public.sdk/source/vst/utility/stringconvert.h"
 
 vst3_midi_instrument::vst3_midi_instrument(audio_graph<xmodule*>& graph) : xmodule(graph)
 {
@@ -8,6 +9,9 @@ vst3_midi_instrument::vst3_midi_instrument(audio_graph<xmodule*>& graph) : xmodu
     
     event = graph.event;
     name = module_vst3_instrument__get_name();
+    
+//    float *input_mono_signal = new float[256]();
+//    input_void_ptr = input_mono_signal;
     
     // Library/Audio/Plug-Ins/VST3/Surge XT.vst3
     // vst setup TODO CLEAN !!!!
@@ -33,6 +37,23 @@ vst3_midi_instrument::vst3_midi_instrument(audio_graph<xmodule*>& graph) : xmodu
     vst.setBusActive(Steinberg::Vst::kEvent, Steinberg::Vst::kInput, 0, true);
     vst.setBusActive(Steinberg::Vst::kAudio, Steinberg::Vst::kOutput, 1, true);
     vst.setProcessing(true);
+    
+    // get param names
+    int num_params = vst._editController->getParameterCount();
+    print("vst num params", num_params);
+    for(int i = 0; i < vst._editController->getParameterCount(); i++)
+    {
+        Steinberg::Vst::ParameterInfo info;
+        vst._editController->getParameterInfo(i, info);
+        std::string title_str = VST3::StringConvert::convert(info.title); // whyyyy
+        print(i, title_str);
+    }
+    
+//    Steinberg::Vst::ParamValue myvalue = 0.0;
+//    vst._editController->setParamNormalized(12, myvalue);
+    
+//    Steinberg::Vst::IParameterChanges* paramChanges = vst.parameterChanges(0, 0);
+//    Steinberg::Vst::IParamValueQueue* paramQueue = paramChanges->addParameterData();
     
      if (!vst.createView()) {
            std::cerr << "Failed to create VST view" << std::endl;
@@ -71,9 +92,9 @@ void vst3_midi_instrument::process()
         continuousSamples += 256;
         
         Steinberg::Vst::EventList *eventList = vst.eventList(Steinberg::Vst::kInput, 0);
-        for(int i = 0; i < midi_in_module->notes.size(); i++)
+        for(int i = 0; i < midi_in_module->input_notes.size(); i++)
         {
-            MidiNoteMessage note = midi_in_module->notes[i];
+            MidiNoteMessage note = midi_in_module->input_notes[i];
             
             Steinberg::Vst::Event evt = {};
             evt.busIndex = 0;

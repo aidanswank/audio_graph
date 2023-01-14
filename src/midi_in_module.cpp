@@ -63,7 +63,8 @@ midi_in_module::midi_in_module(audio_graph<xmodule*>& graph) : xmodule(graph)
 
      for ( unsigned int i=0; i<nPorts; i++ ) {
          try {
-         portName = midiin_ptr->getPortName(i);
+             portName = midiin_ptr->getPortName(i);
+             port_names.push_back(portName);
          }
          catch ( RtMidiError &error ) {
          error.printMessage();
@@ -71,7 +72,7 @@ midi_in_module::midi_in_module(audio_graph<xmodule*>& graph) : xmodule(graph)
          std::cout << "  Input Port #" << i+1 << ": " << portName << '\n';
      }
 
-     midiin_ptr->openPort(1);
+//     midiin_ptr->openPort(1);
      midiin_ptr->setCallback(&midiCallback, this);
 };
 
@@ -79,7 +80,7 @@ void midi_in_module::process()
  {
 //     std::cout << "id " << id << " midi in process" << std::endl;
     
-    notes.clear();
+    input_notes.clear();
     
     while (true) {
         MidiNoteMessage note;
@@ -88,7 +89,7 @@ void midi_in_module::process()
             break;
         }
         std::cout << note.isNoteOn << " " << note.noteNum << " " << note.velocity << std::endl;
-        notes.push_back(note);
+        input_notes.push_back(note);
     }
         
 //    value_stack.push(module_data);

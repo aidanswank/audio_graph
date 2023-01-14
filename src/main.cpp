@@ -21,13 +21,15 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
     audio_interface* interface = (audio_interface*)userData;
     audio_graph<xmodule*>* graph = (audio_graph<xmodule*>*)interface->data;
 
-    int root_node = 0;
 
 //    interface->graph->clear(); // clear previous search
 //    interface->graph->DFS(root_node); // do graph search from root node
-    graph->clear();
-    if(graph->xmodules.size()>0)
+    if(graph->xmodules.size()>0 && graph->root_id!=-1)
     {
+        int root_node = graph->root_id;
+        
+        graph->clear();
+
         graph->DFS(root_node);
         
         float *output = (float*)outputBuffer;
@@ -92,34 +94,24 @@ public:
             {
                 const ImVec2 click_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
                 
-//                for(int i = 0; i < graph->module_names.size(); i++)
-//                {
-//                    if (ImGui::MenuItem(graph->module_names[i].c_str()))
-//                    {
-//                        print(click_pos.x, click_pos.y, graph->module_names[i]);
-//                    }
-//                }
-                
-                // UGLY ASF
+                // loop through factory map to display names and push back if selected
                 for (std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&)>::iterator it = factory_map->begin(); it != factory_map->end(); ++it) {
 //                    std::cout << it->first << std::endl;
                     if (ImGui::MenuItem(it->first.c_str()))
                     {
-                        print(click_pos.x, click_pos.y, it->first.c_str());
+//                        print(click_pos.x, click_pos.y, it->first.c_str());
                         xmodule* m = factory_map->at(it->first)(*graph);
+                        if(m->name=="audio output")
+                        {
+                            graph->root_id = m->id;
+                        }
                         graph->xmodules.push_back( m );
-//                        graph->xmodules.push_back( factory_map[it->first](graph) ); // filter
-                        
                     }
                 }
                 
                 ImGui::EndPopup();
             }
             ImGui::PopStyleVar();
-
-//            ImNodes::BeginNode(hardcoded_node_id);
-//            ImGui::Dummy(ImVec2(80.0f, 45.0f));
-//            ImNodes::EndNode();
 
             for(uint i = 0; i < graph->xmodules.size(); ++i)
             {
@@ -289,7 +281,11 @@ int main()
             }
             for(uint i = 0; i < graph.xmodules.size(); ++i)
             {
-                graph.xmodules[i]->poll();
+                if(graph.xmodules[i]->name=="vst instrument") // sdl2 polling for easyvst
+                {
+                    vst3_midi_instrument* vst_mid_inst_ptr = (vst3_midi_instrument*)graph.xmodules[i];
+                    vst_mid_inst_ptr->poll();
+                }
             }
         }
                 

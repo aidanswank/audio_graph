@@ -15,6 +15,7 @@ struct audio_graph
     unsigned int id_counter = 0;
 //    std::vector<int> id_attrs;
     std::vector<std::string> module_names;
+    int root_id = -1;
     
     SDL_Event *event;
     

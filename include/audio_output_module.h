@@ -23,7 +23,6 @@ struct audio_output_module : xmodule {
 
         ImNodes::EndNode();
     };
-    void poll() override {};
     
     void process() override;
 };

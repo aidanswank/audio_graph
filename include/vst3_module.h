@@ -52,7 +52,7 @@ struct vst3_midi_instrument : xmodule {
     };
     
     // modified easyvst so it doesnt destroy window it just hides it! beware!
-    void poll() override {
+    void poll() {
         vst.processSdlEvent(*event);
     };
 };

@@ -28,18 +28,7 @@ struct xmodule
 //        id = p_id;
         
         print("xmodule id", id);
-    
-//        for(int i = 0; i < num_ins; i++)
-//        {
-//            input_attrs.push_back(graph.attr_counter);
-//            graph.attr_counter++;
-//        }
-//
-//        for(int i = 0; i < num_outs; i++)
-//        {
-//            output_attrs.push_back(graph.attr_counter);
-//            graph.attr_counter++;
-//        }
+
     }
     
     void config(int p_num_inputs, int p_num_outputs)
@@ -96,9 +85,6 @@ struct xmodule
     
     // show user interface
     virtual void show() = 0;
-    
-    // poll user input
-    virtual void poll() = 0;
 
     // ~xmodule() {};
 
@@ -110,15 +96,17 @@ struct xmodule
 
     // The input and output xmodule IDs
     std::vector<int> input_ids;
-    std::vector<int> input_attrs;
     std::vector<int> output_ids;
+    
+    std::vector<int> input_attrs;
     std::vector<int> output_attrs;
 
     //todo seperate
-    std::vector<MidiNoteMessage> notes;
+    std::vector<MidiNoteMessage> input_notes;
     STEREO_AUDIO output_audio;
     STEREO_AUDIO input_audio;
     
+    void* input_void_ptr;
     
 //    std::vector<xmodule*>& modules;
     audio_graph<xmodule*>& graph;
