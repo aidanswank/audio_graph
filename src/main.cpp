@@ -21,23 +21,26 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
     audio_interface* interface = (audio_interface*)userData;
     audio_graph<xmodule*>* graph = (audio_graph<xmodule*>*)interface->data;
 
-    int root_node = 3;
+    int root_node = 0;
 
 //    interface->graph->clear(); // clear previous search
 //    interface->graph->DFS(root_node); // do graph search from root node
     graph->clear();
-    graph->DFS(3);
-
-    float *output = (float*)outputBuffer;
-
-    for( uint i=0; i<framesPerBuffer; ++i )
+    if(graph->xmodules.size()>0)
     {
-//        float w = (float)(rand()%100)/1000.0f; //testing with white noise
-        // TODO CHANGE ROOT NODE TO 0 NOT 3 !!
-//        output[i * 2] = w;
-//        output[i * 2 + 1] = w;  /* right */
-        output[i * 2] = graph->xmodules[root_node]->output_audio[0][i]; /* left */
-        output[i * 2 + 1] = graph->xmodules[root_node]->output_audio[1][i];  /* right */
+        graph->DFS(root_node);
+        
+        float *output = (float*)outputBuffer;
+        
+        for( uint i=0; i<framesPerBuffer; ++i )
+        {
+            //        float w = (float)(rand()%100)/1000.0f; //testing with white noise
+            // TODO CHANGE ROOT NODE TO 0 NOT 3 !!
+            //        output[i * 2] = w;
+            //        output[i * 2 + 1] = w;  /* right */
+            output[i * 2] = graph->xmodules[root_node]->output_audio[0][i]; /* left */
+            output[i * 2 + 1] = graph->xmodules[root_node]->output_audio[1][i];  /* right */
+        }
     }
 
     return 0;
@@ -207,43 +210,45 @@ int main()
     factory_map[module_vst3_instrument__get_name()] = &module_vst3_instrument__create;
     factory_map[module_cjfilter__get_name()] = &module_cjfilter__create;
 
-    graph.xmodules.push_back( factory_map[module_midi_in__get_name()](graph) ); // rt midi in
-    graph.xmodules.push_back( factory_map[module_vst3_instrument__get_name()](graph) ); // vst plug
-    graph.xmodules.push_back( factory_map[module_vst3_instrument__get_name()](graph) ); // vst plug
-    graph.xmodules.push_back( factory_map[module_audio_output__get_name()](graph) ); // output
-    graph.xmodules.push_back( factory_map[module_cjfilter__get_name()](graph) ); // filter
-
+//    graph.xmodules.push_back( factory_map[module_midi_in__get_name()](graph) ); // rt midi in
+//    graph.xmodules.push_back( factory_map[module_vst3_instrument__get_name()](graph) ); // vst plug
+//    graph.xmodules.push_back( factory_map[module_vst3_instrument__get_name()](graph) ); // vst plug
+//    graph.xmodules.push_back( factory_map[module_audio_output__get_name()](graph) ); // output
+//    graph.xmodules.push_back( factory_map[module_cjfilter__get_name()](graph) ); // filter
     
-//     example patch
-    graph.xmodules[0]->add_output(1);
-    graph.xmodules[0]->add_output(2);
-
-    graph.xmodules[1]->add_input(0);
-    graph.xmodules[1]->add_output(4);//filter
-
-    graph.xmodules[2]->add_input(0);
-    graph.xmodules[2]->add_output(3);
-
-    graph.xmodules[3]->add_input(4);
-    graph.xmodules[3]->add_input(2);
-
-    graph.xmodules[4]->add_input(1);
-    graph.xmodules[4]->add_output(3);
+////     example patch
+//    graph.xmodules[0]->add_output(1);
+//    graph.xmodules[0]->add_output(2);
+//
+//    graph.xmodules[1]->add_input(0);
+//    graph.xmodules[1]->add_output(4);//filter
+//
+//    graph.xmodules[2]->add_input(0);
+//    graph.xmodules[2]->add_output(3);
+//
+//    graph.xmodules[3]->add_input(4);
+//    graph.xmodules[3]->add_input(2);
+//
+//    graph.xmodules[4]->add_input(1);
+//    graph.xmodules[4]->add_output(3);
+//
+//    std::pair<int, int> link{0, 1};
+//    graph.links.push_back(link);
+//
+//    std::pair<int, int> link2{0, 3};
+//    graph.links.push_back(link2);
+//
+//    std::pair<int, int> link3{2, 6};
+//    graph.links.push_back(link3);
+//
+//    std::pair<int, int> link4{7, 5};
+//    graph.links.push_back(link4);
+//
+//    std::pair<int, int> link5{4, 5};
+//    graph.links.push_back(link5);
+//
     
-    std::pair<int, int> link{0, 1};
-    graph.links.push_back(link);
-
-    std::pair<int, int> link2{0, 3};
-    graph.links.push_back(link2);
-
-    std::pair<int, int> link3{2, 6};
-    graph.links.push_back(link3);
-
-    std::pair<int, int> link4{7, 5};
-    graph.links.push_back(link4);
-
-    std::pair<int, int> link5{4, 5};
-    graph.links.push_back(link5);
+    
 //
     // another one
 //    graph.xmodules[0]->add_output(1);
