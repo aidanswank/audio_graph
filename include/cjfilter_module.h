@@ -6,7 +6,7 @@ struct cjfilter_module : xmodule {
     float resonance;
     CjFilter filter[2];
     float filterOut[4];
-    
+        
     cjfilter_module(audio_graph<xmodule*>& graph);
     void process() override;
     void show() override {
@@ -21,7 +21,7 @@ struct cjfilter_module : xmodule {
         ImNodes::EndInputAttribute();
         
         ImNodes::BeginInputAttribute( input_attrs[1] );
-        ImGui::Text("input");
+        ImGui::Text("cutoff cv");
         ImNodes::EndInputAttribute();
         
         ImGui::PushItemWidth(100.0f);

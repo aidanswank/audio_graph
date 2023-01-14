@@ -7,6 +7,7 @@
 #include "vst3_module.h"
 #include "cjfilter_module.h"
 #include "audio_output_module.h"
+#include "osc_module.h"
 //#include "graph.h"
 #include "audio_interface.h"
 //#include "audio_callback.h"
@@ -201,6 +202,7 @@ int main()
     factory_map[module_midi_in__get_name()] = &module_midi_in__create;
     factory_map[module_vst3_instrument__get_name()] = &module_vst3_instrument__create;
     factory_map[module_cjfilter__get_name()] = &module_cjfilter__create;
+    factory_map[module_osc__get_name()] = &module_osc__create;
 
 //    graph.xmodules.push_back( factory_map[module_midi_in__get_name()](graph) ); // rt midi in
 //    graph.xmodules.push_back( factory_map[module_vst3_instrument__get_name()](graph) ); // vst plug
