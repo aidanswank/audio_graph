@@ -1,6 +1,7 @@
 #include <vector>
 //#include "xmodule.h"
 #include "SDL.h"
+#include <map>
 
 // I made this a template because I wanted to be able to pass in graph inside xmodule class
 // but I couldnt do that without creating circular dependencies
@@ -13,9 +14,9 @@ struct audio_graph
     std::vector<std::pair<int, int>> links;
     unsigned int attr_counter = 0;
     unsigned int id_counter = 0;
-//    std::vector<int> id_attrs;
     std::vector<std::string> module_names;
     int root_id = -1;
+    std::map<int, int> attr2id;
     
     SDL_Event *event;
     
@@ -28,28 +29,28 @@ struct audio_graph
 //        }
 //    }
     
-    int attr2id(int io_attr)
-    {
-//        bool found;
-        for(int i = 0; i < xmodules.size(); i++)
-        {
-            for(int j = 0; j < xmodules[i]->input_attrs.size(); j++)
-            {
-                if(xmodules[i]->input_attrs[j]==io_attr)
-                {
-                    return xmodules[i]->id;
-                }
-            }
-            for(int j = 0; j < xmodules[i]->output_attrs.size(); j++)
-            {
-                if(xmodules[i]->output_attrs[j]==io_attr)
-                {
-                    return xmodules[i]->id;
-                }
-            }
-        }
-        return -1;
-    }
+//    int attr2id(int io_attr)
+//    {
+////        bool found;
+//        for(int i = 0; i < xmodules.size(); i++)
+//        {
+//            for(int j = 0; j < xmodules[i]->input_attrs.size(); j++)
+//            {
+//                if(xmodules[i]->input_attrs[j]==io_attr)
+//                {
+//                    return xmodules[i]->id;
+//                }
+//            }
+//            for(int j = 0; j < xmodules[i]->output_attrs.size(); j++)
+//            {
+//                if(xmodules[i]->output_attrs[j]==io_attr)
+//                {
+//                    return xmodules[i]->id;
+//                }
+//            }
+//        }
+//        return -1;
+//    }
     
     void clear()
     {

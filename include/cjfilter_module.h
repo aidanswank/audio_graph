@@ -9,32 +9,7 @@ struct cjfilter_module : xmodule {
         
     cjfilter_module(audio_graph<xmodule*>& graph);
     void process() override;
-    void show() override {
-        ImNodes::BeginNode(xmodule::id);
-        
-        ImNodes::BeginNodeTitleBar();
-        ImGui::Text( "%s (%i)", xmodule::name.c_str(), id );
-        ImNodes::EndNodeTitleBar();
-        
-        ImNodes::BeginInputAttribute( input_attrs[0] );
-        ImGui::Text("input");
-        ImNodes::EndInputAttribute();
-        
-        ImNodes::BeginInputAttribute( input_attrs[1] );
-        ImGui::Text("cutoff cv");
-        ImNodes::EndInputAttribute();
-        
-        ImGui::PushItemWidth(100.0f);
-        ImGui::SliderFloat("cutoff", &cutoff, 0.0f, 1.0f);
-        ImGui::SliderFloat("resonance", &resonance, 0.0f, 1.0f);
-        ImGui::PopItemWidth();
-        
-        ImNodes::BeginOutputAttribute( output_attrs[0] );
-        ImGui::Text("output");
-        ImNodes::EndOutputAttribute();
-        
-        ImNodes::EndNode();
-    };
+    void show() override;
     
 };
 

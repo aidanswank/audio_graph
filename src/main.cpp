@@ -133,11 +133,53 @@ public:
             if (ImNodes::IsLinkCreated(&start_attr, &end_attr))
             {
                 print("start", start_attr, "end", end_attr);
-                print("attr2id",graph->attr2id(start_attr),graph->attr2id(end_attr));
-                graph->xmodules[graph->attr2id(start_attr)]->add_output(graph->attr2id(end_attr));
-                graph->xmodules[graph->attr2id(end_attr)]->add_input(graph->attr2id(start_attr));
+//                print("attr2id",graph->attr2id(start_attr),graph->attr2id(end_attr));
+                print("id attr map", graph->attr2id[start_attr], "end", graph->attr2id[end_attr]);
+    
+                
+                graph->xmodules[ graph->attr2id[start_attr] ]->add_output( graph->attr2id[end_attr] );
+                
+                graph->xmodules[ graph->attr2id[end_attr] ]->add_input( graph->attr2id[start_attr] );
+                
                 graph->links.push_back(std::make_pair(start_attr, end_attr));
             }
+  
+            
+//            {
+//                int link_id;
+//                if (ImNodes::IsLinkDestroyed(&link_id))
+//                {
+//                    print("link id",link_id);
+////                    graph2.erase_edge(link_id);
+//                }
+//            }
+            
+            // audio nodes deleting links
+            {
+                const int num_selected = ImNodes::NumSelectedLinks();
+                if (num_selected > 0 && ImGui::IsKeyReleased((ImGuiKey)SDL_SCANCODE_X))
+                {
+                    static std::vector<int> selected_links;
+                    selected_links.resize(static_cast<size_t>(num_selected));
+                    ImNodes::GetSelectedLinks(selected_links.data());
+                    for (const int edge_id : selected_links)
+                    {
+                        print("ei",edge_id);
+//                        graph->
+//                        graph2.erase_edge(edge_id);
+                    }
+                }
+            }
+            
+//            // Note that since many nodes can be selected at once, we first need to query the number of
+//            // selected nodes before getting them.
+//            const int num_selected_nodes = ImNodes::NumSelectedNodes();
+//            if (num_selected_nodes > 0)
+//            {
+//              std::vector<int> selected_nodes;
+//              selected_nodes.resize(num_selected_nodes);
+//              ImNodes::GetSelectedNodes(selected_nodes.data());
+//            }
 
             ImGui::End();
         }

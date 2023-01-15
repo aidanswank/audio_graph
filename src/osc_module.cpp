@@ -3,7 +3,6 @@
 osc_module::osc_module(audio_graph<xmodule*>& graph) : xmodule(graph)
 {
     blep = new PolyBLEP(44100, PolyBLEP::SINE, 440.0f);
-//    blep
     name = module_osc__get_name();
     config(0,1);
 };
@@ -22,6 +21,7 @@ void osc_module::process() {
         audio_output_left[i] = samp;
         audio_output_right[i] = samp;
     }
+    
 }
 
 void osc_module::show() {
@@ -35,15 +35,13 @@ void osc_module::show() {
     ImGui::Checkbox("LFO", &isLFO);
     if(isLFO)
     {
-        ImGui::SliderFloat("freq", &freq, 0.0f, 10.0f);
+        ImGui::SliderFloat("freq", &freq, 0.0f, 30.0f);
     } else {
         ImGui::SliderFloat("freq", &freq, 0.0f, 1000.0f);
     }
     
     const char* items[] = { "SINE", "COSINE", "TRIANGLE", "SQUARE", "RECTANGLE", "SAWTOOTH", "RAMP", "MODIFIED_TRIANGLE", "MODIFIED_SQUARE", "HALF_WAVE_RECTIFIED_SINE", "FULL_WAVE_RECTIFIED_SINE", "TRIANGULAR_PULSE", "TRAPEZOID_FIXED", "TRAPEZOID_VARIABLE" };
     
-//    static const char* current_item = NULL;
-
     if (ImGui::BeginCombo("##combo", current_item)) // The second parameter is the label previewed before opening the combo.
     {
         for (int n = 0; n < IM_ARRAYSIZE(items); n++)
@@ -77,5 +75,5 @@ xmodule* module_osc__create(audio_graph<xmodule*>& graph)
 
 std::string module_osc__get_name()
 {
-    return "oscillator";
+    return "polybleep osc";
 };

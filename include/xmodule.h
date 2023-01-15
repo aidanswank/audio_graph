@@ -41,12 +41,14 @@ struct xmodule
         for(int i = 0; i < num_inputs; i++)
         {
             input_attrs.push_back(graph.attr_counter);
+            graph.attr2id[ graph.attr_counter ] = id;
             graph.attr_counter++;
         }
         
         for(int i = 0; i < num_ouputs; i++)
         {
             output_attrs.push_back(graph.attr_counter);
+            graph.attr2id[ graph.attr_counter ] = id;
             graph.attr_counter++;
         }
     }
@@ -100,7 +102,7 @@ struct xmodule
     
     std::vector<int> input_attrs;
     std::vector<int> output_attrs;
-
+    
     //todo seperate
     std::vector<MidiNoteMessage> input_notes;
     STEREO_AUDIO output_audio;

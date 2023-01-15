@@ -30,7 +30,8 @@ void cjfilter_module::process()
                     xmodule* input2_test = (xmodule*)graph.xmodules[ input_ids[1] ];
                     float sig = input2_test->output_audio[0][i];
                     float sig2 = (sig + 1.0) / 2.0; // scale -1.0 to 1.0 -> 0.0 to 1.0
-                    cutoff = sig2;
+                    float sig3 = pow(sig2,3);
+                    cutoff = sig3;
                 }
                 filter[0].doFilter(input_audio[0][i], cutoff, resonance);
                 filter[1].doFilter(input_audio[1][i], cutoff, resonance);
@@ -40,6 +41,34 @@ void cjfilter_module::process()
         }
     }
 }
+
+void cjfilter_module::show()
+{
+    ImNodes::BeginNode(xmodule::id);
+    
+    ImNodes::BeginNodeTitleBar();
+    ImGui::Text( "%s (%i)", xmodule::name.c_str(), id );
+    ImNodes::EndNodeTitleBar();
+    
+    ImNodes::BeginInputAttribute( input_attrs[0] );
+    ImGui::Text("audio input");
+    ImNodes::EndInputAttribute();
+    
+    ImNodes::BeginInputAttribute( input_attrs[1] );
+    ImGui::Text("cutoff cv");
+    ImNodes::EndInputAttribute();
+    
+    ImGui::PushItemWidth(100.0f);
+    ImGui::SliderFloat("cutoff", &cutoff, 0.0f, 1.0f);
+    ImGui::SliderFloat("resonance", &resonance, 0.0f, 1.0f);
+    ImGui::PopItemWidth();
+    
+    ImNodes::BeginOutputAttribute( output_attrs[0] );
+    ImGui::Text("output");
+    ImNodes::EndOutputAttribute();
+    
+    ImNodes::EndNode();
+};
 
 xmodule* module_cjfilter__create(audio_graph<xmodule*>& graph)
 {
