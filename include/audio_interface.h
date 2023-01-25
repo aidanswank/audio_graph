@@ -14,6 +14,7 @@ public:
     void scan_devices();
     void turn_on(PaStreamCallback* callback);
     void close_stream();
+    void try_params();
     
 ////    std::vector<xmodule*> xmodules;
 ////    std::vector<int> visited;
@@ -29,9 +30,11 @@ public:
 //        visited = p_visited;
 //        visited = p_process_order;
     };
-
-private:
+    
+    std::vector<PaDeviceInfo> device_infos;
     void set_param(bool is_capture, int dev_id);
+
+//private:
     int sample_rate;
     int buffer_size;
     PaStreamParameters input_parameters;

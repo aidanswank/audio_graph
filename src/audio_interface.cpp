@@ -32,15 +32,9 @@ void audio_interface::set_param(bool is_capture, int dev_id)
     param.hostApiSpecificStreamInfo = NULL; //See you specific host's API docs for info on using this field 
 }
 
-void audio_interface::init_devices(int p_sample_rate, int p_buffer_size, int input_device_id, int output_device_id)
+void audio_interface::try_params()
 {
-    sample_rate = p_sample_rate;
-    buffer_size = p_buffer_size;
     PaError err;
-
-    set_param(true,input_device_id);
-    set_param(false,output_device_id);
-
     // check if format is supported
     // remember laptop mic is MONO! if wrong channel count will fail
     err = Pa_IsFormatSupported( &input_parameters, &output_parameters, sample_rate );
@@ -54,7 +48,18 @@ void audio_interface::init_devices(int p_sample_rate, int p_buffer_size, int inp
     }
 }
 
-// this is mostly just helpful for the dev, prints out 
+void audio_interface::init_devices(int p_sample_rate, int p_buffer_size, int input_device_id, int output_device_id)
+{
+    sample_rate = p_sample_rate;
+    buffer_size = p_buffer_size;
+    PaError err;
+
+    set_param(true,input_device_id);
+    set_param(false,output_device_id);
+
+    try_params();
+}
+
 void audio_interface::scan_devices()
 {
     int numDevices;
@@ -69,6 +74,7 @@ void audio_interface::scan_devices()
     for( int i=0; i<numDevices; i++ )
     {
         deviceInfo = Pa_GetDeviceInfo( i );
+        device_infos.push_back(*deviceInfo);
         print(i,"~",deviceInfo->name,"\ndefault sample rate:", deviceInfo->defaultSampleRate,"max inputs:",deviceInfo->maxInputChannels,"max outputs:",deviceInfo->maxOutputChannels,"\n");
     }
 }

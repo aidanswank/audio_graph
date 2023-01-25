@@ -51,17 +51,79 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
 
 #include "im_wrap.h"
 
+void audio_settings_gui(audio_interface* interface)
+{
+    static bool audio_settings_open = true;
+    ImGui::Begin("audio settings", &audio_settings_open);
+
+    static const char* current_item = NULL;
+    
+    if (ImGui::BeginCombo("input devices", current_item)) // The second parameter is the label previewed before opening the combo.
+    {
+        for (int n = 0; n < interface->device_infos.size(); n++)
+        {
+            if(interface->device_infos[n].maxInputChannels>0)
+            {
+                bool is_selected = (current_item == interface->device_infos[n].name); // You can store your selection however you want, outside or inside your objects
+                if (ImGui::Selectable(interface->device_infos[n].name, is_selected))
+                {
+                    current_item = interface->device_infos[n].name;
+                    print("dev id", n);
+                    interface->set_param(true, n);
+                    interface->try_params();
+                    interface->turn_on(audio_callback);
+                }
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+            }
+        }
+        ImGui::EndCombo();
+    }
+    
+    static const char* current_item2 = NULL;
+    if (ImGui::BeginCombo("outout devices", current_item2))
+    {
+        for (int n = 0; n < interface->device_infos.size(); n++)
+        {
+            if(interface->device_infos[n].maxOutputChannels>0)
+            {
+                bool is_selected = (current_item2 == interface->device_infos[n].name);
+                if (ImGui::Selectable(interface->device_infos[n].name, is_selected))
+                {
+                    current_item2 = interface->device_infos[n].name;
+                    print("dev id", n);
+                    interface->set_param(false, n);
+                    interface->try_params();
+                    interface->turn_on(audio_callback);
+                }
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+            }
+        }
+        ImGui::EndCombo();
+    }
+        
+    ImGui::End();
+}
+
 class user_interface
 {
 public:
     im_wrap ui;
     audio_graph<xmodule*>* graph;
     std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&)>* factory_map;
+    audio_interface *my_audio_interface;
 
-    user_interface(SDL_Window* window, SDL_GLContext gl_context, audio_graph<xmodule*>* p_graph, std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&)>* p_factory_map)
+    user_interface(SDL_Window* window,
+                   SDL_GLContext gl_context,
+                   audio_graph<xmodule*>* p_graph,
+                   std::map<std::string,
+                   xmodule* (*)(audio_graph<xmodule*>&)>* p_factory_map,
+                   audio_interface *p_audio_interface)
     {
         factory_map = p_factory_map;
         graph = p_graph;
+        my_audio_interface = p_audio_interface;
         print("ui init");
         ui.init(window,gl_context);
     }
@@ -72,7 +134,10 @@ public:
     }
     void update()
     {
+        
         ui.new_frame();
+        
+        audio_settings_gui(my_audio_interface);
 
         ui.update();
 
@@ -139,14 +204,17 @@ public:
                 
                 std::vector<int>& end_attr_vector    = graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ];
                 
-                if(start_attr_vector[0]==-1) // if there was nothing connected before put it in the first slot which is 0
+                
+                // if there was nothing connected before (-1) put it in the first slot which is 0
+                // else if theres already a cable connected push it onto the vector (e.g the final audio output were multiple cables to be connected to same slot)
+                
+                if(start_attr_vector[0]==-1)
                 {
                     start_attr_vector[0] = graph->attr2id[end_attr];
-                } else { // if theres already a cable connected push it onto the vector (e.g the final audio output were multiple cables to be connected to same slot)
+                } else {
                     start_attr_vector.push_back(graph->attr2id[end_attr]);
                 }
-                
-                // same thing as above happens here
+  
                 if(end_attr_vector[0]==-1)
                 {
                     end_attr_vector[0] = graph->attr2id[start_attr];
@@ -253,11 +321,11 @@ int main()
     
     std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&)> factory_map;
     
-    factory_map[module_audio_output__get_name()] = &module_audio_output__create;
-    factory_map[module_midi_in__get_name()] = &module_midi_in__create;
+    factory_map[module_audio_output__get_name()]    = &module_audio_output__create;
+    factory_map[module_midi_in__get_name()]         = &module_midi_in__create;
     factory_map[module_vst3_instrument__get_name()] = &module_vst3_instrument__create;
-    factory_map[module_cjfilter__get_name()] = &module_cjfilter__create;
-    factory_map[module_osc__get_name()] = &module_osc__create;
+    factory_map[module_cjfilter__get_name()]        = &module_cjfilter__create;
+    factory_map[module_osc__get_name()]             = &module_osc__create;
 
 //    graph.xmodules.push_back( factory_map[module_midi_in__get_name()](graph) ); // rt midi in
 //    graph.xmodules.push_back( factory_map[module_vst3_instrument__get_name()](graph) ); // vst plug
@@ -321,7 +389,7 @@ int main()
     interface.pass_userdata(&graph);
     interface.turn_on(audio_callback);
     
-    user_interface ui(window, gl_context, &graph, &factory_map);
+    user_interface ui(window, gl_context, &graph, &factory_map, &interface);
     
     bool is_running = true;
     
