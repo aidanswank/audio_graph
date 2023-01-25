@@ -133,32 +133,26 @@ public:
             if (ImNodes::IsLinkCreated(&start_attr, &end_attr))
             {
                 print("start", start_attr, "end", end_attr);
-//                print("attr2id",graph->attr2id(start_attr),graph->attr2id(end_attr));
                 print("arr2id map start", graph->attr2id[start_attr], "end", graph->attr2id[end_attr]);
-//                print("arr2slot map start slot", graph->attr2slot[start_attr], "end slot", graph->attr2slot[end_attr]);
+        
+                std::vector<int>& start_attr_vector  = graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[end_attr] ];
                 
-//                graph->xmodules[ graph->attr2id[start_attr] ]->add_output( graph->attr2id[end_attr] );
+                std::vector<int>& end_attr_vector    = graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ];
                 
-                if(graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[end_attr] ][0]==-1) // if there was nothing connected before put it in the first slot which is 0
+                if(start_attr_vector[0]==-1) // if there was nothing connected before put it in the first slot which is 0
                 {
-//                    print("yup");
-                    graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[end_attr] ][0] = graph->attr2id[end_attr];
+                    start_attr_vector[0] = graph->attr2id[end_attr];
                 } else { // if theres already a cable connected push it onto the vector (e.g the final audio output were multiple cables to be connected to same slot)
-                    graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[end_attr] ].push_back(graph->attr2id[end_attr]);
+                    start_attr_vector.push_back(graph->attr2id[end_attr]);
                 }
-                
-                
-//                graph->xmodules[ graph->attr2id[end_attr] ]->add_input( graph->attr2id[start_attr] );
                 
                 // same thing as above happens here
-                if(graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ][0]==-1)
+                if(end_attr_vector[0]==-1)
                 {
-//                    print("yup");
-                    graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ][0] = graph->attr2id[start_attr];
+                    end_attr_vector[0] = graph->attr2id[start_attr];
                 } else {
-                    graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ].push_back( graph->attr2id[start_attr] );
+                    end_attr_vector.push_back( graph->attr2id[start_attr] );
                 }
-//                graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ][0] = graph->attr2id[start_attr];
 
                 graph->links.push_back(std::make_pair(start_attr, end_attr));
             }
