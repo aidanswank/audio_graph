@@ -10,16 +10,23 @@ void audio_output_module::process()
     
     for(int i = 0; i < input_ids.size(); i++)
     {
-        xmodule *mod = graph.xmodules[ input_ids[i] ];
-        // TODO CHANGE FIXED BUFFER
-        for(int i = 0; i < 256; i++)
+        for(int j = 0; j < input_ids[i].size(); j++)
         {
-//                xmodule::audio[i] += mod->audio[i];
-            xmodule::output_audio[0][i] += mod->output_audio[0][i] * output_gain;
-            xmodule::output_audio[1][i] += mod->output_audio[1][i] * output_gain;
+            print(i,j,"id",input_ids[i][j]);
+            if(input_ids[i][j] != -1)
+            {
+                xmodule *mod = graph.xmodules[ input_ids[i][j] ];
+                // TODO CHANGE FIXED BUFFER
+                for(int i = 0; i < 256; i++)
+                {
+                    //                xmodule::audio[i] += mod->audio[i];
+                    xmodule::output_audio[0][i] += mod->output_audio[0][i] * output_gain;
+                    xmodule::output_audio[1][i] += mod->output_audio[1][i] * output_gain;
+                }
+                //            mod->audio.clear();
+                //            std::cout <<  "summing " << i << std::endl;
+            }
         }
-//            mod->audio.clear();
-//            std::cout <<  "summing " << i << " audio size " << mod->audio.size() << std::endl;
     }
 
 };

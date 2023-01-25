@@ -4,6 +4,7 @@
 #include "vprint.h"
 #include "imnodes.h"
 #include "graph.h"
+#include <map>
 
 struct MidiNoteMessage
 {
@@ -42,6 +43,13 @@ struct xmodule
         {
             input_attrs.push_back(graph.attr_counter);
             graph.attr2id[ graph.attr_counter ] = id;
+            graph.attr2inslot[ graph.attr_counter ] = i;
+//            print("attr",graph.attr_counter,"slot",i);
+            
+            std::vector<int> ids;
+            ids.push_back(-1);
+            input_ids.push_back(ids);
+            
             graph.attr_counter++;
         }
         
@@ -49,38 +57,36 @@ struct xmodule
         {
             output_attrs.push_back(graph.attr_counter);
             graph.attr2id[ graph.attr_counter ] = id;
+            graph.attr2outslot[ graph.attr_counter ] = i;
+//            print("attr",graph.attr_counter,"slot",i+num_inputs);
+            
+            std::vector<int> ids;
+            ids.push_back(-1);
+            output_ids.push_back(ids);
+
             graph.attr_counter++;
         }
     }
 
-    // Add an input to the xmodule
-    void add_input(int p_input_id)
-    {
-        input_ids.push_back(p_input_id);
-//        input_attrs.push_back(graph.id_counter);
-        print("[xmodule] id",id,"\tinput size ", input_ids.size(),"\tinput id  ",p_input_id,"\tid counter",graph.attr_counter);
-//        std::pair<int, int> link{id, p_input_id};
-//        graph.links.push_back(link);
-//        std::pair<int, int> link{input_attrs[0], output_attrs[0]};
-//        graph.links.push_back(link);
+//    // Add an input to the xmodule
+//    void add_input(int p_input_id)
+//    {
+//        input_ids.push_back(p_input_id);
+//        print("[xmodule] id",id,"\tinput size ", input_ids.size(),"\tinput id  ",p_input_id,"\tid counter",graph.attr_counter);
+//    }
+    
+//    void add_input_slot(int attr, int slot)
+//    {
+//        attr2slot[attr] = slot;
+//    };
 
-        ///
-//        graph.id_counter++;
-    }
-
-    // Add an output to the xmodule
-    void add_output(int p_output_id)
-    {
-        output_ids.push_back(p_output_id);
-//        output_attrs.push_back(graph.id_counter);
-//        std::pair<int, int> link{id, p_output_id};
-//        graph.links.push_back(link);
-//        print(input_attrs[0], output_attrs[0]);
-//        std::pair<int, int> link{input_attrs[input_ids.size()-1], output_attrs[output_ids.size()-1]};
-//        graph.links.push_back(link);
-        print("[xmodule] id",id,"\toutput size", output_ids.size(),"\toutput id ",p_output_id,"\tid counter",graph.attr_counter);
-//        graph.id_counter++;
-    }
+//    // Add an output to the xmodule
+//    void add_output(int p_output_id)
+//    {
+//        output_ids.push_back(p_output_id);
+//        print("[xmodule] id",id,"\toutput size", output_ids.size(),"\toutput id ",p_output_id,"\tid counter",graph.attr_counter);
+//    }
+    
 
     // process the audio signal
     virtual void process() = 0;
@@ -97,11 +103,15 @@ struct xmodule
     int num_ouputs;
 
     // The input and output xmodule IDs
-    std::vector<int> input_ids;
-    std::vector<int> output_ids;
-    
+//    std::vector<int> input_ids;
+    std::vector<std::vector<int>> input_ids;
     std::vector<int> input_attrs;
+    
+//    std::vector<int> output_ids;
+    std::vector<std::vector<int>> output_ids;
     std::vector<int> output_attrs;
+    
+    std::map<int, int> attr2slot;
     
     //todo seperate
     std::vector<MidiNoteMessage> input_notes;

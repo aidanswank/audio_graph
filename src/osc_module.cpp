@@ -75,5 +75,5 @@ xmodule* module_osc__create(audio_graph<xmodule*>& graph)
 
 std::string module_osc__get_name()
 {
-    return "polybleep osc";
+    return "oscillator";
 };

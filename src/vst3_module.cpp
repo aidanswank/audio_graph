@@ -67,7 +67,7 @@ void vst3_midi_instrument::process()
 {
     if(input_ids.size()>0)
     {
-        xmodule *midi_in_module = (xmodule*)xmodule::graph.xmodules[ input_ids[MIDI_IN] ];
+        xmodule *midi_in_module = (xmodule*)xmodule::graph.xmodules[ input_ids[MIDI_IN][0] ];
         
         int SAMPLE_RATE = 44100;
         int TEMPO = 120;

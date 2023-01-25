@@ -17,7 +17,9 @@ struct audio_graph
     std::vector<std::string> module_names;
     int root_id = -1;
     std::map<int, int> attr2id;
-    
+    std::map<int, int> attr2inslot;
+    std::map<int, int> attr2outslot;
+
     SDL_Event *event;
     
 //    void push_unique_str(std::string str)
@@ -65,17 +67,27 @@ struct audio_graph
             return;                // Return if the node has already been visited
         visited.push_back(rootId); // Mark the node as visited
         // process the audio signal for the input xmodules of the current node
-        for (int input_id : xmodules[rootId]->input_ids)
+        for (std::vector<int> ids : xmodules[rootId]->input_ids)
         {
-            DFS(input_id);
+            for(int i = 0; i < ids.size(); i++)
+            {
+                if(ids[i]!=-1)
+                    DFS(ids[i]);
+            }
         }
 //        print("processing",rootId,"...");
         xmodules[rootId]->process(); // process the audio signal for the current node
 //        process_order.push_back(rootId);
         // process the audio signal for the output xmodules of the current node
-        for (int output_id : xmodules[rootId]->output_ids)
+        for (std::vector<int> ids : xmodules[rootId]->output_ids)
         {
-            DFS(output_id); // Recursively process the audio signal for the output nodes
+//            if(output_id!=-1)
+//                DFS(output_id); // Recursively process the audio signal for the output nodes
+            for(int i = 0; i < ids.size(); i++)
+            {
+                if(ids[i]!=-1)
+                    DFS(ids[i]);
+            }
         }
     };
 };

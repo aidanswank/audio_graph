@@ -14,24 +14,30 @@ cjfilter_module::cjfilter_module(audio_graph<xmodule*>& graph) : xmodule(graph)
 
 void cjfilter_module::process()
 {
-    if(input_ids.size()>0)
+//    if(input_ids.size()>0)
+//    {
+////        print("true");
+    
+    for(int i = 0; i < input_ids.size(); i++)
     {
-        if(input_ids[0])
+        print(i, "ii", input_ids[i][0]);
+    }
+        if(input_ids[0][0]!=-1)
         {
-//            print("?????");
-            xmodule* input_module = (xmodule*)graph.xmodules[ input_ids[0] ];
+            print("?????");
+            xmodule* input_module = (xmodule*)graph.xmodules[ input_ids[0][0] ];
             
             STEREO_AUDIO input_audio = input_module->output_audio;
             
             for(int i = 0; i < 256; ++i)
             {
-                if(input_ids[1]) // check if input 2 plugged in
+                if(input_ids[1][0]!=-1) // check if input 2 plugged in
                 {
-                    xmodule* input2_test = (xmodule*)graph.xmodules[ input_ids[1] ];
+                    xmodule* input2_test = (xmodule*)graph.xmodules[ input_ids[1][0] ];
                     float sig = input2_test->output_audio[0][i];
-                    float sig2 = (sig + 1.0) / 2.0; // scale -1.0 to 1.0 -> 0.0 to 1.0
-                    float sig3 = pow(sig2,3);
-                    cutoff = sig3;
+                    sig = (sig + 1.0) / 2.0; // scale -1.0 to 1.0 -> 0.0 to 1.0
+                    sig = pow(sig,3);
+                    cutoff = sig;
                 }
                 filter[0].doFilter(input_audio[0][i], cutoff, resonance);
                 filter[1].doFilter(input_audio[1][i], cutoff, resonance);
@@ -39,7 +45,7 @@ void cjfilter_module::process()
                 xmodule::output_audio[1][i] = filter[1].filterOut[0]; //todo add another cjfilter class n do stereo
             }
         }
-    }
+//    }
 }
 
 void cjfilter_module::show()
