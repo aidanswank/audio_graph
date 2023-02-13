@@ -12,6 +12,7 @@ midi_sequencer::midi_sequencer(audio_graph<xmodule*>& graph) : xmodule(graph)
 //    fakenote.velocity=1;
 //    input_notes.push_back(fakenote);
 //
+
 }
 
 void midi_sequencer::show()
@@ -32,25 +33,29 @@ void midi_sequencer::show()
 void midi_sequencer::process()
 {
     input_notes.clear();
-//    int tstart = samples_to_ticks(g_transport.sample_count, g_transport.ms_per_tick, 44100);
-    float block_size_in_ticks = samples_to_ticks(256, g_transport.ms_per_tick, 44100);
-//    print("tick start",g_transport.midi_tick_count,"tick block",block_size_in_ticks);
     
-    smf::MidiEventList midi_track = g_transport.midifile[0][0];
+    float tick_start = g_transport.midi_tick_count;
+    float block_size_in_ticks = samples_to_ticks(256, g_transport.ms_per_tick, 44100);
 
-    for(int i = 0; i < midi_track.size(); i++)
+    float tick_end = tick_start + block_size_in_ticks;
+    
+    smf::MidiEventList midi_events = g_transport.midifile[0][0];
+    
+//    if()
+
+    for(int i = 0; i < midi_events.size(); i++)
     {
-//        print(g_transport.midifile[0][i].tick);
-        smf::MidiEvent *event = &midi_track[i];
-        if(event->tick==g_transport.midi_tick_count||event->tick==g_transport.midi_tick_count+(int)block_size_in_ticks)
-        {
-//            print("note",event->getKeyNumber());
-            MidiNoteMessage note;
-            note.velocity = event->getVelocity();
-            note.noteNum = event->getKeyNumber();
-            note.isNoteOn = event->isNoteOn();
+        smf::MidiEvent event = midi_events[i];
 
-            input_notes.push_back(note);
+        if(event.tick>=tick_start&&event.tick<=tick_end)
+        {
+            MidiNoteMessage note;
+            note.velocity = event.getVelocity();
+            note.noteNum = event.getKeyNumber();
+            note.isNoteOn = event.isNoteOn();
+
+            print("midi event",note.isNoteOn,note.noteNum,note.velocity);
+//            input_notes.push_back(note);
         }
     }
 }

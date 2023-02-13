@@ -30,16 +30,6 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
     audio_interface* interface = (audio_interface*)userData;
     audio_graph<xmodule*>* graph = (audio_graph<xmodule*>*)interface->data;
 
-
-    if(g_transport.is_playing)
-    {
-        g_transport.sample_count += framesPerBuffer;
-        g_transport.ms_per_tick = get_ms_per_tick(g_transport.tempo,g_transport.ticks_per_quarter_note);
-        float midi_tick_count = samples_to_ticks(g_transport.sample_count, g_transport.ms_per_tick, 44100);
-        g_transport.midi_tick_count = midi_tick_count;
-        g_transport.current_seconds = g_transport.sample_count/44100.0f;
-    }
-    
 //    interface->graph->clear(); // clear previous search
 //    interface->graph->DFS(root_node); // do graph search from root node
     if(graph->xmodules.size()>0 && graph->root_id!=-1)
@@ -60,6 +50,15 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
             output[i * 2] = graph->xmodules[root_node]->output_audio[0][i]; /* left */
             output[i * 2 + 1] = graph->xmodules[root_node]->output_audio[1][i];  /* right */
         }
+    }
+    
+    if(g_transport.is_playing)
+    {
+        g_transport.sample_count += framesPerBuffer;
+        g_transport.ms_per_tick = get_ms_per_tick(g_transport.tempo,g_transport.ticks_per_quarter_note);
+        float midi_tick_count = samples_to_ticks(g_transport.sample_count, g_transport.ms_per_tick, 44100);
+        g_transport.midi_tick_count = midi_tick_count;
+        g_transport.current_seconds = g_transport.sample_count/44100.0f;
     }
 
     return 0;
@@ -119,6 +118,36 @@ void audio_settings_gui(audio_interface* interface)
     }
         
     ImGui::End();
+}
+
+void link_module(int start_attr, int end_attr, audio_graph<xmodule*>* graph)
+{
+    print("start", start_attr, "end", end_attr);
+    print("arr2id map start", graph->attr2id[start_attr], "end", graph->attr2id[end_attr]);
+
+    std::vector<int>& start_attr_vector  = graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[end_attr] ];
+    
+    std::vector<int>& end_attr_vector    = graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ];
+    
+    
+    // if there was nothing connected before (-1) put it in the first slot which is 0
+    // else if theres already a cable connected push it onto the vector (e.g the final audio output were multiple cables to be connected to same slot)
+    
+    if(start_attr_vector[0]==-1)
+    {
+        start_attr_vector[0] = graph->attr2id[end_attr];
+    } else {
+        start_attr_vector.push_back(graph->attr2id[end_attr]);
+    }
+
+    if(end_attr_vector[0]==-1)
+    {
+        end_attr_vector[0] = graph->attr2id[start_attr];
+    } else {
+        end_attr_vector.push_back( graph->attr2id[start_attr] );
+    }
+
+    graph->links.push_back(std::make_pair(start_attr, end_attr));
 }
 
 class user_interface
@@ -187,7 +216,7 @@ public:
                     {
 //                        print(click_pos.x, click_pos.y, it->first.c_str());
                         xmodule* m = factory_map->at(it->first)(*graph);
-                        if(m->name=="audio output")
+                        if(m->name=="audio output") // special case
                         {
                             graph->root_id = m->id;
                         }
@@ -217,32 +246,7 @@ public:
             int start_attr, end_attr;
             if (ImNodes::IsLinkCreated(&start_attr, &end_attr))
             {
-                print("start", start_attr, "end", end_attr);
-                print("arr2id map start", graph->attr2id[start_attr], "end", graph->attr2id[end_attr]);
-        
-                std::vector<int>& start_attr_vector  = graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[end_attr] ];
-                
-                std::vector<int>& end_attr_vector    = graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ];
-                
-                
-                // if there was nothing connected before (-1) put it in the first slot which is 0
-                // else if theres already a cable connected push it onto the vector (e.g the final audio output were multiple cables to be connected to same slot)
-                
-                if(start_attr_vector[0]==-1)
-                {
-                    start_attr_vector[0] = graph->attr2id[end_attr];
-                } else {
-                    start_attr_vector.push_back(graph->attr2id[end_attr]);
-                }
-  
-                if(end_attr_vector[0]==-1)
-                {
-                    end_attr_vector[0] = graph->attr2id[start_attr];
-                } else {
-                    end_attr_vector.push_back( graph->attr2id[start_attr] );
-                }
-
-                graph->links.push_back(std::make_pair(start_attr, end_attr));
+                link_module(start_attr, end_attr, graph);
             }
   
             
@@ -421,9 +425,11 @@ int main()
     interface.scan_devices();
     interface.sample_rate=44100;
     interface.buffer_size=256;
-//    interface.init_devices(44100, 256, 0, 1);  //  sample rate, buffer size, input_device_id, output_device_id
     interface.pass_userdata(&graph);
-//    interface.turn_on(audio_callback);
+
+    // only run on start up for debug
+    interface.init_devices(44100, 256, 2, 3);  //  sample rate, buffer size, input_device_id, output_device_id
+    interface.turn_on(audio_callback);
     
 //    smf::MidiFile mymidifile;
     int midifile_err = mymidifile.read("/Users/aidan/dev/cpp/dfs_modules/arp.mid");
@@ -434,10 +440,19 @@ int main()
     g_transport.midifile=&mymidifile;
     mymidifile.linkNotePairs();
     
+    
+    // testing patch
+    xmodule* test_osc = module_osc__create(graph);
+    graph.xmodules.push_back( test_osc );
+    xmodule* audio_output = module_audio_output__create(graph);
+    graph.root_id = audio_output->id;// NEED TO LINK ROOT ID FOR AUDIO TO WORK
+    graph.xmodules.push_back( audio_output );
+    link_module(2, 3, &graph);
+    
     user_interface ui(window, gl_context, &graph, &module_factory_map, &interface);
     
     bool is_running = true;
-    
+//
     // main window loop
     while (is_running)
     {

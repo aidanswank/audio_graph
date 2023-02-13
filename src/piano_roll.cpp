@@ -327,13 +327,13 @@ void piano_roll_window(bool *isOpen, smf::MidiFile& midiFile)
     // resets note selection
     if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
     {
-        print("ImGuiMouseButton_Left released");
+//        print("ImGuiMouseButton_Left released");
         sel = -1;
         noteleft_dragIdx = -1;
         noteright_dragIdx = -1;
     }
     
-    if(ImGui::IsWindowFocused() && mouse_pos.y<vMax.y && mouse_pos.x<vMax.x) // need focus to insert note and not clicking scrollbar
+    if(ImGui::IsWindowFocused() && mouse_pos.y<vMax.y && mouse_pos.x<vMax.x && mouse_pos.y>vMin.y && mouse_pos.x>vMin.x) // need focus to insert note and not clicking outside scrollbar bounds
     {
         // insert note if nothing is selected and clicked
         if(sel==-1&&noteleft_dragIdx==-1&&noteright_dragIdx==-1)
