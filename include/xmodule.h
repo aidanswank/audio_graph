@@ -118,7 +118,7 @@ struct xmodule
     STEREO_AUDIO output_audio;
     STEREO_AUDIO input_audio;
     
-    void* input_void_ptr;
+    void* input_void_ptr = NULL;
     
 //    std::vector<xmodule*>& modules;
     audio_graph<xmodule*>& graph;

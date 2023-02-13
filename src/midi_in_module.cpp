@@ -1,5 +1,12 @@
 #include "midi_in_module.h"
 
+double midi2freq(int n)
+{
+    double f = 440.0 * pow(2, ((double)n - 69) / 12.0);
+
+    return f;
+}
+
 void midiCallback(double deltaTime, std::vector<unsigned char> *message, void *pUserData)
 {
     
@@ -74,10 +81,13 @@ midi_in_module::midi_in_module(audio_graph<xmodule*>& graph) : xmodule(graph)
 
 //     midiin_ptr->openPort(1);
      midiin_ptr->setCallback(&midiCallback, this);
+    
+//    int* secret_luv_uu = new int(123456789);
+    input_void_ptr = (void*)&current_midi_note;
 };
 
 void midi_in_module::process()
- {
+{
 //     std::cout << "id " << id << " midi in process" << std::endl;
     
     input_notes.clear();
@@ -89,11 +99,11 @@ void midi_in_module::process()
             break;
         }
         std::cout << note.isNoteOn << " " << note.noteNum << " " << note.velocity << std::endl;
+        current_midi_note = note.noteNum;
         input_notes.push_back(note);
     }
         
-//    value_stack.push(module_data);
- };
+};
 
 xmodule* module_midi_in__create(audio_graph<xmodule*>& graph)
 {

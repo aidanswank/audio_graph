@@ -14,12 +14,16 @@
 //    bool isNoteOn = false;
 //};
 
+double midi2freq(int n);
+
 struct midi_in_module : xmodule {
     
     RtMidiIn* midiin_ptr;
     //    std::vector<MidiNoteMessage> notes;
     moodycamel::ConcurrentQueue<MidiNoteMessage> notesQueue;
     std::vector<std::string> port_names;
+    
+    int current_midi_note = 0;
     
     midi_in_module(audio_graph<xmodule*>& graph);
     void process() override;

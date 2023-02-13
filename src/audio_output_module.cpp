@@ -12,7 +12,7 @@ void audio_output_module::process()
     {
         for(int j = 0; j < input_ids[i].size(); j++)
         {
-            print(i,j,"id",input_ids[i][j]);
+//            print(i,j,"id",input_ids[i][j]);
             if(input_ids[i][j] != -1)
             {
                 xmodule *mod = graph.xmodules[ input_ids[i][j] ];

@@ -8,9 +8,17 @@
 #include "cjfilter_module.h"
 #include "audio_output_module.h"
 #include "osc_module.h"
+#include "midi_sequencer_module.h"
 //#include "graph.h"
 #include "audio_interface.h"
 //#include "audio_callback.h"
+#include "MidiFile.h"
+
+global_transport g_transport;
+
+#include "piano_roll.h"
+static bool isOpenSequencerWindow;
+smf::MidiFile mymidifile;
 
 static int audio_callback( const void *inputBuffer, void *outputBuffer,
                             unsigned long framesPerBuffer,
@@ -23,6 +31,15 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
     audio_graph<xmodule*>* graph = (audio_graph<xmodule*>*)interface->data;
 
 
+    if(g_transport.is_playing)
+    {
+        g_transport.sample_count += framesPerBuffer;
+        g_transport.ms_per_tick = get_ms_per_tick(g_transport.tempo,g_transport.ticks_per_quarter_note);
+        float midi_tick_count = samples_to_ticks(g_transport.sample_count, g_transport.ms_per_tick, 44100);
+        g_transport.midi_tick_count = midi_tick_count;
+        g_transport.current_seconds = g_transport.sample_count/44100.0f;
+    }
+    
 //    interface->graph->clear(); // clear previous search
 //    interface->graph->DFS(root_node); // do graph search from root node
     if(graph->xmodules.size()>0 && graph->root_id!=-1)
@@ -38,7 +55,6 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
         for( uint i=0; i<framesPerBuffer; ++i )
         {
             //        float w = (float)(rand()%100)/1000.0f; //testing with white noise
-            // TODO CHANGE ROOT NODE TO 0 NOT 3 !!
             //        output[i * 2] = w;
             //        output[i * 2 + 1] = w;  /* right */
             output[i * 2] = graph->xmodules[root_node]->output_audio[0][i]; /* left */
@@ -68,7 +84,6 @@ void audio_settings_gui(audio_interface* interface)
                 if (ImGui::Selectable(interface->device_infos[n].name, is_selected))
                 {
                     current_item = interface->device_infos[n].name;
-                    print("dev id", n);
                     interface->set_param(true, n);
                     interface->try_params();
                     interface->turn_on(audio_callback);
@@ -126,6 +141,7 @@ public:
         my_audio_interface = p_audio_interface;
         print("ui init");
         ui.init(window,gl_context);
+        isOpenSequencerWindow=true;
     }
     ~user_interface()
     {
@@ -139,12 +155,16 @@ public:
         
         audio_settings_gui(my_audio_interface);
 
-        ui.update();
+//        ui.update();
+        
+        ImGui::ShowDemoWindow();
+        
+        piano_roll_window(&isOpenSequencerWindow, mymidifile);
 
         static bool node_editor_active = true;
         if(node_editor_active)
         {
-            ImGui::Begin("testing", &node_editor_active, ImGuiWindowFlags_MenuBar);
+            ImGui::Begin("patch editor", &node_editor_active);
             ImNodes::BeginNodeEditor();
             
             const bool open_popup = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
@@ -266,15 +286,28 @@ public:
         }
 
         // Create a window called "My First Tool", with a menu bar.
-        static bool debug_active = true;
-        if(debug_active)
-        {
-            ImGui::Begin("debug", &debug_active);
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
-                           1000.0f / ImGui::GetIO().Framerate,
-                           ImGui::GetIO().Framerate);
-            ImGui::End();
-        }
+//        static bool debug_active = true;
+//        if(debug_active)
+//        {
+//            ImGui::Begin("debug", &debug_active);
+//            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)",
+//                           1000.0f / ImGui::GetIO().Framerate,
+//                           ImGui::GetIO().Framerate);
+//            
+////            ImDrawList *draw_list = ImGui::GetWindowDrawList();
+//            
+//            ImVec2 vMin = ImGui::GetWindowContentRegionMin();
+//            ImVec2 vMax = ImGui::GetWindowContentRegionMax();
+//
+//            vMin.x += ImGui::GetWindowPos().x;
+//            vMin.y += ImGui::GetWindowPos().y;
+//            vMax.x += ImGui::GetWindowPos().x;
+//            vMax.y += ImGui::GetWindowPos().y;
+//
+//            ImGui::GetForegroundDrawList()->AddRect( vMin, vMax, IM_COL32( 255, 255, 0, 255 ) );
+//            
+//            ImGui::End();
+//        }
 
         ui.render();
     }
@@ -319,13 +352,14 @@ int main()
     // idk just easier right now
     graph.event = &event;
     
-    std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&)> factory_map;
+    std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&)> module_factory_map;
     
-    factory_map[module_audio_output__get_name()]    = &module_audio_output__create;
-    factory_map[module_midi_in__get_name()]         = &module_midi_in__create;
-    factory_map[module_vst3_instrument__get_name()] = &module_vst3_instrument__create;
-    factory_map[module_cjfilter__get_name()]        = &module_cjfilter__create;
-    factory_map[module_osc__get_name()]             = &module_osc__create;
+    module_factory_map[module_audio_output__get_name()]    = &module_audio_output__create;
+    module_factory_map[module_midi_in__get_name()]         = &module_midi_in__create;
+    module_factory_map[module_vst3_instrument__get_name()] = &module_vst3_instrument__create;
+    module_factory_map[module_cjfilter__get_name()]        = &module_cjfilter__create;
+    module_factory_map[module_osc__get_name()]             = &module_osc__create;
+    module_factory_map[module_midi_sequencer__get_name()]  = &module_midi_sequencer__create;
 
 //    graph.xmodules.push_back( factory_map[module_midi_in__get_name()](graph) ); // rt midi in
 //    graph.xmodules.push_back( factory_map[module_vst3_instrument__get_name()](graph) ); // vst plug
@@ -385,11 +419,22 @@ int main()
     // set up audio interface and open stream
     audio_interface interface;
     interface.scan_devices();
-    interface.init_devices(44100, 256, 2, 3);  //  sample rate, buffer size, input_device_id, output_device_id
+    interface.sample_rate=44100;
+    interface.buffer_size=256;
+//    interface.init_devices(44100, 256, 0, 1);  //  sample rate, buffer size, input_device_id, output_device_id
     interface.pass_userdata(&graph);
-    interface.turn_on(audio_callback);
+//    interface.turn_on(audio_callback);
     
-    user_interface ui(window, gl_context, &graph, &factory_map, &interface);
+//    smf::MidiFile mymidifile;
+    int midifile_err = mymidifile.read("/Users/aidan/dev/cpp/dfs_modules/arp.mid");
+    if (midifile_err == 0)
+    {
+        std::cout << "error loading midi!! :(" << std::endl;
+    }
+    g_transport.midifile=&mymidifile;
+    mymidifile.linkNotePairs();
+    
+    user_interface ui(window, gl_context, &graph, &module_factory_map, &interface);
     
     bool is_running = true;
     

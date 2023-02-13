@@ -24,10 +24,16 @@ include_directories(${CMAKE_SOURCE_DIR} include vendor ${vst3sdk_path})
 link_directories(${vst3sdk_path}/build/lib/Debug)
 
 file(GLOB SOURCES 
-    src/*.cpp
+   	src/*.cpp
 	vendor/*.cpp
-    vendor/EasyVst/src/window.mm
+    	vendor/EasyVst/src/window.mm
 	vendor/EasyVst/src/EasyVst.cpp
+	vendor/midifile/src/MidiFile.cpp
+	vendor/midifile/src/MidiEventList.cpp
+	vendor/midifile/src/MidiEvent.cpp
+	vendor/midifile/src/MidiMessage.cpp
+	vendor/midifile/src/Options.cpp
+	vendor/midifile/src/Binasc.cpp
 	${vst3sdk_path}/public.sdk/source/vst/hosting/connectionproxy.cpp
 	${vst3sdk_path}/public.sdk/source/vst/hosting/eventlist.cpp
 	${vst3sdk_path}/public.sdk/source/vst/hosting/hostclasses.cpp
@@ -41,7 +47,7 @@ file(GLOB SOURCES
 	${vst3sdk_path}/public.sdk/source/vst/hosting/module_mac.mm
 )
 file(GLOB INCLUDES include/*.h vendor/*.h)
-include_directories(vendor/EasyVst/include/ ${vst3sdk_path})
+include_directories(vendor/EasyVst/include/ vendor/midifile/include/ ${vst3sdk_path})
 add_executable(
     ${TARGET_EXE}
     ${SOURCES}

@@ -18,13 +18,13 @@ void cjfilter_module::process()
 //    {
 ////        print("true");
     
-    for(int i = 0; i < input_ids.size(); i++)
-    {
-        print(i, "ii", input_ids[i][0]);
-    }
+//    for(int i = 0; i < input_ids.size(); i++)
+//    {
+//        print(i, "ii", input_ids[i][0]);
+//    }
         if(input_ids[0][0]!=-1)
         {
-            print("?????");
+//            print("?????");
             xmodule* input_module = (xmodule*)graph.xmodules[ input_ids[0][0] ];
             
             STEREO_AUDIO input_audio = input_module->output_audio;
