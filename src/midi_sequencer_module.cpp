@@ -55,7 +55,7 @@ void midi_sequencer::process()
             note.isNoteOn = event.isNoteOn();
 
             print("midi event",note.isNoteOn,note.noteNum,note.velocity);
-//            input_notes.push_back(note);
+            input_notes.push_back(note);
         }
     }
 }

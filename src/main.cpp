@@ -442,13 +442,22 @@ int main()
     
     
     // testing patch
-    xmodule* test_osc = module_osc__create(graph);
-    graph.xmodules.push_back( test_osc );
     xmodule* audio_output = module_audio_output__create(graph);
     graph.root_id = audio_output->id;// NEED TO LINK ROOT ID FOR AUDIO TO WORK
     graph.xmodules.push_back( audio_output );
-    link_module(2, 3, &graph);
     
+//    xmodule* test_osc = module_osc__create(graph);
+//    graph.xmodules.push_back( test_osc );
+    
+    xmodule* midi_seq = module_midi_sequencer__create(graph);
+    graph.xmodules.push_back( midi_seq );
+    
+    xmodule* vst3_inst = module_vst3_instrument__create(graph);
+    graph.xmodules.push_back( vst3_inst );
+    
+    link_module(1, 2, &graph); // midi seq to vst
+    link_module(3, 0, &graph); // vst to output
+
     user_interface ui(window, gl_context, &graph, &module_factory_map, &interface);
     
     bool is_running = true;
