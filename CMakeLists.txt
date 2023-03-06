@@ -20,13 +20,19 @@ find_package(rtmidi CONFIG REQUIRED)
 find_package(unofficial-concurrentqueue CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 
-include_directories(${CMAKE_SOURCE_DIR} include vendor ${vst3sdk_path})
+include_directories(${CMAKE_SOURCE_DIR} include vendor src/modules ${vst3sdk_path})
 link_directories(${vst3sdk_path}/build/lib/Debug)
+
+file(GLOB MODULE_SOURCES src/modules/*.cpp)
+file(GLOB MODULE_INCLUDES src/modules/*.h)
+source_group(TREE "${CMAKE_CURRENT_LIST_DIR}" FILES ${MODULE_SOURCES})
+source_group(TREE "${CMAKE_CURRENT_LIST_DIR}" FILES ${MODULE_INCLUDES})
 
 file(GLOB SOURCES 
    	src/*.cpp
 	vendor/*.cpp
-    	vendor/EasyVst/src/window.mm
+	src/modules/*.cpp
+	vendor/EasyVst/src/window.mm
 	vendor/EasyVst/src/EasyVst.cpp
 	vendor/midifile/src/MidiFile.cpp
 	vendor/midifile/src/MidiEventList.cpp
@@ -51,8 +57,13 @@ include_directories(vendor/EasyVst/include/ vendor/midifile/include/ ${vst3sdk_p
 add_executable(
     ${TARGET_EXE}
     ${SOURCES}
-    ${INCLUDES})
-    target_link_libraries(${TARGET_EXE}
+    ${INCLUDES}
+	${MODULE_SOURCES}
+    ${MODULE_INCLUDES}
+)
+
+target_link_libraries(
+	${TARGET_EXE}
     SDL2::SDL2                                          #app libs
     portaudio_static
     RtMidi::rtmidi
