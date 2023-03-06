@@ -41,8 +41,6 @@ void midi_sequencer::process()
     
     smf::MidiEventList midi_events = g_transport.midifile[0][0];
     
-//    if()
-
     for(int i = 0; i < midi_events.size(); i++)
     {
         smf::MidiEvent event = midi_events[i];

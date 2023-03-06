@@ -20,8 +20,13 @@ void audio_output_module::process()
                 for(int i = 0; i < 256; i++)
                 {
                     //                xmodule::audio[i] += mod->audio[i];
-                    xmodule::output_audio[0][i] += mod->output_audio[0][i] * output_gain;
-                    xmodule::output_audio[1][i] += mod->output_audio[1][i] * output_gain;
+                    
+                    double exp_adjusted_slider = pow(output_gain,2); // make slider exponentional because volume intensity response of our ear is logarithmic
+                    
+//                    print(exp_adjusted_slider);
+                    
+                    xmodule::output_audio[0][i] += mod->output_audio[0][i] * exp_adjusted_slider;
+                    xmodule::output_audio[1][i] += mod->output_audio[1][i] * exp_adjusted_slider;
                 }
                 //            mod->audio.clear();
                 //            std::cout <<  "summing " << i << std::endl;

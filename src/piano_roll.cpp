@@ -24,7 +24,7 @@ void piano_roll_window(bool *isOpen, smf::MidiFile& midiFile)
     static float ticksPerColum = 1;
     static float noteHeight = 8;
 
-    float divsize = (96.f / 2);
+    float divsize = (96.f / 4);
 
     
     ImGui::Begin("toptoolbar", isOpen, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_HorizontalScrollbar);
@@ -32,13 +32,21 @@ void piano_roll_window(bool *isOpen, smf::MidiFile& midiFile)
 //    static char buf[16];
 //    snprintf(buf, 16, "%f", g_transport.tempo);
     ImGui::PushItemWidth(35.0f);
-    ImGui::InputFloat("TEMPO", &g_transport.tempo);
+    if(ImGui::Button("-"))
+    {
+        g_transport.tempo-=5;
+    }
+    ImGui::SameLine();
+    ImGui::InputFloat("##tempo", &g_transport.tempo);
+    ImGui::SameLine();
+    if(ImGui::Button("+"))
+    {
+        g_transport.tempo+=5;
+    }
     ImGui::SameLine();
     if(ImGui::Button("PLAY"))
     {
         g_transport.is_playing=true;
-//        float tempo = atof(buf);
-//        print("play sequence",tempo);
     }
     ImGui::SameLine();
     if(ImGui::Button("PAUSE"))

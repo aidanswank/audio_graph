@@ -3,6 +3,7 @@
 xmodule* module_audio_output__create(audio_graph<xmodule*>& graph);
 std::string module_audio_output__get_name();
 
+
 struct audio_output_module : xmodule {
     
     float output_gain;
