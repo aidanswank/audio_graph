@@ -118,8 +118,9 @@ struct xmodule
     STEREO_AUDIO output_audio;
     STEREO_AUDIO input_audio;
     
+    // if the user wants to store some data that isn't audio or midi
     void* input_void_ptr = NULL;
-    
+    void* output_void_ptr = NULL;
 //    std::vector<xmodule*>& modules;
     audio_graph<xmodule*>& graph;
     std::string name;

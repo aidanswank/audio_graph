@@ -6,8 +6,8 @@ osc_module::osc_module(audio_graph<xmodule*>& graph) : xmodule(graph)
     blep = new PolyBLEP(44100, PolyBLEP::SINE, 440.0f);
     name = module_osc__get_name();
         
-//    int* secret_luv_uu = new int(123456789);
-//    input_void_ptr = (void*)secret_luv_uu;
+//    float* secret_luv_uu = new float(0);
+    input_void_ptr = (void*)new float(0);
     
     config(2,1);
 };
@@ -17,32 +17,55 @@ void osc_module::process() {
 
     float *audio_output_left = xmodule::output_audio[0].data();
     float *audio_output_right = xmodule::output_audio[1].data();
+    xmodule* freq_input_mod = NULL;
 
     if(input_ids[0][0]!=-1)
     {
-        print("in 1");
-        xmodule* input = (xmodule*)graph.xmodules[ input_ids[0][0] ];
-        int* test_in = (int*)input->input_void_ptr;
-        if(test_in==NULL)
-        {
-            print("CONNECTED INPUT IS NULL!");
-        } else {
-            print(*test_in);
-            freq = midi2freq(*test_in);
-//            blep->setFrequency(midi2freq(*test_in));
-        }
-    }
-    
-    if(input_ids[1][0]!=-1)
-    {
-        print("in 2");
-    }
-    
-    blep->setFrequency(freq);
+////        print("in 1");
+//        xmodule* input = (xmodule*)graph.xmodules[ input_ids[0][0] ];
+//        float* test_in = (float*)input->output_void_ptr;
+//        if(test_in==NULL)
+//        {
+//            print("CONNECTED INPUT IS NULL!");
+//        } else {
+//            print(*test_in);
+////            freq = midi2freq(*test_in);
+//            freq = *test_in;
+//
+////            blep->setFrequency(midi2freq(*test_in));
+//        }
+        
+        freq_input_mod = (xmodule*)graph.xmodules[ input_ids[0][0] ];
+//        freq_input_mod->output_audio[i][0]
+        
 
+    }
+    
+//    if(input_ids[1][0]!=-1)
+//    {
+//        print("in 2");
+//    }
+//
+//    blep->setFrequency(freq);
+
+//    if(freq_input_mod) {
+////        print(output_audio[0][0]);
+//        freq = freq_input_mod->output_audio[0][0];
+//    }
+//
+    blep->setFrequency(freq);
+    
     for (unsigned long i = 0; i < 256; ++i) {
+        
+        if(freq_input_mod) {
+    //        print(output_audio[0][0]);
+            freq = freq_input_mod->output_audio[0][i];
+        }
+        
+        blep->setFrequency(freq);
+        
         float samp = blep->getAndInc();
-//        print("samp",samp);
+        
         audio_output_left[i] = samp;
         audio_output_right[i] = samp;
     }
@@ -57,12 +80,12 @@ void osc_module::show() {
     ImNodes::EndNodeTitleBar();
     
     ImNodes::BeginInputAttribute( input_attrs[0] );
-    ImGui::Text("midi input");
+    ImGui::Text("freq in");
     ImNodes::EndInputAttribute();
     
-    ImNodes::BeginInputAttribute( input_attrs[1] );
-    ImGui::Text("not real");
-    ImNodes::EndInputAttribute();
+//    ImNodes::BeginInputAttribute( input_attrs[1] );
+//    ImGui::Text("not real");
+//    ImNodes::EndInputAttribute();
     
     ImGui::PushItemWidth(100.0f);
     ImGui::Checkbox("LFO", &isLFO);

@@ -2,6 +2,7 @@
 #include <vector>
 #include "SDL2/SDL.h"
 
+// modules
 #include "xmodule.h"
 #include "midi_in_module.h"
 #include "vst3_module.h"
@@ -9,6 +10,10 @@
 #include "audio_output_module.h"
 #include "osc_module.h"
 #include "midi_sequencer_module.h"
+#include "float_module.h"
+#include "multiply_sig_module.h"
+#include "add_sig_module.h"
+
 //#include "graph.h"
 #include "audio_interface.h"
 //#include "audio_callback.h"
@@ -364,6 +369,9 @@ int main()
     module_factory_map[module_cjfilter__get_name()]        = &module_cjfilter__create;
     module_factory_map[module_osc__get_name()]             = &module_osc__create;
     module_factory_map[module_midi_sequencer__get_name()]  = &module_midi_sequencer__create;
+    module_factory_map[module_float__get_name()]           = &module_float__create;
+    module_factory_map[module_multiply__get_name()]        = &module_multiply__create;
+    module_factory_map[module_add__get_name()]             = &module_add__create;
 
 //    graph.xmodules.push_back( factory_map[module_midi_in__get_name()](graph) ); // rt midi in
 //    graph.xmodules.push_back( factory_map[module_vst3_instrument__get_name()](graph) ); // vst plug

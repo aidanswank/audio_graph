@@ -36,7 +36,7 @@ void cjfilter_module::process()
                     xmodule* input2_test = (xmodule*)graph.xmodules[ input_ids[1][0] ];
                     float sig = input2_test->output_audio[0][i];
                     sig = (sig + 1.0) / 2.0; // scale -1.0 to 1.0 -> 0.0 to 1.0
-                    sig = pow(sig,3);
+//                    sig = pow(sig,3);
                     cutoff = sig;
                 }
                 filter[0].doFilter(input_audio[0][i], cutoff, resonance);
