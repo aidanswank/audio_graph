@@ -275,6 +275,35 @@ public:
                     for (const int edge_id : selected_links)
                     {
                         print("ei",edge_id);
+                        int start_attr = graph->links[ edge_id ].first;
+                        int end_attr = graph->links[ edge_id ].second;
+                        print("start_attr", start_attr, "end attr",end_attr);
+                        print(
+                              "start id",graph->xmodules[ graph->attr2id[start_attr] ]->id,
+                              "end id",graph->xmodules[ graph->attr2id[end_attr] ]->id
+                        );
+
+                        graph->links.erase(graph->links.begin() + edge_id);
+                        
+                        std::vector<int>& start_attr_vector  = graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[end_attr] ];
+                        
+                        std::vector<int>& end_attr_vector    = graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ];
+                        
+//                        start_attr_vector[0] = -1;
+//                        end_attr_vector[0] = -1;
+//
+                        for(int i = 0; i < start_attr_vector.size(); i++)
+                        {
+                            start_attr_vector[i] = -1;
+                        }
+                        
+                        for(int i = 0; i < end_attr_vector.size(); i++)
+                        {
+                            end_attr_vector[i] = -1;
+                        }
+
+
+//                        graph->links[edge_id].
 //                        graph->
 //                        graph2.erase_edge(edge_id);
                     }

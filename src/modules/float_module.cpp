@@ -47,5 +47,5 @@ xmodule* module_float__create(audio_graph<xmodule*>& graph)
 
 std::string module_float__get_name()
 {
-    return "float32";
+    return "float signal";
 };
