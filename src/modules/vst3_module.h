@@ -13,7 +13,7 @@ struct vst3_midi_instrument : xmodule {
     
     enum input_id { MIDI_IN };
 
-    vst3_midi_instrument(audio_graph<xmodule*>& graph);
+    vst3_midi_instrument(audio_graph<xmodule*>& graph, ImVec2 click_pos);
 //    vst3_midi_instrument* init(audio_graph<xmodule*>& graph)
 //    {
 //        return new vst3_midi_instrument(event,graph);
@@ -57,5 +57,5 @@ struct vst3_midi_instrument : xmodule {
     };
 };
 
-xmodule* module_vst3_instrument__create(audio_graph<xmodule*>& graph);
+xmodule* module_vst3_instrument__create(audio_graph<xmodule*>& graph, ImVec2 click_pos);
 std::string module_vst3_instrument__get_name();

@@ -61,14 +61,14 @@ void add_module::process() {
     }
 }
 
-add_module::add_module(audio_graph<xmodule*>& graph) : xmodule(graph) {
+add_module::add_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule(graph, click_pos) {
     config(2,1);
     name = module_add__get_name(); // this feels weird
 }
 
-xmodule* module_add__create(audio_graph<xmodule*>& graph)
+xmodule* module_add__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)
 {
-    return new add_module(graph);
+    return new add_module(graph, click_pos);
 };
 
 std::string module_add__get_name()

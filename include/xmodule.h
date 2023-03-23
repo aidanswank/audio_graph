@@ -22,7 +22,7 @@ struct xmodule
 {
     // Constructor
     // xmodule(int p_id, int p_num_inputs, int p_num_outputs) : id(p_id), num_inputs(p_num_inputs), num_ouputs(p_num_outputs) {}
-    xmodule(audio_graph<xmodule*>& p_graph) : graph(p_graph) {
+    xmodule(audio_graph<xmodule*>& p_graph, ImVec2 click_pos) : graph(p_graph) {
         zero_audio(output_audio, 256);
         id = graph.id_counter;
         graph.id_counter++;

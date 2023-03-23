@@ -1,6 +1,6 @@
 #include "xmodule.h"
 
-xmodule* module_audio_output__create(audio_graph<xmodule*>& graph);
+xmodule* module_audio_output__create(audio_graph<xmodule*>& graph, ImVec2 click_pos);
 std::string module_audio_output__get_name();
 
 
@@ -8,10 +8,11 @@ struct audio_output_module : xmodule {
     
     float output_gain;
     
-    audio_output_module(audio_graph<xmodule*>& graph) : xmodule(graph){
+    audio_output_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule(graph, click_pos){
         name = module_audio_output__get_name();
         output_gain = 0.0f;
         config(1,0);
+        ImNodes::SetNodeScreenSpacePos(xmodule::id, click_pos);
     }
     
     void show() override {

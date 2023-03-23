@@ -25,7 +25,7 @@ struct midi_in_module : xmodule {
     
     int current_midi_note = 0;
     
-    midi_in_module(audio_graph<xmodule*>& graph);
+    midi_in_module(audio_graph<xmodule*>& graph, ImVec2 click_pos);
     void process() override;
     void show() override {
         ImNodes::BeginNode(xmodule::id);
@@ -72,5 +72,5 @@ struct midi_in_module : xmodule {
     
 };
 
-xmodule* module_midi_in__create(audio_graph<xmodule*>& graph);
+xmodule* module_midi_in__create(audio_graph<xmodule*>& graph, ImVec2 click_pos);
 std::string module_midi_in__get_name();

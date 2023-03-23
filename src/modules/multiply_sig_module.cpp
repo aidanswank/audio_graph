@@ -69,14 +69,15 @@ void multiply_module::process() {
     
 }
 
-multiply_module::multiply_module(audio_graph<xmodule*>& graph) : xmodule(graph) {
+multiply_module::multiply_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule(graph, click_pos) {
     config(2,1);
     name = module_multiply__get_name(); // this feels weird
+    ImNodes::SetNodeScreenSpacePos(id, click_pos);
 }
 
-xmodule* module_multiply__create(audio_graph<xmodule*>& graph)
+xmodule* module_multiply__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)
 {
-    return new multiply_module(graph);
+    return new multiply_module(graph, click_pos);
 };
 
 std::string module_multiply__get_name()

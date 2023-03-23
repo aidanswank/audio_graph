@@ -1,10 +1,11 @@
 #include "float_module.h"
 
-float_module::float_module(audio_graph<xmodule*>& graph) : xmodule(graph)
+float_module::float_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule(graph, click_pos)
 {
     data = 0;
     name = module_float__get_name();
     config(1,1);
+    ImNodes::SetNodeScreenSpacePos(id, click_pos);
 }
 
 void float_module::process() {
@@ -40,9 +41,9 @@ void float_module::show() {
     ImNodes::EndNode();
 }
 
-xmodule* module_float__create(audio_graph<xmodule*>& graph)
+xmodule* module_float__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)
 {
-    return new float_module(graph);
+    return new float_module(graph, click_pos);
 };
 
 std::string module_float__get_name()

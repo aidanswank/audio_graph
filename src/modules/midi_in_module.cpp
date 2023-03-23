@@ -44,7 +44,7 @@ void midiCallback(double deltaTime, std::vector<unsigned char> *message, void *p
 
 };
 
-midi_in_module::midi_in_module(audio_graph<xmodule*>& graph) : xmodule(graph)
+midi_in_module::midi_in_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule(graph, click_pos)
 {
     name = module_midi_in__get_name();
     config(0,1);
@@ -84,6 +84,8 @@ midi_in_module::midi_in_module(audio_graph<xmodule*>& graph) : xmodule(graph)
     
 //    int* secret_luv_uu = new int(123456789);
     input_void_ptr = (void*)&current_midi_note;
+    
+    ImNodes::SetNodeScreenSpacePos(id, click_pos);
 };
 
 void midi_in_module::process()
@@ -105,9 +107,9 @@ void midi_in_module::process()
         
 };
 
-xmodule* module_midi_in__create(audio_graph<xmodule*>& graph)
+xmodule* module_midi_in__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)
 {
-    return new midi_in_module(graph);
+    return new midi_in_module(graph, click_pos);
 }
 
 std::string module_midi_in__get_name()

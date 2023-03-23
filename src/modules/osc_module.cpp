@@ -1,7 +1,7 @@
 #include "osc_module.h"
 #include "midi_in_module.h"
 
-osc_module::osc_module(audio_graph<xmodule*>& graph) : xmodule(graph)
+osc_module::osc_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule(graph, click_pos)
 {
     blep = new PolyBLEP(44100, PolyBLEP::SINE, 440.0f);
     name = module_osc__get_name();
@@ -10,6 +10,8 @@ osc_module::osc_module(audio_graph<xmodule*>& graph) : xmodule(graph)
     input_void_ptr = (void*)new float(0);
     
     config(2,1);
+    
+    ImNodes::SetNodeScreenSpacePos(id, click_pos);
 };
 
 
@@ -124,9 +126,9 @@ void osc_module::show() {
     ImNodes::EndNode();
 };
 
-xmodule* module_osc__create(audio_graph<xmodule*>& graph)
+xmodule* module_osc__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)
 {
-    return new osc_module(graph);
+    return new osc_module(graph, click_pos);
 };
 
 std::string module_osc__get_name()

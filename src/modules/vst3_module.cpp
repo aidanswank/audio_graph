@@ -1,7 +1,7 @@
 #include "vst3_module.h"
 #include "public.sdk/source/vst/utility/stringconvert.h"
 
-vst3_midi_instrument::vst3_midi_instrument(audio_graph<xmodule*>& graph) : xmodule(graph)
+vst3_midi_instrument::vst3_midi_instrument(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule(graph, click_pos)
 {
     config(1,1);
     
@@ -60,6 +60,8 @@ vst3_midi_instrument::vst3_midi_instrument(audio_graph<xmodule*>& graph) : xmodu
         //    return 1;
      }
     SDL_HideWindow(vst._window);
+    
+    ImNodes::SetNodeScreenSpacePos(id, click_pos);
 
 };
 
@@ -147,9 +149,9 @@ void vst3_midi_instrument::process()
     
 }
 
-xmodule* module_vst3_instrument__create(audio_graph<xmodule*>& graph)
+xmodule* module_vst3_instrument__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)
 {
-    return new vst3_midi_instrument(graph);
+    return new vst3_midi_instrument(graph, click_pos);
 };
 
 std::string module_vst3_instrument__get_name(){

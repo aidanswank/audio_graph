@@ -1,6 +1,6 @@
 #include "cjfilter_module.h"
 
-cjfilter_module::cjfilter_module(audio_graph<xmodule*>& graph) : xmodule(graph)
+cjfilter_module::cjfilter_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule(graph, click_pos)
 {
 //    name = "cjfilter";
 //    graph.push_unique_str(name);
@@ -8,7 +8,8 @@ cjfilter_module::cjfilter_module(audio_graph<xmodule*>& graph) : xmodule(graph)
     config(2,1);
     cutoff = 0.1;
     resonance = 0.0;
-    
+    ImNodes::SetNodeScreenSpacePos(id, click_pos);
+
 //    input_void_ptr = new float[256](); // some mono signal to control cutoff
 }
 
@@ -76,9 +77,9 @@ void cjfilter_module::show()
     ImNodes::EndNode();
 };
 
-xmodule* module_cjfilter__create(audio_graph<xmodule*>& graph)
+xmodule* module_cjfilter__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)
 {
-    return new cjfilter_module(graph);
+    return new cjfilter_module(graph, click_pos);
 };
 
 std::string module_cjfilter__get_name()

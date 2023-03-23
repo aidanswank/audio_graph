@@ -1,11 +1,12 @@
 #include "midi_sequencer_module.h"
 
 
-midi_sequencer::midi_sequencer(audio_graph<xmodule*>& graph) : xmodule(graph)
+midi_sequencer::midi_sequencer(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule(graph, click_pos)
 {
     name = module_midi_sequencer__get_name();
     config(0,1);
-    
+    ImNodes::SetNodeScreenSpacePos(id, click_pos);
+
 //    MidiNoteMessage fakenote;
 //    fakenote.noteNum=65;
 //    fakenote.isNoteOn=true;
@@ -58,9 +59,9 @@ void midi_sequencer::process()
     }
 }
 
-xmodule* module_midi_sequencer__create(audio_graph<xmodule*>& graph)
+xmodule* module_midi_sequencer__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)
 {
-    return new midi_sequencer(graph);
+    return new midi_sequencer(graph, click_pos);
 }
 
 std::string module_midi_sequencer__get_name()

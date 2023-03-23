@@ -131,13 +131,13 @@ void link_module(int start_attr, int end_attr, audio_graph<xmodule*>* graph)
     print("arr2id map start", graph->attr2id[start_attr], "end", graph->attr2id[end_attr]);
 
     std::vector<int>& start_attr_vector  = graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[end_attr] ];
-    
+
     std::vector<int>& end_attr_vector    = graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ];
-    
-    
+
+
     // if there was nothing connected before (-1) put it in the first slot which is 0
     // else if theres already a cable connected push it onto the vector (e.g the final audio output were multiple cables to be connected to same slot)
-    
+
     if(start_attr_vector[0]==-1)
     {
         start_attr_vector[0] = graph->attr2id[end_attr];
@@ -155,19 +155,52 @@ void link_module(int start_attr, int end_attr, audio_graph<xmodule*>* graph)
     graph->links.push_back(std::make_pair(start_attr, end_attr));
 }
 
+void remove_link(int edge_id, audio_graph<xmodule*>* graph)
+{
+    
+    int start_attr = graph->links[ edge_id ].first;
+    int end_attr = graph->links[ edge_id ].second;
+//                        print("start_attr", start_attr, "end attr",end_attr);
+//                        print(
+//                              "start id",graph->xmodules[ graph->attr2id[start_attr] ]->id,
+//                              "end id",graph->xmodules[ graph->attr2id[end_attr] ]->id
+//                        );
+        
+    std::vector<int>& start_attr_vector  = graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[end_attr] ];
+    
+    std::vector<int>& end_attr_vector    = graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ];
+    
+    // fill input and output slots with -1
+    
+    for(int i = 0; i < start_attr_vector.size(); i++)
+    {
+        start_attr_vector[i] = -1;
+    }
+    
+    for(int i = 0; i < end_attr_vector.size(); i++)
+    {
+        end_attr_vector[i] = -1;
+    }
+    
+    // BREAKS WHEN DELETETING MULTIPLE NODES GOTTA FIX
+    graph->links.erase(graph->links.begin() + edge_id);
+
+}
+
 class user_interface
 {
 public:
     im_wrap ui;
     audio_graph<xmodule*>* graph;
-    std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&)>* factory_map;
+//    std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&)>* factory_map;
+    std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&, ImVec2)>* factory_map;
+
     audio_interface *my_audio_interface;
 
     user_interface(SDL_Window* window,
                    SDL_GLContext gl_context,
                    audio_graph<xmodule*>* p_graph,
-                   std::map<std::string,
-                   xmodule* (*)(audio_graph<xmodule*>&)>* p_factory_map,
+                   std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&, ImVec2)>* p_factory_map,
                    audio_interface *p_audio_interface)
     {
         factory_map = p_factory_map;
@@ -214,13 +247,14 @@ public:
             {
                 const ImVec2 click_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
                 
-                // loop through factory map to display names and push back if selected
-                for (std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&)>::iterator it = factory_map->begin(); it != factory_map->end(); ++it) {
+                print("click",click_pos.x, click_pos.y);
+//                 loop through factory map to display names and push back if selected
+                for (std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&, ImVec2)>::iterator it = factory_map->begin(); it != factory_map->end(); ++it) {
 //                    std::cout << it->first << std::endl;
                     if (ImGui::MenuItem(it->first.c_str()))
                     {
 //                        print(click_pos.x, click_pos.y, it->first.c_str());
-                        xmodule* m = factory_map->at(it->first)(*graph);
+                        xmodule* m = factory_map->at(it->first)(*graph, click_pos);
                         if(m->name=="audio output") // special case
                         {
                             graph->root_id = m->id;
@@ -275,37 +309,9 @@ public:
                     for (const int edge_id : selected_links)
                     {
                         print("ei",edge_id);
-                        int start_attr = graph->links[ edge_id ].first;
-                        int end_attr = graph->links[ edge_id ].second;
-                        print("start_attr", start_attr, "end attr",end_attr);
-                        print(
-                              "start id",graph->xmodules[ graph->attr2id[start_attr] ]->id,
-                              "end id",graph->xmodules[ graph->attr2id[end_attr] ]->id
-                        );
-
-                        graph->links.erase(graph->links.begin() + edge_id);
-                        
-                        std::vector<int>& start_attr_vector  = graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[end_attr] ];
-                        
-                        std::vector<int>& end_attr_vector    = graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ];
-                        
-//                        start_attr_vector[0] = -1;
-//                        end_attr_vector[0] = -1;
 //
-                        for(int i = 0; i < start_attr_vector.size(); i++)
-                        {
-                            start_attr_vector[i] = -1;
-                        }
-                        
-                        for(int i = 0; i < end_attr_vector.size(); i++)
-                        {
-                            end_attr_vector[i] = -1;
-                        }
+                        remove_link(edge_id, graph);
 
-
-//                        graph->links[edge_id].
-//                        graph->
-//                        graph2.erase_edge(edge_id);
                     }
                 }
             }
@@ -390,8 +396,9 @@ int main()
     // idk just easier right now
     graph.event = &event;
     
-    std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&)> module_factory_map;
-    
+//    std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&)> module_factory_map;
+    std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&, ImVec2)> module_factory_map;
+
     module_factory_map[module_audio_output__get_name()]    = &module_audio_output__create;
     module_factory_map[module_midi_in__get_name()]         = &module_midi_in__create;
     module_factory_map[module_vst3_instrument__get_name()] = &module_vst3_instrument__create;
@@ -477,12 +484,13 @@ int main()
     g_transport.midifile=&mymidifile;
     mymidifile.linkNotePairs();
     
+    user_interface ui(window, gl_context, &graph, &module_factory_map, &interface);
     
     // testing patch
-    xmodule* audio_output = module_audio_output__create(graph);
+    xmodule* audio_output = module_audio_output__create(graph, ImVec2(100,100));
     graph.root_id = audio_output->id;// NEED TO LINK ROOT ID FOR AUDIO TO WORK
     graph.xmodules.push_back( audio_output );
-    
+//
 ////    xmodule* test_osc = module_osc__create(graph);
 ////    graph.xmodules.push_back( test_osc );
 //    
@@ -494,8 +502,6 @@ int main()
 //    
 //    link_module(1, 2, &graph); // midi seq to vst
 //    link_module(3, 0, &graph); // vst to output
-
-    user_interface ui(window, gl_context, &graph, &module_factory_map, &interface);
     
     bool is_running = true;
 //
