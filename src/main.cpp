@@ -19,6 +19,9 @@
 //#include "audio_callback.h"
 #include "MidiFile.h"
 
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+json current_patch;
 global_transport g_transport;
 
 #include "piano_roll.h"
@@ -127,6 +130,7 @@ void audio_settings_gui(audio_interface* interface)
 
 void link_module(int start_attr, int end_attr, audio_graph<xmodule*>* graph)
 {
+        
     print("start", start_attr, "end", end_attr);
     print("arr2id map start", graph->attr2id[start_attr], "end", graph->attr2id[end_attr]);
 
@@ -134,6 +138,15 @@ void link_module(int start_attr, int end_attr, audio_graph<xmodule*>* graph)
 
     std::vector<int>& end_attr_vector    = graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ];
 
+    json link;
+    link["start"] = start_attr;
+    link["end"] = end_attr;
+    current_patch["links"].push_back(link);
+    print(current_patch);
+    
+//    // write prettified JSON to another file
+//    std::ofstream o("pretty.json");
+//    o << std::setw(4) << current_patch << std::endl;
 
     // if there was nothing connected before (-1) put it in the first slot which is 0
     // else if theres already a cable connected push it onto the vector (e.g the final audio output were multiple cables to be connected to same slot)
@@ -215,6 +228,38 @@ public:
         print("ui shutdown");
         ui.shutdown();
     }
+    void load_patch(std::string file_path)
+    {
+        std::ifstream i(file_path);
+        json loaded_patch;
+        i >> loaded_patch;
+        print(loaded_patch);
+        
+//        xmodule* m = factory_map->at(it->first)(*graph, click_pos);
+        
+        graph->root_id = loaded_patch["root_id"];
+        
+        for (auto& element : loaded_patch["nodes"])
+        {
+            float x = element["x"];
+            float y = element["y"];
+            std::string name = element["name"].get<std::string>();
+            ImVec2 pos(x,y);
+            print("name",name,"x",x,"y",y);
+            xmodule* m = factory_map->at(name)(*graph, pos);
+            graph->xmodules.push_back( m );
+        }
+        
+        for (auto& element : loaded_patch["links"])
+        {
+//            link
+            print(element);
+            link_module(element["start"], element["end"], graph);
+        }
+        
+//        graph->xmodules.push_back( m );
+        
+    }
     void update()
     {
         
@@ -231,7 +276,28 @@ public:
         static bool node_editor_active = true;
         if(node_editor_active)
         {
-            ImGui::Begin("patch editor", &node_editor_active);
+            ImGui::Begin("patch editor", &node_editor_active, ImGuiWindowFlags_MenuBar);
+            
+            if (ImGui::BeginMenuBar())
+            {
+                if (ImGui::BeginMenu("File"))
+                {
+                    if (ImGui::MenuItem("Open..", "Ctrl+O"))
+                    {
+                    }
+                    if (ImGui::MenuItem("Save", "Ctrl+S"))
+                    {
+                        // write prettified JSON to another file
+                        std::ofstream o("mypatch.json");
+                        o << std::setw(4) << current_patch << std::endl;
+                        print("saved patch!", current_patch);
+                    }
+    //                if (ImGui::MenuItem("Close", "Ctrl+W"))  { my_tool_active = false; }
+                    ImGui::EndMenu();
+                }
+                ImGui::EndMenuBar();
+            }
+            
             ImNodes::BeginNodeEditor();
             
             const bool open_popup = ImGui::IsWindowFocused(ImGuiFocusedFlags_RootAndChildWindows) &&
@@ -247,19 +313,28 @@ public:
             {
                 const ImVec2 click_pos = ImGui::GetMousePosOnOpeningCurrentPopup();
                 
-                print("click",click_pos.x, click_pos.y);
 //                 loop through factory map to display names and push back if selected
                 for (std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&, ImVec2)>::iterator it = factory_map->begin(); it != factory_map->end(); ++it) {
 //                    std::cout << it->first << std::endl;
                     if (ImGui::MenuItem(it->first.c_str()))
                     {
-//                        print(click_pos.x, click_pos.y, it->first.c_str());
+                        print(click_pos.x, click_pos.y, it->first.c_str());
                         xmodule* m = factory_map->at(it->first)(*graph, click_pos);
-                        if(m->name=="audio output") // special case
+                        
+                        if(m->name=="audio output") // special case set root node
                         {
                             graph->root_id = m->id;
                         }
+                        
                         graph->xmodules.push_back( m );
+                        
+                        json mod_storage;
+                        mod_storage["name"] = m->name;
+                        mod_storage["x"] = click_pos.x;
+                        mod_storage["y"] = click_pos.y;
+                        current_patch["nodes"].push_back(mod_storage);
+                        current_patch["root_id"] = graph->root_id;
+//                        print(current_patch);
                     }
                 }
                 
@@ -329,6 +404,7 @@ public:
             ImGui::End();
         }
 
+        
         // Create a window called "My First Tool", with a menu bar.
 //        static bool debug_active = true;
 //        if(debug_active)
@@ -486,11 +562,13 @@ int main()
     
     user_interface ui(window, gl_context, &graph, &module_factory_map, &interface);
     
-    // testing patch
-    xmodule* audio_output = module_audio_output__create(graph, ImVec2(100,100));
-    graph.root_id = audio_output->id;// NEED TO LINK ROOT ID FOR AUDIO TO WORK
-    graph.xmodules.push_back( audio_output );
-//
+//    // testing patch
+//    xmodule* audio_output = module_audio_output__create(graph, ImVec2(100,100));
+//    graph.root_id = audio_output->id;// NEED TO LINK ROOT ID FOR AUDIO TO WORK
+//    graph.xmodules.push_back( audio_output );
+    
+    ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/mypatch.json");
+
 ////    xmodule* test_osc = module_osc__create(graph);
 ////    graph.xmodules.push_back( test_osc );
 //    
