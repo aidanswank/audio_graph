@@ -64,6 +64,7 @@ void add_module::process() {
 add_module::add_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule(graph, click_pos) {
     config(2,1);
     name = module_add__get_name(); // this feels weird
+    ImNodes::SetNodeScreenSpacePos(id, click_pos);
 }
 
 xmodule* module_add__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)

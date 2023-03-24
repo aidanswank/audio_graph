@@ -138,15 +138,11 @@ void link_module(int start_attr, int end_attr, audio_graph<xmodule*>* graph)
 
     std::vector<int>& end_attr_vector    = graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ];
 
-    json link;
-    link["start"] = start_attr;
-    link["end"] = end_attr;
-    current_patch["links"].push_back(link);
-    print(current_patch);
-    
-//    // write prettified JSON to another file
-//    std::ofstream o("pretty.json");
-//    o << std::setw(4) << current_patch << std::endl;
+//    json link;
+//    link["start"] = start_attr;
+//    link["end"] = end_attr;
+//    current_patch["links"].push_back(link);
+//    print(current_patch);
 
     // if there was nothing connected before (-1) put it in the first slot which is 0
     // else if theres already a cable connected push it onto the vector (e.g the final audio output were multiple cables to be connected to same slot)
@@ -184,7 +180,6 @@ void remove_link(int edge_id, audio_graph<xmodule*>* graph)
     std::vector<int>& end_attr_vector    = graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ];
     
     // fill input and output slots with -1
-    
     for(int i = 0; i < start_attr_vector.size(); i++)
     {
         start_attr_vector[i] = -1;
@@ -195,6 +190,23 @@ void remove_link(int edge_id, audio_graph<xmodule*>* graph)
         end_attr_vector[i] = -1;
     }
     
+//    int start = graph->links[edge_id].first;
+//    int end = graph->links[edge_id].second;
+//    int index = 0;
+//    for (auto& element : current_patch["links"])
+//    {
+////        link_module(element["start"], element["end"], graph);
+//        if(element["start"]==start&&element["end"]==end)
+//        {
+//            print("found link in patch");
+//            current_patch["links"].erase(current_patch["links"].begin())
+//        }
+//        index++;
+//    }
+    
+    current_patch["links"].erase(current_patch["links"].begin() + edge_id);
+    print("erased!, current",current_patch);
+        
     // BREAKS WHEN DELETETING MULTIPLE NODES GOTTA FIX
     graph->links.erase(graph->links.begin() + edge_id);
 
@@ -231,15 +243,17 @@ public:
     void load_patch(std::string file_path)
     {
         std::ifstream i(file_path);
-        json loaded_patch;
-        i >> loaded_patch;
-        print(loaded_patch);
+//        json current_patch;
+        i >> current_patch;
+//        print(current_patch);
+        
+//        current_patch = loaded_patch;
         
 //        xmodule* m = factory_map->at(it->first)(*graph, click_pos);
         
-        graph->root_id = loaded_patch["root_id"];
+        graph->root_id = current_patch["root_id"];
         
-        for (auto& element : loaded_patch["nodes"])
+        for (auto& element : current_patch["nodes"])
         {
             float x = element["x"];
             float y = element["y"];
@@ -250,11 +264,13 @@ public:
             graph->xmodules.push_back( m );
         }
         
-        for (auto& element : loaded_patch["links"])
+        for (auto& element : current_patch["links"])
         {
-//            link
-            print(element);
-            link_module(element["start"], element["end"], graph);
+            print("link!!!!!",element);
+            int start = element["start"];
+            int end = element["end"];
+//            print("start",start,"end",end);
+            link_module(start, end, graph);
         }
         
 //        graph->xmodules.push_back( m );
@@ -287,6 +303,17 @@ public:
                     }
                     if (ImGui::MenuItem("Save", "Ctrl+S"))
                     {
+                        // get current position of the modules and update json patch state
+                        for(int i = 0; i < graph->xmodules.size(); i++)
+                        {
+//                            print(graph->xmodules[i]->id);
+                            int id = graph->xmodules[i]->id;
+                            ImVec2 pos = ImNodes::GetNodeScreenSpacePos(id);
+                            print("pos",pos.x,pos.y);
+                            current_patch["nodes"][id]["x"] = pos.x;
+                            current_patch["nodes"][id]["y"] = pos.y;
+
+                        }
                         // write prettified JSON to another file
                         std::ofstream o("mypatch.json");
                         o << std::setw(4) << current_patch << std::endl;
@@ -361,6 +388,11 @@ public:
             if (ImNodes::IsLinkCreated(&start_attr, &end_attr))
             {
                 link_module(start_attr, end_attr, graph);
+                json link;
+                link["start"] = start_attr;
+                link["end"] = end_attr;
+                current_patch["links"].push_back(link);
+                print(current_patch);
             }
   
             
