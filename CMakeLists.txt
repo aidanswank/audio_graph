@@ -40,6 +40,7 @@ file(GLOB SOURCES
 	vendor/midifile/src/MidiMessage.cpp
 	vendor/midifile/src/Options.cpp
 	vendor/midifile/src/Binasc.cpp
+	vendor/libtinyfiledialogs/tinyfiledialogs.c
 	${vst3sdk_path}/public.sdk/source/vst/hosting/connectionproxy.cpp
 	${vst3sdk_path}/public.sdk/source/vst/hosting/eventlist.cpp
 	${vst3sdk_path}/public.sdk/source/vst/hosting/hostclasses.cpp

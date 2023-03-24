@@ -30,8 +30,11 @@ void float_module::show() {
     ImNodes::EndInputAttribute();
     
     ImGui::PushItemWidth(100.0f);
-//    ImGui::SliderFloat("##number_float", &data, 0.0f, 2000.0f);
-    ImGui::InputFloat("##float_input", &data);
+    ImGui::InputFloat("##max_input", &min);
+    ImGui::InputFloat("##min_input", &max);
+
+    ImGui::SliderFloat("##number_float", &data, min, max);
+//    ImGui::InputFloat("##float_input", &data);
     ImGui::PopItemWidth();
     
     ImNodes::BeginOutputAttribute( output_attrs[0] );

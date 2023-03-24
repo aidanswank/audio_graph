@@ -22,6 +22,9 @@
 #include <nlohmann/json.hpp>
 using json = nlohmann::json;
 json current_patch;
+
+#include "libtinyfiledialogs/tinyfiledialogs.h"
+
 global_transport g_transport;
 
 #include "piano_roll.h"
@@ -300,6 +303,7 @@ public:
                 {
                     if (ImGui::MenuItem("Open..", "Ctrl+O"))
                     {
+                        print("wtf");
                     }
                     if (ImGui::MenuItem("Save", "Ctrl+S"))
                     {
@@ -495,13 +499,9 @@ int main()
     
     SDL_Event event;
     
-//    im_wrap gui;
-//    gui.init(window, gl_context);
-
     // graph that contains xmodule nodes
-    
     audio_graph<xmodule*> graph;
-    // idk just easier right now
+    // idk just easier right now for vst
     graph.event = &event;
     
 //    std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&)> module_factory_map;
@@ -517,61 +517,6 @@ int main()
     module_factory_map[module_multiply__get_name()]        = &module_multiply__create;
     module_factory_map[module_add__get_name()]             = &module_add__create;
 
-//    graph.xmodules.push_back( factory_map[module_midi_in__get_name()](graph) ); // rt midi in
-//    graph.xmodules.push_back( factory_map[module_vst3_instrument__get_name()](graph) ); // vst plug
-//    graph.xmodules.push_back( factory_map[module_vst3_instrument__get_name()](graph) ); // vst plug
-//    graph.xmodules.push_back( factory_map[module_audio_output__get_name()](graph) ); // output
-//    graph.xmodules.push_back( factory_map[module_cjfilter__get_name()](graph) ); // filter
-    
-////     example patch
-//    graph.xmodules[0]->add_output(1);
-//    graph.xmodules[0]->add_output(2);
-//
-//    graph.xmodules[1]->add_input(0);
-//    graph.xmodules[1]->add_output(4);//filter
-//
-//    graph.xmodules[2]->add_input(0);
-//    graph.xmodules[2]->add_output(3);
-//
-//    graph.xmodules[3]->add_input(4);
-//    graph.xmodules[3]->add_input(2);
-//
-//    graph.xmodules[4]->add_input(1);
-//    graph.xmodules[4]->add_output(3);
-//
-//    std::pair<int, int> link{0, 1};
-//    graph.links.push_back(link);
-//
-//    std::pair<int, int> link2{0, 3};
-//    graph.links.push_back(link2);
-//
-//    std::pair<int, int> link3{2, 6};
-//    graph.links.push_back(link3);
-//
-//    std::pair<int, int> link4{7, 5};
-//    graph.links.push_back(link4);
-//
-//    std::pair<int, int> link5{4, 5};
-//    graph.links.push_back(link5);
-//
-    
-    
-//
-    // another one
-//    graph.xmodules[0]->add_output(1);
-//    graph.xmodules[0]->add_output(2);
-//
-//    graph.xmodules[1]->add_input(0);
-//    graph.xmodules[1]->add_output(3);//filter
-//
-//    graph.xmodules[2]->add_input(0);
-//    graph.xmodules[2]->add_output(3);
-//
-//    graph.xmodules[3]->add_input(1);
-//    graph.xmodules[3]->add_input(2);
-    
-//    graph.DFS(3);
-
     // set up audio interface and open stream
     audio_interface interface;
     interface.scan_devices();
@@ -579,10 +524,6 @@ int main()
     interface.buffer_size=256;
     interface.pass_userdata(&graph);
 
-    // only run on start up for debug
-    interface.init_devices(44100, 256, 2, 3);  //  sample rate, buffer size, input_device_id, output_device_id
-    interface.turn_on(audio_callback);
-    
 //    smf::MidiFile mymidifile;
     int midifile_err = mymidifile.read("/Users/aidan/dev/cpp/dfs_modules/arp2.mid");
     if (midifile_err == 0)
@@ -593,25 +534,12 @@ int main()
     mymidifile.linkNotePairs();
     
     user_interface ui(window, gl_context, &graph, &module_factory_map, &interface);
+    ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/vst_example.json");
+    ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/simple_fm.json");
     
-//    // testing patch
-//    xmodule* audio_output = module_audio_output__create(graph, ImVec2(100,100));
-//    graph.root_id = audio_output->id;// NEED TO LINK ROOT ID FOR AUDIO TO WORK
-//    graph.xmodules.push_back( audio_output );
-    
-    ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/mypatch.json");
-
-////    xmodule* test_osc = module_osc__create(graph);
-////    graph.xmodules.push_back( test_osc );
-//    
-//    xmodule* midi_seq = module_midi_sequencer__create(graph);
-//    graph.xmodules.push_back( midi_seq );
-//    
-//    xmodule* vst3_inst = module_vst3_instrument__create(graph);
-//    graph.xmodules.push_back( vst3_inst );
-//    
-//    link_module(1, 2, &graph); // midi seq to vst
-//    link_module(3, 0, &graph); // vst to output
+    // only run on start up for debug
+    interface.init_devices(44100, 256, 2, 3);  //  sample rate, buffer size, input_device_id, output_device_id
+    interface.turn_on(audio_callback);
     
     bool is_running = true;
 //
