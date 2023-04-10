@@ -34,27 +34,59 @@ void midi_sequencer::show()
 void midi_sequencer::process()
 {
     input_notes.clear();
-    
+
     float tick_start = g_transport.midi_tick_count;
     float block_size_in_ticks = samples_to_ticks(256, g_transport.ms_per_tick, 44100);
+    
+//    print(g_transport.midi_tick_count);
 
     float tick_end = tick_start + block_size_in_ticks;
     
+//    std::cout << tick_start << " " << tick_end << std::endl;
+
     smf::MidiEventList midi_events = g_transport.midifile[0][0];
     
-    for(int i = 0; i < midi_events.size(); i++)
+//    int eventsize = midi_events.getSize();
+   // std::cout << eventsize << std::endl;
+//   for (int eventindex = 0; eventindex < eventsize; eventindex++)
+//   {
+//       smf::MidiEvent event = midi_events.getEvent(eventindex);
+//
+//       if (event.tick == g_transport.midi_tick_count)
+//       {
+////           std::vector<unsigned char> msg = event;
+////           for (int i = 0; i < msg.size(); i += 3)
+////           {
+////              printf("%u %u %u\n", msg[i], msg[i + 1], msg[i + 2]);
+////           }
+////
+//           MidiNoteMessage note;
+//           note.velocity = event.getVelocity();
+//           note.noteNum = event.getKeyNumber();
+//           note.isNoteOn = event.isNoteOn();
+//
+////            print("midi event",note.isNoteOn,note.noteNum,note.velocity);
+////           input_notes.push_back(note);
+//       }
+//   }
+//
+////
+    if(g_transport.is_playing)
     {
-        smf::MidiEvent event = midi_events[i];
-
-        if(event.tick>=tick_start&&event.tick<=tick_end)
+        for(int i = 0; i < midi_events.size(); i++)
         {
-            MidiNoteMessage note;
-            note.velocity = event.getVelocity();
-            note.noteNum = event.getKeyNumber();
-            note.isNoteOn = event.isNoteOn();
-
-            print("midi event",note.isNoteOn,note.noteNum,note.velocity);
-            input_notes.push_back(note);
+            smf::MidiEvent event = midi_events[i];
+            
+            if(event.tick>=tick_start&&event.tick<=tick_end)
+            {
+                MidiNoteMessage note;
+                note.velocity = event.getVelocity();
+                note.noteNum = event.getKeyNumber();
+                note.isNoteOn = event.isNoteOn();
+                
+                print("midi event",note.isNoteOn,note.noteNum,note.velocity);
+                input_notes.push_back(note);
+            }
         }
     }
 }

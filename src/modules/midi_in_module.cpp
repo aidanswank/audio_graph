@@ -9,6 +9,11 @@ double midi2freq(int n)
 
 void midiCallback(double deltaTime, std::vector<unsigned char> *message, void *pUserData)
 {
+//
+//    for(int i = 0; i < message->size(); i++)
+//    {
+//        print("index",i,"data",(int)message->at(i));
+//    }
     
     if (message->size() < 3)
     {
@@ -100,7 +105,7 @@ void midi_in_module::process()
         if (!hasNotes) {
             break;
         }
-        std::cout << note.isNoteOn << " " << note.noteNum << " " << note.velocity << std::endl;
+//        std::cout << note.isNoteOn << " " << note.noteNum << " " << note.velocity << std::endl;
         current_midi_note = note.noteNum;
         input_notes.push_back(note);
     }

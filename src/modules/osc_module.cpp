@@ -11,6 +11,8 @@ osc_module::osc_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule
     
     config(2,1);
     
+    // register_param(current_patch[])
+    
     ImNodes::SetNodeScreenSpacePos(id, click_pos);
 };
 

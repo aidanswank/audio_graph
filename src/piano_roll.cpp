@@ -61,7 +61,7 @@ void piano_roll_window(bool *isOpen, smf::MidiFile& midiFile)
         g_transport.current_seconds=0;
     }
 //    ImGui::SameLine();
-    ImGui::Text("sample %i midi tick %i seconds%f",g_transport.sample_count,g_transport.midi_tick_count,g_transport.current_seconds);
+    ImGui::Text("sample %i midi tick %f seconds%f",g_transport.sample_count,g_transport.midi_tick_count,g_transport.current_seconds);
     ImGui::PopItemWidth();
     
     ImGui::SliderFloat("width", &ticksPerColum, 0.25f, 32);
@@ -139,7 +139,7 @@ void piano_roll_window(bool *isOpen, smf::MidiFile& midiFile)
     // draw playhead
     {
         float x = g_transport.midi_tick_count * ticksPerColum;
-        ImGui::SetScrollX(x);
+//        ImGui::SetScrollX(x);
         
         draw_list->AddLine(
                            ImVec2(relativeWindowPos.x + x + 32, relativeWindowPos.y + 0),

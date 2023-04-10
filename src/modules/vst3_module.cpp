@@ -103,8 +103,9 @@ void vst3_midi_instrument::process()
             evt.sampleOffset = 0;
             evt.ppqPosition = currentBeat;
             evt.flags = Steinberg::Vst::Event::EventFlags::kIsLive;
+//            evt.flags = 1 << 14;
             if (note.isNoteOn) {
-                //            print("note on");
+//                            print("note on");
                 evt.type = Steinberg::Vst::Event::EventTypes::kNoteOnEvent;
                 evt.noteOn.channel = 0;
                 evt.noteOn.pitch = note.noteNum;
@@ -113,7 +114,7 @@ void vst3_midi_instrument::process()
                 evt.noteOn.length = 0;
                 evt.noteOn.noteId = -1;
             } else {
-                //            print("note off");
+//                            print("note off");
                 evt.type = Steinberg::Vst::Event::EventTypes::kNoteOffEvent;
                 evt.noteOff.channel = 0;
                 evt.noteOff.pitch = note.noteNum;

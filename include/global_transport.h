@@ -5,8 +5,8 @@ struct global_transport
 {
     bool is_playing=false;
     float tempo = 120.0f; // default tempo
-    int ticks_per_quarter_note = 96; // dont hardcode but ableton exports at this resolution so its fine for now
-    int midi_tick_count = 0;
+    float ticks_per_quarter_note = 96; // dont hardcode but ableton exports at this resolution so its fine for now
+    float midi_tick_count = 0;
     float current_seconds = 0;
     float ms_per_tick = 0;
     int sample_count = 0;

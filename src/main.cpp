@@ -31,6 +31,18 @@ global_transport g_transport;
 static bool isOpenSequencerWindow;
 smf::MidiFile mymidifile;
 
+// Global variables
+int tick_counter = 0;  // Counter for MIDI clock ticks
+double tick_interval;  // Time interval between MIDI clock ticks in seconds
+double bpm = 120;   // Default BPM
+
+// Set BPM function
+void set_bpm(double new_bpm)
+{
+    bpm = new_bpm;
+    tick_interval = (60.0 / bpm) / 24.0;  // Update tick interval based on new BPM
+}
+
 static int audio_callback( const void *inputBuffer, void *outputBuffer,
                             unsigned long framesPerBuffer,
                             const PaStreamCallbackTimeInfo* timeInfo,
@@ -40,9 +52,16 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
 
     audio_interface* interface = (audio_interface*)userData;
     audio_graph<xmodule*>* graph = (audio_graph<xmodule*>*)interface->data;
+    
+    if(g_transport.is_playing)
+    {
+        g_transport.ms_per_tick = get_ms_per_tick(g_transport.tempo,g_transport.ticks_per_quarter_note);
+        float midi_tick_count = samples_to_ticks(g_transport.sample_count, g_transport.ms_per_tick, 44100);
+        g_transport.midi_tick_count = midi_tick_count;
+        print("tick counter",g_transport.midi_tick_count);
+        g_transport.current_seconds = g_transport.sample_count/44100.0f;
+    }
 
-//    interface->graph->clear(); // clear previous search
-//    interface->graph->DFS(root_node); // do graph search from root node
     if(graph->xmodules.size()>0 && graph->root_id!=-1)
     {
         int root_node = graph->root_id;
@@ -58,18 +77,15 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
             //        float w = (float)(rand()%100)/1000.0f; //testing with white noise
             //        output[i * 2] = w;
             //        output[i * 2 + 1] = w;  /* right */
-            output[i * 2] = graph->xmodules[root_node]->output_audio[0][i]; /* left */
-            output[i * 2 + 1] = graph->xmodules[root_node]->output_audio[1][i];  /* right */
+            output[i * 2]       = graph->xmodules[root_node]->output_audio[0][i]; /* left */
+            output[i * 2 + 1]   = graph->xmodules[root_node]->output_audio[1][i];  /* right */
         }
     }
     
+    // have to increment sample count after module processing or we skip first note
     if(g_transport.is_playing)
     {
         g_transport.sample_count += framesPerBuffer;
-        g_transport.ms_per_tick = get_ms_per_tick(g_transport.tempo,g_transport.ticks_per_quarter_note);
-        float midi_tick_count = samples_to_ticks(g_transport.sample_count, g_transport.ms_per_tick, 44100);
-        g_transport.midi_tick_count = midi_tick_count;
-        g_transport.current_seconds = g_transport.sample_count/44100.0f;
     }
 
     return 0;
@@ -517,6 +533,11 @@ int main()
     module_factory_map[module_multiply__get_name()]        = &module_multiply__create;
     module_factory_map[module_add__get_name()]             = &module_add__create;
 
+    
+    set_bpm(120);
+    // Calculate tick interval based on default BPM
+//    tickInterval = (60.0 / bpm) / 24.0;  // Assuming 24 MIDI clock ticks per quarter note
+
     // set up audio interface and open stream
     audio_interface interface;
     interface.scan_devices();
@@ -534,18 +555,52 @@ int main()
     mymidifile.linkNotePairs();
     
     user_interface ui(window, gl_context, &graph, &module_factory_map, &interface);
-    ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/vst_example.json");
-    ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/simple_fm.json");
+//    ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/vst_example.json");
+    ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/mypatch.json");
     
     // only run on start up for debug
     interface.init_devices(44100, 256, 2, 3);  //  sample rate, buffer size, input_device_id, output_device_id
     interface.turn_on(audio_callback);
     
     bool is_running = true;
+    
+//    // Tempo in BPM
+//     const int tempo = 96;
+//
+//     // MIDI clock ticks per quarter note (TPQ)
+//     const int ticksPerQuarterNote = 96;
+//
+//     // Calculate the tick interval in microseconds
+//     const int tickInterval = static_cast<int>(60000000.0 / (tempo * ticksPerQuarterNote));
+//
+//    std::cout << "tick interval " << tickInterval << std::endl;
+//
+//    // Get the current time point
+//    std::chrono::high_resolution_clock::time_point lastTickTime = std::chrono::high_resolution_clock::now();
+
+    
+    tick_counter = 0;
 //
     // main window loop
     while (is_running)
     {
+        
+//        std::chrono::high_resolution_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
+//
+//    // Calculate the elapsed time duration in seconds
+//    // Calculate the elapsed time duration in microseconds
+//        auto elapsed = duration_cast<std::chrono::microseconds>(currentTime - lastTickTime);
+//        int64_t elapsedMicroseconds = elapsed.count();
+//        // Check if the elapsed time is greater than or equal to the tick interval
+//          if (elapsedMicroseconds >= tickInterval) {
+//              // Trigger the MIDI clock tick
+//              std::cout << "clock tick: " << tick_counter << " elapsed " << elapsedMicroseconds << std::endl;
+//              tick_counter++;
+//
+//              // Update the last tick time
+//              lastTickTime = currentTime;
+//          }
+//
         while(SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
