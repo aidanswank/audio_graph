@@ -56,9 +56,7 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
     if(g_transport.is_playing)
     {
         g_transport.ms_per_tick = get_ms_per_tick(g_transport.tempo,g_transport.ticks_per_quarter_note);
-        float midi_tick_count = samples_to_ticks(g_transport.sample_count, g_transport.ms_per_tick, 44100);
-        g_transport.midi_tick_count = midi_tick_count;
-        print("tick counter",g_transport.midi_tick_count);
+//        print("tick counter",g_transport.midi_tick_count);
         g_transport.current_seconds = g_transport.sample_count/44100.0f;
     }
 
@@ -86,6 +84,8 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
     if(g_transport.is_playing)
     {
         g_transport.sample_count += framesPerBuffer;
+        float midi_tick_inc = samples_to_ticks(framesPerBuffer, g_transport.ms_per_tick, 44100);
+        g_transport.midi_tick_count += midi_tick_inc;
     }
 
     return 0;
@@ -111,8 +111,11 @@ void audio_settings_gui(audio_interface* interface)
                 {
                     current_item = interface->device_infos[n].name;
                     interface->set_param(true, n);
-                    interface->try_params();
-                    interface->turn_on(audio_callback);
+                    
+                    // dont set mic and then retry callback
+                    // if i select speaker then mic with this uncommented i get glitchy audioß
+//                    interface->try_params();
+//                    interface->turn_on(audio_callback);
                 }
                 if (is_selected)
                     ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
