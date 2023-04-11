@@ -36,6 +36,16 @@ void audio_output_module::process()
 
 };
 
+void audio_output_module::save_state(nlohmann::json &object)
+{
+    
+};
+
+void audio_output_module::load_state(nlohmann::json &object)
+{
+    
+};
+
 xmodule* module_audio_output__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)
 {
     return new audio_output_module(graph, click_pos);

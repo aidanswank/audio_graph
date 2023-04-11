@@ -17,7 +17,7 @@ struct audio_output_module : xmodule {
     
     void show() override {
         ImNodes::BeginNode(xmodule::id);
-
+        
         ImNodes::BeginNodeTitleBar();
         ImGui::Text( "%s (%i)", xmodule::name.c_str(), id );
         ImNodes::EndNodeTitleBar();
@@ -25,13 +25,17 @@ struct audio_output_module : xmodule {
         ImGui::PushItemWidth(100.0f);
         ImGui::SliderFloat("gain", &output_gain, 0.0f, 1.0f);
         ImGui::PopItemWidth();
-
+        
         ImNodes::BeginInputAttribute( input_attrs[0] );
         ImGui::Text("input");
         ImNodes::EndInputAttribute();
-
+        
         ImNodes::EndNode();
     };
     
     void process() override;
+    void save_state(nlohmann::json& object) override;
+    void load_state(nlohmann::json& object) override;
+
+    
 };

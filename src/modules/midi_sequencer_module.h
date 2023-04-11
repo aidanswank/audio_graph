@@ -12,6 +12,9 @@ struct midi_sequencer : xmodule {
     midi_sequencer(audio_graph<xmodule*>& graph, ImVec2 click_pos);
     void process() override;
     void show() override;
+    void save_state(nlohmann::json& object) override;
+    void load_state(nlohmann::json& object) override;
+
 };
 
 xmodule* module_midi_sequencer__create(audio_graph<xmodule*>& graph, ImVec2 click_pos);

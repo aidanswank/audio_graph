@@ -10,6 +10,13 @@ struct cjfilter_module : xmodule {
     cjfilter_module(audio_graph<xmodule*>& graph, ImVec2 click_pos);
     void process() override;
     void show() override;
+    void save_state(nlohmann::json& object) override;
+    void load_state(nlohmann::json& object) override;
+//    void save_state(nlohmann::json& object)
+//    {
+//        object["cutoff"] = cutoff;
+//        object["resonance"] = resonance;
+//    };
     
 };
 

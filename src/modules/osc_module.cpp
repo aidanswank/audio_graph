@@ -16,6 +16,20 @@ osc_module::osc_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule
     ImNodes::SetNodeScreenSpacePos(id, click_pos);
 };
 
+void osc_module::save_state(nlohmann::json &object)
+{
+    object["freq"]=freq;
+    object["isLFO"]=isLFO;
+//    object["current_item"]=current_item;
+};
+
+void osc_module::load_state(nlohmann::json &object)
+{
+    print("object!!!!!",object);
+//    freq=object["freq"];
+//    isLFO=object["isLFO"];
+//    current_item=object["current_item"];
+};
 
 void osc_module::process() {
 

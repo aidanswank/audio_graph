@@ -26,6 +26,9 @@ struct midi_in_module : xmodule {
     int current_midi_note = 0;
     
     midi_in_module(audio_graph<xmodule*>& graph, ImVec2 click_pos);
+    void save_state(nlohmann::json& object) override;
+    void load_state(nlohmann::json& object) override;
+
     void process() override;
     void show() override {
         ImNodes::BeginNode(xmodule::id);

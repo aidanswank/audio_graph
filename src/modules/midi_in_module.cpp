@@ -121,3 +121,13 @@ std::string module_midi_in__get_name()
 {
     return "midi in";
 }
+
+void midi_in_module::save_state(nlohmann::json &object)
+{
+    
+};
+
+void midi_in_module::load_state(nlohmann::json &object)
+{
+    
+};

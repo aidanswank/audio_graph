@@ -1,6 +1,16 @@
 #include "vst3_module.h"
 #include "public.sdk/source/vst/utility/stringconvert.h"
 
+void vst3_midi_instrument::save_state(nlohmann::json &object)
+{
+    
+};
+
+void vst3_midi_instrument::load_state(nlohmann::json &object)
+{
+    
+};
+
 vst3_midi_instrument::vst3_midi_instrument(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule(graph, click_pos)
 {
     config(1,1);
@@ -67,15 +77,128 @@ vst3_midi_instrument::vst3_midi_instrument(audio_graph<xmodule*>& graph, ImVec2 
 
 void vst3_midi_instrument::process()
 {
-    if(input_ids.size()>0)
-    {
-        xmodule *midi_in_module = (xmodule*)xmodule::graph.xmodules[ input_ids[MIDI_IN][0] ];
+//    xmodule::output_audio[0].clear();
+//    xmodule::output_audio[1].clear();
+    zero_audio(xmodule::output_audio,256);
+
+    float *audio_output_left_ptr = xmodule::output_audio[0].data();
+    float *audio_output_right_ptr = xmodule::output_audio[1].data();
+    std::vector<MidiNoteMessage> summed_input_notes;
+    summed_input_notes.clear();
+    
+//    bool flag = false;
+//
+//    for(int i = 0; i < input_ids.size(); i++)
+//    {
+//        for(int j = 0; j < input_ids[i].size(); j++)
+//        {
+//            if(input_ids[i][j] != -1)
+//            {
+//
+//                xmodule *midi_in_module = (xmodule*)xmodule::graph.xmodules[ input_ids[i][j] ];
+//
+//                for(int k = 0; k < midi_in_module->input_notes.size(); k++)
+//                {
+//                    summed_input_notes.push_back(midi_in_module->input_notes[i]);
+//                }
+//
+//                flag = true;
+//            }
+//        }
+//    }
+//
+//    if(flag)
+//    {
+////        xmodule *midi_in_module = (xmodule*)xmodule::graph.xmodules[ input_ids[0][0] ];
+//
+//        int SAMPLE_RATE = 44100;
+//        int TEMPO = 120;
+//
+//        double currentBeat = continuousSamples / ((60.0 / TEMPO) * static_cast<double>(SAMPLE_RATE));
+//
+//        Steinberg::Vst::ProcessContext *processContext = vst.processContext();
+//        processContext->state = Steinberg::Vst::ProcessContext::kPlaying;
+//        processContext->sampleRate = SAMPLE_RATE;
+//        processContext->projectTimeSamples = continuousSamples;
+//        processContext->state |= Steinberg::Vst::ProcessContext::kTempoValid;
+//        processContext->tempo = TEMPO;
+//        processContext->state |= Steinberg::Vst::ProcessContext::kTimeSigValid;
+//        processContext->timeSigNumerator = 4;
+//        processContext->timeSigDenominator = 4;
+//        processContext->state |= Steinberg::Vst::ProcessContext::kContTimeValid;
+//        processContext->continousTimeSamples = continuousSamples;
+//        processContext->state |= Steinberg::Vst::ProcessContext::kSystemTimeValid;
+//        processContext->systemTime = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+//        processContext->state |= Steinberg::Vst::ProcessContext::kProjectTimeMusicValid;
+//        processContext->projectTimeMusic = currentBeat;
+//        continuousSamples += 256;
+//
+//        Steinberg::Vst::EventList *eventList = vst.eventList(Steinberg::Vst::kInput, 0);
+//
+//        for(int i = 0; i < summed_input_notes.size(); i++)
+//        {
+//            MidiNoteMessage note = summed_input_notes[i];
+//
+//            Steinberg::Vst::Event evt = {};
+//            evt.busIndex = 0;
+//            evt.sampleOffset = 0;
+//            evt.ppqPosition = currentBeat;
+//            evt.flags = Steinberg::Vst::Event::EventFlags::kIsLive;
+//    //            evt.flags = 1 << 14;
+//            if (note.isNoteOn) {
+//    //                            print("note on");
+//                evt.type = Steinberg::Vst::Event::EventTypes::kNoteOnEvent;
+//                evt.noteOn.channel = 0;
+//                evt.noteOn.pitch = note.noteNum;
+//                evt.noteOn.tuning = 0.0f;
+//                evt.noteOn.velocity = note.velocity;
+//                evt.noteOn.length = 0;
+//                evt.noteOn.noteId = -1;
+//            } else {
+//    //                            print("note off");
+//                evt.type = Steinberg::Vst::Event::EventTypes::kNoteOffEvent;
+//                evt.noteOff.channel = 0;
+//                evt.noteOff.pitch = note.noteNum;
+//                evt.noteOff.tuning = 0.0f;
+//                evt.noteOff.velocity = note.velocity;
+//                evt.noteOff.noteId = -1;
+//            }
+//            eventList->addEvent(evt);
+//        }
+//
+//        if (!vst.process(256)) {
+//            std::cerr << "VST process() failed" << std::endl;
+//            // return 1;
+//        }
+//
+//        eventList->clear();
+//
+//        float *left = vst.channelBuffer32(Steinberg::Vst::kOutput, 0);
+//        float *right = vst.channelBuffer32(Steinberg::Vst::kOutput, 1);
+//
+//        for (unsigned long i = 0; i < 256; ++i) {
+//            audio_output_left_ptr[i] = left[i];
+//            audio_output_right_ptr[i] = right[i];
+//        }
+//    } else {
+//        print("nothing connected to vst?");
+//        // pass silence;
+//        for (unsigned long i = 0; i < 256; ++i) {
+//            audio_output_left_ptr[i] = 0;
+//            audio_output_right_ptr[i] = 0;
+//        }
+//    }
         
+        
+    if(input_ids[0][0]!=-1)
+    {
+        xmodule *midi_in_module = (xmodule*)xmodule::graph.xmodules[ input_ids[0][0] ];
+
         int SAMPLE_RATE = 44100;
         int TEMPO = 120;
-        
+
         double currentBeat = continuousSamples / ((60.0 / TEMPO) * static_cast<double>(SAMPLE_RATE));
-        
+
         Steinberg::Vst::ProcessContext *processContext = vst.processContext();
         processContext->state = Steinberg::Vst::ProcessContext::kPlaying;
         processContext->sampleRate = SAMPLE_RATE;
@@ -92,12 +215,13 @@ void vst3_midi_instrument::process()
         processContext->state |= Steinberg::Vst::ProcessContext::kProjectTimeMusicValid;
         processContext->projectTimeMusic = currentBeat;
         continuousSamples += 256;
-        
+
         Steinberg::Vst::EventList *eventList = vst.eventList(Steinberg::Vst::kInput, 0);
+
         for(int i = 0; i < midi_in_module->input_notes.size(); i++)
         {
             MidiNoteMessage note = midi_in_module->input_notes[i];
-            
+
             Steinberg::Vst::Event evt = {};
             evt.busIndex = 0;
             evt.sampleOffset = 0;
@@ -124,29 +248,29 @@ void vst3_midi_instrument::process()
             }
             eventList->addEvent(evt);
         }
-        
+
         if (!vst.process(256)) {
             std::cerr << "VST process() failed" << std::endl;
             // return 1;
         }
-        
+
         eventList->clear();
-        
+
         float *left = vst.channelBuffer32(Steinberg::Vst::kOutput, 0);
         float *right = vst.channelBuffer32(Steinberg::Vst::kOutput, 1);
-        
-        
-        //    float *audio_output = xmodule::audio.data();
-        //    zero_audio(xmodule::audio,256);
-        float *audio_output_left = xmodule::output_audio[0].data();
-        float *audio_output_right = xmodule::output_audio[1].data();
-        //
+
         for (unsigned long i = 0; i < 256; ++i) {
-            audio_output_left[i] = left[i];
-            audio_output_right[i] = right[i];
+            audio_output_left_ptr[i] = left[i];
+            audio_output_right_ptr[i] = right[i];
+        }
+    } else {
+        print("nothing connected to vst?");
+        // pass silence;
+        for (unsigned long i = 0; i < 256; ++i) {
+            audio_output_left_ptr[i] = 0;
+            audio_output_right_ptr[i] = 0;
         }
     }
-    
     
 }
 

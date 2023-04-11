@@ -53,3 +53,13 @@ std::string module_float__get_name()
 {
     return "float signal";
 };
+
+void float_module::save_state(nlohmann::json &object)
+{
+    
+};
+
+void float_module::load_state(nlohmann::json &object)
+{
+    
+};

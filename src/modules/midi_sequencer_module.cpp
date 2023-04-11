@@ -100,3 +100,13 @@ std::string module_midi_sequencer__get_name()
 {
     return "midi sequencer";
 }
+
+void midi_sequencer::save_state(nlohmann::json &object)
+{
+    
+};
+
+void midi_sequencer::load_state(nlohmann::json &object)
+{
+    
+};

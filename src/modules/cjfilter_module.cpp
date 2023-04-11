@@ -77,6 +77,20 @@ void cjfilter_module::show()
     ImNodes::EndNode();
 };
 
+void cjfilter_module::save_state(nlohmann::json& object)
+{
+    object["cutoff"] = cutoff;
+    object["resonance"] = resonance;
+    print(object);
+};
+
+void cjfilter_module::load_state(nlohmann::json& object)
+{
+    cutoff = object["cutoff"];
+    resonance = object["resonance"];
+    print("loaded",object);
+};
+
 xmodule* module_cjfilter__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)
 {
     return new cjfilter_module(graph, click_pos);

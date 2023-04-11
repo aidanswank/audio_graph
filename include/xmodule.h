@@ -5,6 +5,7 @@
 #include "imnodes.h"
 #include "graph.h"
 #include <map>
+#include <nlohmann/json.hpp>
 
 struct MidiNoteMessage
 {
@@ -93,6 +94,10 @@ struct xmodule
     
     // show user interface
     virtual void show() = 0;
+    
+    virtual void save_state(nlohmann::json& object) = 0;
+    virtual void load_state(nlohmann::json& object) = 0;
+
 
     // ~xmodule() {};
 
@@ -111,7 +116,7 @@ struct xmodule
     std::vector<std::vector<int>> output_ids;
     std::vector<int> output_attrs;
     
-    std::map<int, int> attr2slot;
+//    std::map<int, int> attr2slot;
     
     //todo seperate
     std::vector<MidiNoteMessage> input_notes;

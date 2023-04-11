@@ -40,7 +40,6 @@ file(GLOB SOURCES
 	vendor/midifile/src/MidiMessage.cpp
 	vendor/midifile/src/Options.cpp
 	vendor/midifile/src/Binasc.cpp
-	vendor/libtinyfiledialogs/tinyfiledialogs.c
 	${vst3sdk_path}/public.sdk/source/vst/hosting/connectionproxy.cpp
 	${vst3sdk_path}/public.sdk/source/vst/hosting/eventlist.cpp
 	${vst3sdk_path}/public.sdk/source/vst/hosting/hostclasses.cpp
@@ -54,7 +53,12 @@ file(GLOB SOURCES
 	${vst3sdk_path}/public.sdk/source/vst/hosting/module_mac.mm
 )
 file(GLOB INCLUDES include/*.h vendor/*.h)
-include_directories(vendor/EasyVst/include/ vendor/midifile/include/ ${vst3sdk_path})
+include_directories(
+    vendor/EasyVst/include/
+    vendor/midifile/include/
+    vendor/imgui-filebrowser/
+    ${vst3sdk_path}
+)
 add_executable(
     ${TARGET_EXE}
     ${SOURCES}

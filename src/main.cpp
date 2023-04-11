@@ -23,25 +23,23 @@
 using json = nlohmann::json;
 json current_patch;
 
-#include "libtinyfiledialogs/tinyfiledialogs.h"
-
 global_transport g_transport;
 
 #include "piano_roll.h"
 static bool isOpenSequencerWindow;
 smf::MidiFile mymidifile;
 
-// Global variables
-int tick_counter = 0;  // Counter for MIDI clock ticks
-double tick_interval;  // Time interval between MIDI clock ticks in seconds
-double bpm = 120;   // Default BPM
-
-// Set BPM function
-void set_bpm(double new_bpm)
-{
-    bpm = new_bpm;
-    tick_interval = (60.0 / bpm) / 24.0;  // Update tick interval based on new BPM
-}
+//// Global variables
+//int tick_counter = 0;  // Counter for MIDI clock ticks
+//double tick_interval;  // Time interval between MIDI clock ticks in seconds
+//double bpm = 120;   // Default BPM
+//
+//// Set BPM function
+//void set_bpm(double new_bpm)
+//{
+//    bpm = new_bpm;
+//    tick_interval = (60.0 / bpm) / 24.0;  // Update tick interval based on new BPM
+//}
 
 static int audio_callback( const void *inputBuffer, void *outputBuffer,
                             unsigned long framesPerBuffer,
@@ -52,13 +50,6 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
 
     audio_interface* interface = (audio_interface*)userData;
     audio_graph<xmodule*>* graph = (audio_graph<xmodule*>*)interface->data;
-    
-    if(g_transport.is_playing)
-    {
-        g_transport.ms_per_tick = get_ms_per_tick(g_transport.tempo,g_transport.ticks_per_quarter_note);
-//        print("tick counter",g_transport.midi_tick_count);
-        g_transport.current_seconds = g_transport.sample_count/44100.0f;
-    }
 
     if(graph->xmodules.size()>0 && graph->root_id!=-1)
     {
@@ -83,9 +74,14 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
     // have to increment sample count after module processing or we skip first note
     if(g_transport.is_playing)
     {
-        g_transport.sample_count += framesPerBuffer;
+        
+        g_transport.ms_per_tick = get_ms_per_tick(g_transport.tempo,g_transport.ticks_per_quarter_note);
         float midi_tick_inc = samples_to_ticks(framesPerBuffer, g_transport.ms_per_tick, 44100);
         g_transport.midi_tick_count += midi_tick_inc;
+        //        print("tick counter",g_transport.midi_tick_count);
+        g_transport.sample_count += framesPerBuffer;
+        g_transport.current_seconds = g_transport.sample_count/44100.0f;
+        
     }
 
     return 0;
@@ -156,9 +152,9 @@ void link_module(int start_attr, int end_attr, audio_graph<xmodule*>* graph)
     print("start", start_attr, "end", end_attr);
     print("arr2id map start", graph->attr2id[start_attr], "end", graph->attr2id[end_attr]);
 
-    std::vector<int>& start_attr_vector  = graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[end_attr] ];
+    std::vector<int>& start_attr_vector  = graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[start_attr] ];
 
-    std::vector<int>& end_attr_vector    = graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ];
+    std::vector<int>& end_attr_vector = graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ];
 
 //    json link;
 //    link["start"] = start_attr;
@@ -197,16 +193,25 @@ void remove_link(int edge_id, audio_graph<xmodule*>* graph)
 //                              "end id",graph->xmodules[ graph->attr2id[end_attr] ]->id
 //                        );
         
+    // why did i write end_attr twice in attr2outslot and attr2inslot was that intentional or glitch??? i forgot how this works
+//    std::vector<int>& start_attr_vector  = graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[end_attr] ];
+
     std::vector<int>& start_attr_vector  = graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[end_attr] ];
-    
     std::vector<int>& end_attr_vector    = graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ];
+  
+//
+//    start_attr_vector[ graph->attr2inslot[start] ] = -1;
+//    end_attr_vector[ graph->attr2inslot[end_attr] ] = -1;
+
+    
+//    print("!!!!!!!!!!!",graph->attr2inslot[start_attr],graph->attr2outslot[end_attr]);
     
     // fill input and output slots with -1
     for(int i = 0; i < start_attr_vector.size(); i++)
     {
         start_attr_vector[i] = -1;
     }
-    
+
     for(int i = 0; i < end_attr_vector.size(); i++)
     {
         end_attr_vector[i] = -1;
@@ -234,6 +239,8 @@ void remove_link(int edge_id, audio_graph<xmodule*>* graph)
 
 }
 
+
+#include <imfilebrowser.h>
 class user_interface
 {
 public:
@@ -243,7 +250,9 @@ public:
     std::map<std::string, xmodule* (*)(audio_graph<xmodule*>&, ImVec2)>* factory_map;
 
     audio_interface *my_audio_interface;
-
+    ImGui::FileBrowser *open_file_dialog;
+    ImGui::FileBrowser *save_file_dialog;
+    
     user_interface(SDL_Window* window,
                    SDL_GLContext gl_context,
                    audio_graph<xmodule*>* p_graph,
@@ -256,6 +265,16 @@ public:
         print("ui init");
         ui.init(window,gl_context);
         isOpenSequencerWindow=true;
+        // (optional) set browser properties
+        
+        open_file_dialog = new ImGui::FileBrowser();
+        open_file_dialog->SetTitle("open file");
+        open_file_dialog->SetTypeFilters({ ".json" });
+        
+        save_file_dialog = new ImGui::FileBrowser(ImGuiFileBrowserFlags_EnterNewFilename);
+        save_file_dialog->SetTitle("save file");
+        save_file_dialog->SetTypeFilters({ ".json" });
+
     }
     ~user_interface()
     {
@@ -281,9 +300,12 @@ public:
             float y = element["y"];
             std::string name = element["name"].get<std::string>();
             ImVec2 pos(x,y);
+            
+            xmodule* created_module = factory_map->at(name)(*graph, pos);
+            created_module->load_state(element);
+            graph->xmodules.push_back( created_module );
+
             print("name",name,"x",x,"y",y);
-            xmodule* m = factory_map->at(name)(*graph, pos);
-            graph->xmodules.push_back( m );
         }
         
         for (auto& element : current_patch["links"])
@@ -298,6 +320,29 @@ public:
 //        graph->xmodules.push_back( m );
         
     }
+    
+    void save_patch(std::string file_path)
+    {
+        // get current position of the modules and update json patch state
+        for(int i = 0; i < graph->xmodules.size(); i++)
+        {
+//                            print(graph->xmodules[i]->id);
+            int id = graph->xmodules[i]->id;
+            ImVec2 pos = ImNodes::GetNodeScreenSpacePos(id);
+            print("pos",pos.x,pos.y);
+            current_patch["nodes"][id]["x"] = pos.x;
+            current_patch["nodes"][id]["y"] = pos.y;
+            
+            graph->xmodules[i]->save_state(current_patch["nodes"][id]);
+//            current_patch["nodes"][id][ param ] = value;
+
+        }
+        // write prettified JSON to another file
+        std::ofstream o(file_path);
+        o << std::setw(4) << current_patch << std::endl;
+        print("saved patch!", current_patch);
+    }
+    
     void update()
     {
         
@@ -322,25 +367,12 @@ public:
                 {
                     if (ImGui::MenuItem("Open..", "Ctrl+O"))
                     {
-                        print("wtf");
+                        open_file_dialog->Open();
                     }
                     if (ImGui::MenuItem("Save", "Ctrl+S"))
                     {
-                        // get current position of the modules and update json patch state
-                        for(int i = 0; i < graph->xmodules.size(); i++)
-                        {
-//                            print(graph->xmodules[i]->id);
-                            int id = graph->xmodules[i]->id;
-                            ImVec2 pos = ImNodes::GetNodeScreenSpacePos(id);
-                            print("pos",pos.x,pos.y);
-                            current_patch["nodes"][id]["x"] = pos.x;
-                            current_patch["nodes"][id]["y"] = pos.y;
-
-                        }
-                        // write prettified JSON to another file
-                        std::ofstream o("mypatch.json");
-                        o << std::setw(4) << current_patch << std::endl;
-                        print("saved patch!", current_patch);
+                        save_file_dialog->Open();
+//                        save_patch();
                     }
     //                if (ImGui::MenuItem("Close", "Ctrl+W"))  { my_tool_active = false; }
                     ImGui::EndMenu();
@@ -459,7 +491,24 @@ public:
             ImGui::End();
         }
 
+        open_file_dialog->Display();
+        save_file_dialog->Display();
+
+        if(open_file_dialog->HasSelected())
+        {
+            std::cout << "Selected filename" << open_file_dialog->GetSelected().string() << std::endl;
+            load_patch(open_file_dialog->GetSelected().string());
+            open_file_dialog->ClearSelected();
+        }
         
+        if(save_file_dialog->HasSelected())
+        {
+            std::cout << "Selected filename" << save_file_dialog->GetSelected().string() << std::endl;
+//            load_patch(open_file_dialog->GetSelected().string());
+            save_patch(save_file_dialog->GetSelected().string());
+            save_file_dialog->ClearSelected();
+        }
+
         // Create a window called "My First Tool", with a menu bar.
 //        static bool debug_active = true;
 //        if(debug_active)
@@ -536,11 +585,6 @@ int main()
     module_factory_map[module_multiply__get_name()]        = &module_multiply__create;
     module_factory_map[module_add__get_name()]             = &module_add__create;
 
-    
-    set_bpm(120);
-    // Calculate tick interval based on default BPM
-//    tickInterval = (60.0 / bpm) / 24.0;  // Assuming 24 MIDI clock ticks per quarter note
-
     // set up audio interface and open stream
     audio_interface interface;
     interface.scan_devices();
@@ -559,51 +603,18 @@ int main()
     
     user_interface ui(window, gl_context, &graph, &module_factory_map, &interface);
 //    ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/vst_example.json");
-    ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/mypatch.json");
-    
+//    ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/mypatch.json");
+//        ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/simple_fm.json");
+
     // only run on start up for debug
     interface.init_devices(44100, 256, 2, 3);  //  sample rate, buffer size, input_device_id, output_device_id
     interface.turn_on(audio_callback);
     
     bool is_running = true;
-    
-//    // Tempo in BPM
-//     const int tempo = 96;
-//
-//     // MIDI clock ticks per quarter note (TPQ)
-//     const int ticksPerQuarterNote = 96;
-//
-//     // Calculate the tick interval in microseconds
-//     const int tickInterval = static_cast<int>(60000000.0 / (tempo * ticksPerQuarterNote));
-//
-//    std::cout << "tick interval " << tickInterval << std::endl;
-//
-//    // Get the current time point
-//    std::chrono::high_resolution_clock::time_point lastTickTime = std::chrono::high_resolution_clock::now();
-
-    
-    tick_counter = 0;
 //
     // main window loop
     while (is_running)
     {
-        
-//        std::chrono::high_resolution_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
-//
-//    // Calculate the elapsed time duration in seconds
-//    // Calculate the elapsed time duration in microseconds
-//        auto elapsed = duration_cast<std::chrono::microseconds>(currentTime - lastTickTime);
-//        int64_t elapsedMicroseconds = elapsed.count();
-//        // Check if the elapsed time is greater than or equal to the tick interval
-//          if (elapsedMicroseconds >= tickInterval) {
-//              // Trigger the MIDI clock tick
-//              std::cout << "clock tick: " << tick_counter << " elapsed " << elapsedMicroseconds << std::endl;
-//              tick_counter++;
-//
-//              // Update the last tick time
-//              lastTickTime = currentTime;
-//          }
-//
         while(SDL_PollEvent(&event))
         {
             ImGui_ImplSDL2_ProcessEvent(&event);

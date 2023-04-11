@@ -84,3 +84,13 @@ std::string module_multiply__get_name()
 {
     return "multiply signal";
 };
+
+void multiply_module::save_state(nlohmann::json &object)
+{
+    
+};
+
+void multiply_module::load_state(nlohmann::json &object)
+{
+    
+};

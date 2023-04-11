@@ -9,7 +9,9 @@ struct multiply_module : xmodule {
     multiply_module(audio_graph<xmodule*>& graph, ImVec2 click_pos);
     void process() override;
     void show() override;
-    
+    void save_state(nlohmann::json& object) override;
+    void load_state(nlohmann::json& object) override;
+
 };
 
 xmodule* module_multiply__create(audio_graph<xmodule*>& graph, ImVec2 click_pos);

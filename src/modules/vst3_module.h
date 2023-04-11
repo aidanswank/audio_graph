@@ -18,6 +18,9 @@ struct vst3_midi_instrument : xmodule {
 //    {
 //        return new vst3_midi_instrument(event,graph);
 //    };
+    void save_state(nlohmann::json& object) override;
+    void load_state(nlohmann::json& object) override;
+
     void process() override;
     void show() override {
         ImNodes::BeginNode(xmodule::id);

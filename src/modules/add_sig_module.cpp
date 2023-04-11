@@ -65,7 +65,17 @@ add_module::add_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule
     config(2,1);
     name = module_add__get_name(); // this feels weird
     ImNodes::SetNodeScreenSpacePos(id, click_pos);
-}
+};
+
+void add_module::save_state(nlohmann::json &object)
+{
+    
+};
+
+void add_module::load_state(nlohmann::json &object)
+{
+    
+};
 
 xmodule* module_add__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)
 {
