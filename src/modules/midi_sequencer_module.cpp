@@ -85,7 +85,12 @@ void midi_sequencer::process()
                 note.isNoteOn = event.isNoteOn();
                 
                 print("midi event",note.isNoteOn,note.noteNum,note.velocity);
-                input_notes.push_back(note);
+                if((note.noteNum!=-1) && (note.velocity!=-1))
+                {
+                    input_notes.push_back(note);
+                } else {
+                    print("negative midi note?");
+                }
             }
         }
     }

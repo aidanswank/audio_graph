@@ -2,6 +2,8 @@
 #include <vector>
 #include "SDL2/SDL.h"
 
+#include "global_transport.h"
+global_transport g_transport;
 // modules
 #include "xmodule.h"
 #include "midi_in_module.h"
@@ -23,7 +25,6 @@
 using json = nlohmann::json;
 json current_patch;
 
-global_transport g_transport;
 
 #include "piano_roll.h"
 static bool isOpenSequencerWindow;
@@ -51,6 +52,8 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
     audio_interface* interface = (audio_interface*)userData;
     audio_graph<xmodule*>* graph = (audio_graph<xmodule*>*)interface->data;
 
+    if(g_transport.is_playing)
+    {
     if(graph->xmodules.size()>0 && graph->root_id!=-1)
     {
         int root_node = graph->root_id;
@@ -72,8 +75,6 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
     }
     
     // have to increment sample count after module processing or we skip first note
-    if(g_transport.is_playing)
-    {
         
         g_transport.ms_per_tick = get_ms_per_tick(g_transport.tempo,g_transport.ticks_per_quarter_note);
         float midi_tick_inc = samples_to_ticks(framesPerBuffer, g_transport.ms_per_tick, 44100);
@@ -156,12 +157,6 @@ void link_module(int start_attr, int end_attr, audio_graph<xmodule*>* graph)
 
     std::vector<int>& end_attr_vector = graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ];
 
-//    json link;
-//    link["start"] = start_attr;
-//    link["end"] = end_attr;
-//    current_patch["links"].push_back(link);
-//    print(current_patch);
-
     // if there was nothing connected before (-1) put it in the first slot which is 0
     // else if theres already a cable connected push it onto the vector (e.g the final audio output were multiple cables to be connected to same slot)
 
@@ -196,7 +191,7 @@ void remove_link(int edge_id, audio_graph<xmodule*>* graph)
     // why did i write end_attr twice in attr2outslot and attr2inslot was that intentional or glitch??? i forgot how this works
 //    std::vector<int>& start_attr_vector  = graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[end_attr] ];
 
-    std::vector<int>& start_attr_vector  = graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[end_attr] ];
+    std::vector<int>& start_attr_vector  = graph->xmodules[ graph->attr2id[start_attr] ]->output_ids[ graph->attr2outslot[start_attr] ];
     std::vector<int>& end_attr_vector    = graph->xmodules[ graph->attr2id[end_attr] ]->input_ids[ graph->attr2inslot[end_attr] ];
   
 //
@@ -321,8 +316,12 @@ public:
         
     }
     
-    void save_patch(std::string file_path)
+    void save_patch(std::string filepath)
     {
+
+        current_patch["filepath"] = filepath;
+//        print( current_patch["name"] );
+
         // get current position of the modules and update json patch state
         for(int i = 0; i < graph->xmodules.size(); i++)
         {
@@ -334,11 +333,10 @@ public:
             current_patch["nodes"][id]["y"] = pos.y;
             
             graph->xmodules[i]->save_state(current_patch["nodes"][id]);
-//            current_patch["nodes"][id][ param ] = value;
 
         }
         // write prettified JSON to another file
-        std::ofstream o(file_path);
+        std::ofstream o(filepath);
         o << std::setw(4) << current_patch << std::endl;
         print("saved patch!", current_patch);
     }
@@ -372,7 +370,6 @@ public:
                     if (ImGui::MenuItem("Save", "Ctrl+S"))
                     {
                         save_file_dialog->Open();
-//                        save_patch();
                     }
     //                if (ImGui::MenuItem("Close", "Ctrl+W"))  { my_tool_active = false; }
                     ImGui::EndMenu();

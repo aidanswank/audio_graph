@@ -6,6 +6,10 @@
 #include "graph.h"
 #include <map>
 #include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
+// if null set zero
+void check_and_set_zero(json& obj, const std::string& key);
 
 struct MidiNoteMessage
 {
@@ -89,6 +93,7 @@ struct xmodule
 //    }
     
 
+    // preprocess
     // process the audio signal
     virtual void process() = 0;
     

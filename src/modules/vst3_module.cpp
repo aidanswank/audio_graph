@@ -24,6 +24,7 @@ vst3_midi_instrument::vst3_midi_instrument(audio_graph<xmodule*>& graph, ImVec2 
 //    input_void_ptr = input_mono_signal;
     
     // Library/Audio/Plug-Ins/VST3/Surge XT.vst3
+//    /Library/Audio/Plug-Ins/VST/Sitala.vst
     // vst setup TODO CLEAN !!!!
     if (!vst.init("/Library/Audio/Plug-Ins/VST3/Surge XT.vst3", 44100, 256, Steinberg::Vst::kSample32, true))
     {

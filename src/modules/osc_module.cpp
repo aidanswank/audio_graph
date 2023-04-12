@@ -25,14 +25,15 @@ void osc_module::save_state(nlohmann::json &object)
 
 void osc_module::load_state(nlohmann::json &object)
 {
-    print("object!!!!!",object);
-//    freq=object["freq"];
-//    isLFO=object["isLFO"];
+    print("osc module state",object);
+    freq=object["freq"];
+    isLFO=object["isLFO"];
 //    current_item=object["current_item"];
 };
 
 void osc_module::process() {
-
+//    g_transport;
+    
     float *audio_output_left = xmodule::output_audio[0].data();
     float *audio_output_right = xmodule::output_audio[1].data();
     xmodule* freq_input_mod = NULL;
@@ -109,7 +110,7 @@ void osc_module::show() {
     ImGui::Checkbox("LFO", &isLFO);
     if(isLFO)
     {
-        ImGui::SliderFloat("freq", &freq, 0.0f, 30.0f);
+        ImGui::SliderFloat("freq", &freq, 0.0f, 10.0f);
     } else {
         ImGui::SliderFloat("freq", &freq, 0.0f, 1000.0f);
     }

@@ -38,12 +38,14 @@ void audio_output_module::process()
 
 void audio_output_module::save_state(nlohmann::json &object)
 {
-    
+    object["output_gain"] = output_gain;
+    print("audio output state save", object);
 };
 
 void audio_output_module::load_state(nlohmann::json &object)
 {
-    
+    print("audio output state load", object);
+    output_gain = object["output_gain"];
 };
 
 xmodule* module_audio_output__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)

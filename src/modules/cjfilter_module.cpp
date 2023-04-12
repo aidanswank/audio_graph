@@ -62,7 +62,7 @@ void cjfilter_module::show()
     ImNodes::EndInputAttribute();
     
     ImNodes::BeginInputAttribute( input_attrs[1] );
-    ImGui::Text("cutoff cv");
+    ImGui::Text("cutoff");
     ImNodes::EndInputAttribute();
     
     ImGui::PushItemWidth(100.0f);
