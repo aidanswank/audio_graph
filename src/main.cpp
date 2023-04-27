@@ -353,6 +353,7 @@ public:
         ImGui::ShowDemoWindow();
         
         piano_roll_window(&isOpenSequencerWindow, mymidifile);
+        pattern_editor_window(&isOpenSequencerWindow);
 
         static bool node_editor_active = true;
         if(node_editor_active)
@@ -434,6 +435,7 @@ public:
                   ImNodes::Link(i, p.first, p.second);
             }
 
+            ImNodes::MiniMap();
             ImNodes::EndNodeEditor();
 
             int start_attr, end_attr;
@@ -590,7 +592,7 @@ int main()
     interface.pass_userdata(&graph);
 
 //    smf::MidiFile mymidifile;
-    int midifile_err = mymidifile.read("/Users/aidan/dev/cpp/dfs_modules/arp2.mid");
+    int midifile_err = mymidifile.read("/Users/aidan/dev/cpp/dfs_modules/love_you.mid");
     if (midifile_err == 0)
     {
         std::cout << "error loading midi!! :(" << std::endl;
@@ -619,6 +621,21 @@ int main()
             {
                print("quitttttt");
                is_running = false;
+            }
+            if (event.type == SDL_KEYDOWN)
+            {
+                if (event.key.keysym.sym == SDLK_v && SDL_GetModState() & KMOD_GUI)
+                {
+                    if (SDL_HasClipboardText())
+                    {
+                        char* clipboardText = SDL_GetClipboardText();
+                        if (clipboardText != nullptr)
+                        {
+                            std::cout << "Clipboard Text: " << clipboardText << std::endl;
+                            SDL_free(clipboardText);
+                        }
+                    }
+                }
             }
             for(uint i = 0; i < graph.xmodules.size(); ++i)
             {

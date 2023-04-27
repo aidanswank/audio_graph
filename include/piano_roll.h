@@ -8,4 +8,5 @@
 
 int snap(float num, int by);
 
-void piano_roll_window(bool *isOpen, smf::MidiFile& midiFile);
+void piano_roll_window(bool *is_open, smf::MidiFile& midi_file);
+void pattern_editor_window(bool *is_open);

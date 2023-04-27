@@ -97,9 +97,9 @@ void audio_interface::turn_on(PaStreamCallback* callback)
     err = Pa_StartStream( stream );
 
     if( err != paNoError ) {
-        print("failed to open portaudio stream!",err);
+        print("failed to open portaudio stream!", err);
     } else {
-        print("success?");
+        print("portaudio opened stream");
     };
 }
 
