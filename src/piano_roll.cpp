@@ -138,7 +138,7 @@ void pattern_editor_window(bool *is_open)
     ImVec2 rect_min = relative_win_pos+ImVec2(50, 50); // Adjust the values here to position the rectangle
     ImVec2 rect_max = relative_win_pos+ImVec2(100, 100); // Adjust the values here to position the rectangle
 
-    ImVec4 color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); //RGBA color values ranging from 0 to 1
+    ImVec4 color = ImVec4(1.0f, 0.5f, 1.0f, 0.25); //RGBA color values ranging from 0 to 1
 
     draw_list->AddRect(rect_min, rect_max, ImGui::GetColorU32(color));
     
@@ -403,7 +403,7 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
             // draw button
             ImVec2 rect_min = relative_win_pos + ImVec2(note_x, note_y); // Adjust the values here to position the rectangle
             ImVec2 rect_max = relative_win_pos + ImVec2(note_x + note_w, note_y + note_height); // Adjust the values here to position the rectangle
-            ImVec4 color = ImVec4(1.0f, 1.0f, 1.0f, 1.0f); //RGBA color values ranging from 0 to 1
+            ImVec4 color = ImVec4(1.0f, 1.0f, 1.0f, 0.35f); //RGBA color values ranging from 0 to 1
 
             // Define the vertices of the rectangle
             ImVec2 vertices[4];
@@ -413,7 +413,13 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
             vertices[3] = ImVec2(rect_min.x, rect_max.y-event->pitch_bend_a);
 
             // Draw the filled rectangle
-            draw_list->AddConvexPolyFilled(vertices, 4, ImGui::GetColorU32(color));
+//            draw_list->AddConvexPolyFilled(vertices, 4, ImGui::GetColorU32(color));
+            
+            draw_list->AddLine(
+                                   relative_win_pos+ImVec2(note_x,note_y-event->pitch_bend_a+(note_height/2)),
+                                   relative_win_pos+ImVec2(note_x+note_w,note_y-event->pitch_bend_b+(note_height/2)),
+                                   ImGui::GetColorU32(ImVec4(1,0.1,1,1))
+                               );
 
             // selects note
             if (ImGui::IsItemClicked())
