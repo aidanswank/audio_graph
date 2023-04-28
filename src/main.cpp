@@ -592,7 +592,7 @@ int main()
     interface.pass_userdata(&graph);
 
 //    smf::MidiFile mymidifile;
-    int midifile_err = mymidifile.read("/Users/aidan/dev/cpp/dfs_modules/love_you.mid");
+    int midifile_err = mymidifile.read("/Users/aidan/dev/cpp/dfs_modules/pitch_bend.mid");
     if (midifile_err == 0)
     {
         std::cout << "error loading midi!! :(" << std::endl;

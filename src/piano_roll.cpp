@@ -192,7 +192,7 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
     static smf::MidiEvent mynote;
     static smf::MidiEvent lastNote;
     static smf::MidiEvent lastEventClicked;
-    static float ticksPerColum = 1;
+    static float ticks_per_colum = 1;
     static float note_height = 8;
 
     float divsize = (96.f / 4);
@@ -243,7 +243,7 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
     ImGui::Text("sample %i midi tick %f seconds%f",g_transport.sample_count,g_transport.midi_tick_count,g_transport.current_seconds);
     ImGui::PopItemWidth();
     
-    ImGui::SliderFloat("width", &ticksPerColum, 0.25f, 32);
+    ImGui::SliderFloat("width", &ticks_per_colum, 0.25f, 32);
 //     ImGui::SameLine();
     ImGui::SliderFloat("height", &note_height, 1.f, 32);
     
@@ -299,7 +299,7 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
     // grid grids
     
 //    print(ImGui::GetWindowContentRegionMax().x+ImGui::GetScrollX(),ImGui::GetContentRegionMax().y);
-    float space_between_grids = (divsize / ticksPerColum);
+    float space_between_grids = (divsize / ticks_per_colum);
     int grid_loop_size = (content_pane_x);
 //    grid_loop_size = grid_loop_size;
 //    print("grid loop sz", grid_loop_size);
@@ -317,7 +317,7 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
     
     // draw playhead
     {
-        float x = g_transport.midi_tick_count * ticksPerColum;
+        float x = g_transport.midi_tick_count * ticks_per_colum;
 //        ImGui::SetScrollX(x);
         
         draw_list->AddLine(
@@ -338,24 +338,25 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
         ImGui::PopStyleColor();
 
         smf::MidiEvent *event = &midiTrack[i];
-
+        
         if(event->isNoteOn())
         {
-            // print("testttt");
+//             print("pitch",event->pitch_bend);
+            
             float duration = event->getTickDuration();
             float tick = event->tick;
             float key = event->getKeyNumber();
             // set up note rectangle dimensions
-            float note_w = duration / ticksPerColum;
-            float note_x = (tick / ticksPerColum) + 32;
+            float note_w = duration / ticks_per_colum;
+            float note_x = (tick / ticks_per_colum) + 32;
             // int noteRange = track.maxNote - track.minNote;
             // // float note_y = ((noteRange) - (track.notes[i].key - track.minNote)) * noteHeight;
             float note_y = (127-key) * note_height;
 
 
             // smf::MidiEvent *endNote = track.notes[i].endNote;
-            int startX = ((float)event->tick / ticksPerColum) + 32;
-            int endX = ((float)event->tick / ticksPerColum) + 32 + note_w - 8;
+            int startX = ((float)event->tick / ticks_per_colum) + 32;
+            int endX = ((float)event->tick / ticks_per_colum) + 32 + note_w - 8;
 
             // print(dur);
             ImVec2 startbtnsize = ImVec2(8, note_height);
@@ -406,10 +407,10 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
 
             // Define the vertices of the rectangle
             ImVec2 vertices[4];
-            vertices[0] = ImVec2(rect_min.x, rect_min.y);
-            vertices[1] = ImVec2(rect_max.x, rect_min.y-20);
-            vertices[2] = ImVec2(rect_max.x, rect_max.y-20);
-            vertices[3] = ImVec2(rect_min.x, rect_max.y);
+            vertices[0] = ImVec2(rect_min.x, rect_min.y-event->pitch_bend_a);
+            vertices[1] = ImVec2(rect_max.x, rect_min.y-event->pitch_bend_b);
+            vertices[2] = ImVec2(rect_max.x, rect_max.y-event->pitch_bend_b);
+            vertices[3] = ImVec2(rect_min.x, rect_max.y-event->pitch_bend_a);
 
             // Draw the filled rectangle
             draw_list->AddConvexPolyFilled(vertices, 4, ImGui::GetColorU32(color));
@@ -441,7 +442,7 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
             if (sel != -1)
             {
                 // ((float)(track.tpq / ticksPerColum)/4)
-                int offset = (new_pos.x * ticksPerColum);
+                int offset = (new_pos.x * ticks_per_colum);
                 int dur = midiTrack[sel].getTickDuration();
                 int s = snap(lastEventClicked.tick + offset,divsize);
                 midiTrack[sel].tick = s;
@@ -463,22 +464,24 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
                 // begin note button
                 if(noteleft_dragIdx != -1)
                 {
-                    print("new drag pos left",new_pos.x,new_pos.y);
-                    int offset = (new_pos.x * ticksPerColum);
+//                    print("new drag pos left",new_pos.x,new_pos.y);
+                    int offset = (new_pos.x * ticks_per_colum);
                     int left_tick = snap(lastEventClicked.tick + offset,divsize);
 //                    print(left_tick,right_tick);
 
                     midiTrack[noteleft_dragIdx].tick = left_tick;
+                    midiTrack[noteleft_dragIdx].pitch_bend_a = -new_pos.y;
                 }
                 
                 // end note button
                 if(noteright_dragIdx != -1)
                 {
-                    print("new drag pos right",new_pos.x,new_pos.y);
-                    int offset = (new_pos.x * ticksPerColum);
+//                    print("new drag pos right",new_pos.x,new_pos.y);
+                    int offset = (new_pos.x * ticks_per_colum);
                     int s = snap(lastEventClicked.tick + offset,divsize);
                     // print(s);
                     midiTrack[noteright_dragIdx].getLinkedEvent()->tick = s;
+                    midiTrack[noteright_dragIdx].pitch_bend_b = -new_pos.y;
                 }
             }
             
@@ -555,7 +558,7 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
                 int key = (floor(relative_mouse_pos.y/note_height)*-1) - 1; // why is this negative?
                 print(key);
                 
-                int tick = (mouse_pos.x-32+ImGui::GetScrollX()-ImGui::GetWindowPos().x) * ticksPerColum;
+                int tick = (mouse_pos.x-32+ImGui::GetScrollX()-ImGui::GetWindowPos().x) * ticks_per_colum;
                 
                 //             tick = snap(tick,divsize);
                 tick = floor(tick/divsize)*divsize;

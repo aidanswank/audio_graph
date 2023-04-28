@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MidiFile.h"
+
 struct global_transport
 {
     bool is_playing=false;
