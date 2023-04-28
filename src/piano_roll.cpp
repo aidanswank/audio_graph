@@ -120,6 +120,11 @@ ImVec2 operator+(const ImVec2& a, const ImVec2& b)
     return ImVec2(a.x + b.x, a.y + b.y);
 }
 
+ImVec2 operator-(const ImVec2& a, const ImVec2& b)
+{
+    return ImVec2(a.x - b.x, a.y - b.y);
+}
+
 void pattern_editor_window(bool *is_open)
 {
     ImGui::Begin("pattern editor", is_open, ImGuiWindowFlags_HorizontalScrollbar);
@@ -189,13 +194,12 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
     static int sel = -1; // track note index??
     static int noteleft_dragIdx = -1;
     static int noteright_dragIdx = -1;
-    static smf::MidiEvent mynote;
-    static smf::MidiEvent lastNote;
-    static smf::MidiEvent lastEventClicked;
+    static smf::MidiEvent last_event_clicked;
     static float ticks_per_colum = 1;
     static float note_height = 8;
-
-    float divsize = (96.f / 4);
+    
+    static int grid_div = 4;
+    static float divsize = (96.f / grid_div);
 
     
     ImGui::Begin("toptoolbar", is_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_HorizontalScrollbar);
@@ -239,9 +243,44 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
         g_transport.midi_tick_count=0;
         g_transport.current_seconds=0;
     }
-//    ImGui::SameLine();
-    ImGui::Text("sample %i midi tick %f seconds%f",g_transport.sample_count,g_transport.midi_tick_count,g_transport.current_seconds);
+    
     ImGui::PopItemWidth();
+
+    ImGui::SameLine();
+    
+    
+    static int selected_item = 0;
+    const char* items[] = { "1", "2", "3" };
+    const int num_items = sizeof(items) / sizeof(items[0]);
+
+    ImGui::PushItemWidth(40.0f);
+    if (ImGui::BeginCombo("##div", items[selected_item])) {
+        for (int i = 0; i < num_items; ++i) {
+            const bool is_selected = (selected_item == i);
+            if (ImGui::Selectable(items[i], is_selected)) {
+                selected_item = i;
+//                print(i);
+                if(i==0)
+                {
+                    grid_div = 4;
+                    divsize = (96.f / grid_div);
+                }
+                if(i==1)
+                {
+                    grid_div = 8;
+                    divsize = (96.f / grid_div);
+                }
+                    
+            }
+            if (is_selected) {
+                ImGui::SetItemDefaultFocus(); // set focus on this item by default
+            }
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::PopItemWidth();
+    
+    ImGui::Text("sample %i midi tick %f seconds%f",g_transport.sample_count,g_transport.midi_tick_count,g_transport.current_seconds);
     
     ImGui::SliderFloat("width", &ticks_per_colum, 0.25f, 32);
 //     ImGui::SameLine();
@@ -291,13 +330,10 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
     ImVec2 mouse_pos = ImGui::GetMousePos();
     // print(mouse_pos.x,mouse_pos.y-relativeWindowPos.y);
 
-    // float relativeMouse.y = mouse_pos.y-relativeWindowPos.y;
     ImVec2 relative_mouse_pos;
-    relative_mouse_pos.x = mouse_pos.x-relative_win_pos.x;
-    relative_mouse_pos.y = mouse_pos.y-relative_win_pos.y;
+    relative_mouse_pos = mouse_pos - relative_win_pos;
 
     // grid grids
-    
 //    print(ImGui::GetWindowContentRegionMax().x+ImGui::GetScrollX(),ImGui::GetContentRegionMax().y);
     float space_between_grids = (divsize / ticks_per_colum);
     int grid_loop_size = (content_pane_x);
@@ -371,7 +407,7 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
             {
                  print("start note",i);
                 noteleft_dragIdx = i;
-                lastEventClicked = midiTrack[noteleft_dragIdx];
+                last_event_clicked = midiTrack[noteleft_dragIdx];
             }
             ImGui::SetCursorPos(endbtnpos);
             ImGui::Button(std::to_string(i).c_str(),startbtnsize);
@@ -380,7 +416,7 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
             {
                 // print("start??",i);
                 noteright_dragIdx = i;
-                lastEventClicked = *midiTrack[noteright_dragIdx].getLinkedEvent();
+                last_event_clicked = *midiTrack[noteright_dragIdx].getLinkedEvent();
             }
             ImGui::PopStyleColor();
 
@@ -412,8 +448,9 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
             vertices[2] = ImVec2(rect_max.x, rect_max.y-event->pitch_bend_b);
             vertices[3] = ImVec2(rect_min.x, rect_max.y-event->pitch_bend_a);
 
-            // Draw the filled rectangle
-//            draw_list->AddConvexPolyFilled(vertices, 4, ImGui::GetColorU32(color));
+//             Draw the filled rectangle
+            draw_list->AddConvexPolyFilled(vertices, 4, ImGui::GetColorU32(color));
+            
             
             draw_list->AddLine(
                                    relative_win_pos+ImVec2(note_x,note_y-event->pitch_bend_a+(note_height/2)),
@@ -426,7 +463,7 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
             {
                 sel = i;
                 // mynote = track.notes[sel];
-                lastEventClicked = midiTrack[sel];
+                last_event_clicked = midiTrack[sel];
 //                print("sel",sel);
             }
             //double click remove note;
@@ -450,14 +487,14 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
                 // ((float)(track.tpq / ticksPerColum)/4)
                 int offset = (new_pos.x * ticks_per_colum);
                 int dur = midiTrack[sel].getTickDuration();
-                int s = snap(lastEventClicked.tick + offset,divsize);
+                int s = snap(last_event_clicked.tick + offset,divsize);
                 midiTrack[sel].tick = s;
 
                 // move other note
                 midiTrack[sel].getLinkedEvent()->tick = dur + s;
                 // print(midiTrack[sel].tick,midiTrack[sel].getLinkedEvent()->tick);
 
-                int new_key = lastEventClicked.getKeyNumber() + (round(new_pos.y / note_height) * -1);
+                int new_key = last_event_clicked.getKeyNumber() + (round(new_pos.y / note_height) * -1);
                 midiTrack[sel].setKeyNumber(new_key);
                 midiTrack[sel].getLinkedEvent()->setKeyNumber(new_key);
 
@@ -467,16 +504,26 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
 //                int left_tick = midiTrack[noteleft_dragIdx].tick;
 //                int right_tick = midiTrack[noteright_dragIdx].tick;
 
+                bool shift_down = ImGui::GetIO().KeyShift;
+
                 // begin note button
                 if(noteleft_dragIdx != -1)
                 {
 //                    print("new drag pos left",new_pos.x,new_pos.y);
                     int offset = (new_pos.x * ticks_per_colum);
-                    int left_tick = snap(lastEventClicked.tick + offset,divsize);
-//                    print(left_tick,right_tick);
+                    int left_tick = snap(last_event_clicked.tick + offset, divsize);
+                    int right_tick = midiTrack[noteleft_dragIdx].getLinkedEvent()->tick;
+                    print("lr",left_tick,right_tick);
 
-                    midiTrack[noteleft_dragIdx].tick = left_tick;
-                    midiTrack[noteleft_dragIdx].pitch_bend_a = -new_pos.y;
+                    if(left_tick+divsize-1<right_tick)
+                    {
+                        midiTrack[noteleft_dragIdx].tick = left_tick;
+                    }
+                    
+                    if (shift_down) {
+                        // Do something if the shift key is down
+                        midiTrack[noteleft_dragIdx].pitch_bend_a = snap(-new_pos.y,note_height);
+                    }
                 }
                 
                 // end note button
@@ -484,11 +531,26 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
                 {
 //                    print("new drag pos right",new_pos.x,new_pos.y);
                     int offset = (new_pos.x * ticks_per_colum);
-                    int s = snap(lastEventClicked.tick + offset,divsize);
+                    
+                    int left_tick = midiTrack[noteright_dragIdx].tick;
+                    int right_tick = snap(last_event_clicked.tick + offset, divsize);
                     // print(s);
-                    midiTrack[noteright_dragIdx].getLinkedEvent()->tick = s;
-                    midiTrack[noteright_dragIdx].pitch_bend_b = -new_pos.y;
+                    
+                    print("left",left_tick,"right",right_tick);
+                    
+                    // make sure right button doesnt go farther back than left
+                    if(left_tick<right_tick)
+                    {
+                        midiTrack[noteright_dragIdx].getLinkedEvent()->tick = right_tick;
+                    }
+                    
+                    if (shift_down) {
+                        midiTrack[noteright_dragIdx].pitch_bend_b = snap(-new_pos.y,note_height);
+                    }
                 }
+                
+                print("note left idx",noteleft_dragIdx, "note right idx",noteright_dragIdx);
+                
             }
             
         }
