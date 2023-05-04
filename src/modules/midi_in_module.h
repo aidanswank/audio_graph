@@ -20,7 +20,7 @@ struct midi_in_module : xmodule {
     
     RtMidiIn* midiin_ptr;
     //    std::vector<MidiNoteMessage> notes;
-    moodycamel::ConcurrentQueue<MidiNoteMessage> notesQueue;
+    moodycamel::ConcurrentQueue<midi_note_message> notesQueue;
     std::vector<std::string> port_names;
     
     int current_midi_note = 0;

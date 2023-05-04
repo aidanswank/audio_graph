@@ -24,6 +24,18 @@ void midi_sequencer::show()
     ImGui::Text( "%s (%i)", xmodule::name.c_str(), id );
     ImNodes::EndNodeTitleBar();
     
+    if(ImGui::Button("open"))
+    {
+        is_piano_roll_open=!is_piano_roll_open;
+        print("yes?",is_piano_roll_open);
+    }
+    
+    if(is_piano_roll_open)
+    {
+        piano_roll_window(&is_piano_roll_open, g_transport.midi_map, midi_sequencer::id);
+    }
+    
+    
     ImNodes::BeginOutputAttribute( output_attrs[0] );
     ImGui::Text("output");
     ImNodes::EndOutputAttribute();
@@ -43,34 +55,10 @@ void midi_sequencer::process()
     float tick_end = tick_start + block_size_in_ticks;
     
 //    std::cout << tick_start << " " << tick_end << std::endl;
+    smf::MidiFile& midi_file = g_transport.midi_map[midi_sequencer::id];
+    smf::MidiEventList& midi_events = midi_file[0];
 
-    smf::MidiEventList midi_events = g_transport.midifile[0][0];
     
-//    int eventsize = midi_events.getSize();
-   // std::cout << eventsize << std::endl;
-//   for (int eventindex = 0; eventindex < eventsize; eventindex++)
-//   {
-//       smf::MidiEvent event = midi_events.getEvent(eventindex);
-//
-//       if (event.tick == g_transport.midi_tick_count)
-//       {
-////           std::vector<unsigned char> msg = event;
-////           for (int i = 0; i < msg.size(); i += 3)
-////           {
-////              printf("%u %u %u\n", msg[i], msg[i + 1], msg[i + 2]);
-////           }
-////
-//           MidiNoteMessage note;
-//           note.velocity = event.getVelocity();
-//           note.noteNum = event.getKeyNumber();
-//           note.isNoteOn = event.isNoteOn();
-//
-////            print("midi event",note.isNoteOn,note.noteNum,note.velocity);
-////           input_notes.push_back(note);
-//       }
-//   }
-//
-////
     if(g_transport.is_playing)
     {
         for(int i = 0; i < midi_events.size(); i++)
@@ -79,13 +67,13 @@ void midi_sequencer::process()
             
             if(event.tick>=tick_start&&event.tick<=tick_end)
             {
-                MidiNoteMessage note;
+                midi_note_message note;
                 note.velocity = event.getVelocity();
-                note.noteNum = event.getKeyNumber();
-                note.isNoteOn = event.isNoteOn();
+                note.note_num = event.getKeyNumber();
+                note.is_note_on = event.isNoteOn();
                 
-                print("midi event",note.isNoteOn,note.noteNum,note.velocity);
-                if((note.noteNum!=-1) && (note.velocity!=-1))
+                print("midi event",note.is_note_on,note.note_num,note.velocity);
+                if((note.note_num!=-1) && (note.velocity!=-1))
                 {
                     input_notes.push_back(note);
                 } else {

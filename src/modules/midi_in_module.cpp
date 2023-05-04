@@ -34,16 +34,16 @@ void midiCallback(double deltaTime, std::vector<unsigned char> *message, void *p
 ////    print("num consumers", module_data->graph->node(module_data->node_id));
 //
     if (command == 144) {
-        MidiNoteMessage noteOnMsg;
-        noteOnMsg.noteNum = noteNum;
+        midi_note_message noteOnMsg;
+        noteOnMsg.note_num = noteNum;
         noteOnMsg.velocity = static_cast<float>(velocity) / 127.0f;
-        noteOnMsg.isNoteOn = true;
+        noteOnMsg.is_note_on = true;
         midi_module->notesQueue.enqueue(noteOnMsg);
     } else if (command == 128) {
-        MidiNoteMessage noteOffMsg;
-        noteOffMsg.noteNum = noteNum;
+        midi_note_message noteOffMsg;
+        noteOffMsg.note_num = noteNum;
         noteOffMsg.velocity = static_cast<float>(velocity) / 127.0f;
-        noteOffMsg.isNoteOn = false;
+        noteOffMsg.is_note_on = false;
         midi_module->notesQueue.enqueue(noteOffMsg);
     }
 
@@ -100,13 +100,13 @@ void midi_in_module::process()
     input_notes.clear();
     
     while (true) {
-        MidiNoteMessage note;
+        midi_note_message note;
         bool hasNotes = notesQueue.try_dequeue(note);
         if (!hasNotes) {
             break;
         }
 //        std::cout << note.isNoteOn << " " << note.noteNum << " " << note.velocity << std::endl;
-        current_midi_note = note.noteNum;
+        current_midi_note = note.note_num;
         input_notes.push_back(note);
     }
         

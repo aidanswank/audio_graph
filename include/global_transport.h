@@ -2,6 +2,9 @@
 
 #include "MidiFile.h"
 
+#include "midi.h"
+#include <map>
+
 struct global_transport
 {
     bool is_playing=false;
@@ -12,7 +15,13 @@ struct global_transport
     float ms_per_tick = 0;
     int sample_count = 0;
     int bar = 0;
-    smf::MidiFile* midifile; // not sure gonna keep this
+    
+    int current_selected_track = -1;
+    std::vector<midi_note_message> midi_track;
+    smf::MidiFile midi_file; // not sure gonna keep this
+    std::map<int, smf::MidiFile> midi_map;
+
+    smf::MidiFile *midifile; // not sure gonna keep this
 };
 
 float get_ms_per_tick(int bpm, int tpq);

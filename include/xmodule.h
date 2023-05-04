@@ -11,12 +11,7 @@ using json = nlohmann::json;
 // if null set zero
 void check_and_set_zero(json& obj, const std::string& key);
 
-struct MidiNoteMessage
-{
-    int noteNum = -1;
-    float velocity = 0.0f;
-    bool isNoteOn = false;
-};
+#include "midi.h"
 
 // multichannel audio
 typedef std::vector<std::vector<float>> STEREO_AUDIO;
@@ -124,7 +119,7 @@ struct xmodule
 //    std::map<int, int> attr2slot;
     
     //todo seperate
-    std::vector<MidiNoteMessage> input_notes;
+    std::vector<midi_note_message> input_notes;
     STEREO_AUDIO output_audio;
     STEREO_AUDIO input_audio;
     

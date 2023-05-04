@@ -9,6 +9,9 @@ extern global_transport g_transport;
 
 struct midi_sequencer : xmodule {
     
+//    smf::MidiEventList midi_events;
+    bool is_piano_roll_open = true;
+
     midi_sequencer(audio_graph<xmodule*>& graph, ImVec2 click_pos);
     void process() override;
     void show() override;

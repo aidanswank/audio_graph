@@ -84,7 +84,7 @@ void vst3_midi_instrument::process()
 
     float *audio_output_left_ptr = xmodule::output_audio[0].data();
     float *audio_output_right_ptr = xmodule::output_audio[1].data();
-    std::vector<MidiNoteMessage> summed_input_notes;
+    std::vector<midi_note_message> summed_input_notes;
     summed_input_notes.clear();
     
 //    bool flag = false;
@@ -221,7 +221,7 @@ void vst3_midi_instrument::process()
 
         for(int i = 0; i < midi_in_module->input_notes.size(); i++)
         {
-            MidiNoteMessage note = midi_in_module->input_notes[i];
+            midi_note_message note = midi_in_module->input_notes[i];
 
             Steinberg::Vst::Event evt = {};
             evt.busIndex = 0;
@@ -229,11 +229,11 @@ void vst3_midi_instrument::process()
             evt.ppqPosition = currentBeat;
             evt.flags = Steinberg::Vst::Event::EventFlags::kIsLive;
 //            evt.flags = 1 << 14;
-            if (note.isNoteOn) {
+            if (note.is_note_on) {
 //                            print("note on");
                 evt.type = Steinberg::Vst::Event::EventTypes::kNoteOnEvent;
                 evt.noteOn.channel = 0;
-                evt.noteOn.pitch = note.noteNum;
+                evt.noteOn.pitch = note.note_num;
                 evt.noteOn.tuning = 0.0f;
                 evt.noteOn.velocity = note.velocity;
                 evt.noteOn.length = 0;
@@ -242,7 +242,7 @@ void vst3_midi_instrument::process()
 //                            print("note off");
                 evt.type = Steinberg::Vst::Event::EventTypes::kNoteOffEvent;
                 evt.noteOff.channel = 0;
-                evt.noteOff.pitch = note.noteNum;
+                evt.noteOff.pitch = note.note_num;
                 evt.noteOff.tuning = 0.0f;
                 evt.noteOff.velocity = note.velocity;
                 evt.noteOff.noteId = -1;

@@ -28,7 +28,7 @@ json current_patch;
 
 #include "piano_roll.h"
 static bool isOpenSequencerWindow;
-smf::MidiFile mymidifile;
+//smf::MidiFile mymidifile;
 
 //// Global variables
 //int tick_counter = 0;  // Counter for MIDI clock ticks
@@ -93,58 +93,62 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
 void audio_settings_gui(audio_interface* interface)
 {
     static bool audio_settings_open = true;
-    ImGui::Begin("audio settings", &audio_settings_open);
-
-    static const char* current_item = NULL;
-    
-    if (ImGui::BeginCombo("input devices", current_item)) // The second parameter is the label previewed before opening the combo.
+    if(audio_settings_open)
     {
-        for (int n = 0; n < interface->device_infos.size(); n++)
-        {
-            if(interface->device_infos[n].maxInputChannels>0)
-            {
-                bool is_selected = (current_item == interface->device_infos[n].name); // You can store your selection however you want, outside or inside your objects
-                if (ImGui::Selectable(interface->device_infos[n].name, is_selected))
-                {
-                    current_item = interface->device_infos[n].name;
-                    interface->set_param(true, n);
-                    
-                    // dont set mic and then retry callback
-                    // if i select speaker then mic with this uncommented i get glitchy audioß
-//                    interface->try_params();
-//                    interface->turn_on(audio_callback);
-                }
-                if (is_selected)
-                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
-            }
-        }
-        ImGui::EndCombo();
-    }
-    
-    static const char* current_item2 = NULL;
-    if (ImGui::BeginCombo("outout devices", current_item2))
-    {
-        for (int n = 0; n < interface->device_infos.size(); n++)
-        {
-            if(interface->device_infos[n].maxOutputChannels>0)
-            {
-                bool is_selected = (current_item2 == interface->device_infos[n].name);
-                if (ImGui::Selectable(interface->device_infos[n].name, is_selected))
-                {
-                    current_item2 = interface->device_infos[n].name;
-                    print("dev id", n);
-                    interface->set_param(false, n);
-                    interface->try_params();
-                    interface->turn_on(audio_callback);
-                }
-                if (is_selected)
-                    ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
-            }
-        }
-        ImGui::EndCombo();
-    }
         
-    ImGui::End();
+        ImGui::Begin("audio settings", &audio_settings_open);
+        
+        static const char* current_item = NULL;
+        
+        if (ImGui::BeginCombo("input devices", current_item)) // The second parameter is the label previewed before opening the combo.
+        {
+            for (int n = 0; n < interface->device_infos.size(); n++)
+            {
+                if(interface->device_infos[n].maxInputChannels>0)
+                {
+                    bool is_selected = (current_item == interface->device_infos[n].name); // You can store your selection however you want, outside or inside your objects
+                    if (ImGui::Selectable(interface->device_infos[n].name, is_selected))
+                    {
+                        current_item = interface->device_infos[n].name;
+                        interface->set_param(true, n);
+                        
+                        // dont set mic and then retry callback
+                        // if i select speaker then mic with this uncommented i get glitchy audioß
+                        //                    interface->try_params();
+                        //                    interface->turn_on(audio_callback);
+                    }
+                    if (is_selected)
+                        ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+                }
+            }
+            ImGui::EndCombo();
+        }
+        
+        static const char* current_item2 = NULL;
+        if (ImGui::BeginCombo("outout devices", current_item2))
+        {
+            for (int n = 0; n < interface->device_infos.size(); n++)
+            {
+                if(interface->device_infos[n].maxOutputChannels>0)
+                {
+                    bool is_selected = (current_item2 == interface->device_infos[n].name);
+                    if (ImGui::Selectable(interface->device_infos[n].name, is_selected))
+                    {
+                        current_item2 = interface->device_infos[n].name;
+                        print("dev id", n);
+                        interface->set_param(false, n);
+                        interface->try_params();
+                        interface->turn_on(audio_callback);
+                    }
+                    if (is_selected)
+                        ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+                }
+            }
+            ImGui::EndCombo();
+        }
+        
+        ImGui::End();
+    }
 }
 
 void link_module(int start_attr, int end_attr, audio_graph<xmodule*>* graph)
@@ -260,6 +264,9 @@ public:
         print("ui init");
         ui.init(window,gl_context);
         isOpenSequencerWindow=true;
+        
+        ImNodesStyle& style = ImNodes::GetStyle();
+            style.Flags |= ImNodesStyleFlags_GridLinesPrimary | ImNodesStyleFlags_GridSnapping;
         // (optional) set browser properties
         
         open_file_dialog = new ImGui::FileBrowser();
@@ -345,16 +352,19 @@ public:
     {
         
         ui.new_frame();
-        
         audio_settings_gui(my_audio_interface);
+        
 
 //        ui.update();
         
-        ImGui::ShowDemoWindow();
+//        ImGui::ShowDemoWindow();
         
-        piano_roll_window(&isOpenSequencerWindow, mymidifile);
+//        piano_roll_window(&isOpenSequencerWindow, g_transport.midi_file);
+//        piano_roll_window2(&isOpenSequencerWindow, g_transport.midi_track);
+        sequencer_controls_window();
         pattern_editor_window(&isOpenSequencerWindow);
-
+        clip_timeline_window(&isOpenSequencerWindow);
+        
         static bool node_editor_active = true;
         if(node_editor_active)
         {
@@ -591,14 +601,14 @@ int main()
     interface.buffer_size=256;
     interface.pass_userdata(&graph);
 
-//    smf::MidiFile mymidifile;
-    int midifile_err = mymidifile.read("/Users/aidan/dev/cpp/dfs_modules/pitch_bend.mid");
-    if (midifile_err == 0)
-    {
-        std::cout << "error loading midi!! :(" << std::endl;
-    }
-    g_transport.midifile=&mymidifile;
-    mymidifile.linkNotePairs();
+////    smf::MidiFile mymidifile;
+//    int midifile_err = mymidifile.read("/Users/aidan/dev/cpp/dfs_modules/pitch_bend.mid");
+//    if (midifile_err == 0)
+//    {
+//        std::cout << "error loading midi!! :(" << std::endl;
+//    }
+//    g_transport.midifile=&mymidifile;
+//    mymidifile.linkNotePairs();
     
     user_interface ui(window, gl_context, &graph, &module_factory_map, &interface);
 //    ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/vst_example.json");
