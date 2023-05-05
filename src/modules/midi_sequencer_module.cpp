@@ -32,7 +32,7 @@ void midi_sequencer::show()
     
     if(is_piano_roll_open)
     {
-        piano_roll_window(&is_piano_roll_open, g_transport.midi_map, midi_sequencer::id);
+        piano_roll_window(&is_piano_roll_open, g_transport.midi_module_map, midi_sequencer::id);
     }
     
     
@@ -55,7 +55,9 @@ void midi_sequencer::process()
     float tick_end = tick_start + block_size_in_ticks;
     
 //    std::cout << tick_start << " " << tick_end << std::endl;
-    smf::MidiFile& midi_file = g_transport.midi_map[midi_sequencer::id];
+    
+    // if not refrence losses pitch bend for some reason
+    smf::MidiFile& midi_file = g_transport.midi_module_map[midi_sequencer::id];
     smf::MidiEventList& midi_events = midi_file[0];
 
     
@@ -63,7 +65,7 @@ void midi_sequencer::process()
     {
         for(int i = 0; i < midi_events.size(); i++)
         {
-            smf::MidiEvent event = midi_events[i];
+            smf::MidiEvent &event = midi_events[i];
             
             if(event.tick>=tick_start&&event.tick<=tick_end)
             {
@@ -71,8 +73,13 @@ void midi_sequencer::process()
                 note.velocity = event.getVelocity();
                 note.note_num = event.getKeyNumber();
                 note.is_note_on = event.isNoteOn();
+                note.pitch_bend_a = event.pitch_bend_a;
+                note.pitch_bend_b = event.pitch_bend_b;
+                note.duration = event.getTickDuration();
+                note.tick = event.tick;
                 
-                print("midi event",note.is_note_on,note.note_num,note.velocity);
+//                print("bend a",event.pitch_bend_a,"b",event.pitch_bend_b);
+//                print("midi event",note.is_note_on,note.note_num,note.velocity);
                 if((note.note_num!=-1) && (note.velocity!=-1))
                 {
                     input_notes.push_back(note);

@@ -16,10 +16,8 @@ struct global_transport
     int sample_count = 0;
     int bar = 0;
     
-    int current_selected_track = -1;
-    std::vector<midi_note_message> midi_track;
-    smf::MidiFile midi_file; // not sure gonna keep this
-    std::map<int, smf::MidiFile> midi_map;
+//    smf::MidiFile midi_file; // not sure gonna keep this
+    std::map<int, smf::MidiFile> midi_module_map;
 
     smf::MidiFile *midifile; // not sure gonna keep this
 };

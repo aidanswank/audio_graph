@@ -15,6 +15,8 @@ global_transport g_transport;
 #include "float_module.h"
 #include "multiply_sig_module.h"
 #include "add_sig_module.h"
+#include "polysampler.h"
+#include "polysampler_module.h"
 
 //#include "graph.h"
 #include "audio_interface.h"
@@ -593,6 +595,7 @@ int main()
     module_factory_map[module_float__get_name()]           = &module_float__create;
     module_factory_map[module_multiply__get_name()]        = &module_multiply__create;
     module_factory_map[module_add__get_name()]             = &module_add__create;
+    module_factory_map[module_polysampler__get_name()]     = &module_polysampler__create;
 
     // set up audio interface and open stream
     audio_interface interface;

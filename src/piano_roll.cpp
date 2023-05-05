@@ -810,50 +810,7 @@ void piano_roll_window(bool *is_open, std::map<int, smf::MidiFile> &midi_map, in
     
     ImGui::Begin("fix me", is_open, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_HorizontalScrollbar);
 
-
-//    draw_pattern_editor();
-//    if (ImGui::TreeNode("Contents"))
-//    {
-//        PrintDirectory(currentDirectory);
-//        ImGui::TreePop();
-//    }
-//
-//    static char buf[16];
-//    snprintf(buf, 16, "%f", g_transport.tempo);
-//    ImGui::PushItemWidth(35.0f);
-//    if(ImGui::Button("-"))
-//    {
-//        g_transport.tempo-=5;
-//    }
 //    ImGui::SameLine();
-//    ImGui::InputFloat("##tempo", &g_transport.tempo);
-//    ImGui::SameLine();
-//    if(ImGui::Button("+"))
-//    {
-//        g_transport.tempo+=5;
-//    }
-//    ImGui::SameLine();
-//    if(ImGui::Button("PLAY"))
-//    {
-//        g_transport.is_playing=true;
-//    }
-//    ImGui::SameLine();
-//    if(ImGui::Button("PAUSE"))
-//    {
-//        g_transport.is_playing=false;
-//    }
-//    ImGui::SameLine();
-//    if(ImGui::Button("RESET"))
-//    {
-//        g_transport.sample_count=0;
-//        g_transport.midi_tick_count=0;
-//        g_transport.current_seconds=0;
-//    }
-//
-//    ImGui::PopItemWidth();
-
-    ImGui::SameLine();
-
 
     static int selected_item = 0;
     const char* items[] = { "1", "2", "3" };
@@ -1133,6 +1090,7 @@ void piano_roll_window(bool *is_open, std::map<int, smf::MidiFile> &midi_map, in
                     
                     if (shift_down) {
                         midi_track[note_left_drag_idx].pitch_bend_a = snap(-new_pos.y,note_height);
+//                        midi_track[note_left_drag_idx].getLinkedEvent()->pitch_bend_a = snap(-new_pos.y,note_height);
                     }
                 }
                 
@@ -1156,6 +1114,7 @@ void piano_roll_window(bool *is_open, std::map<int, smf::MidiFile> &midi_map, in
                     
                     if (shift_down) {
                         midi_track[note_right_drag_idx].pitch_bend_b = snap(-new_pos.y,note_height);
+//                        midi_track[note_right_drag_idx].getLinkedEvent()->pitch_bend_b = snap(-new_pos.y,note_height);
                     }
                 }
                 
