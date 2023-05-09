@@ -11,16 +11,24 @@
 
 struct voice
 {
-    bool is_active;
-    int note_num;
+//    bool is_active;
+//    int note_num;
+//    float pitch_bend_a;
+//    float pitch_bend_b;
+    midi_note_message note;
     PolyBLEP *synth;
-    float slope;
+    float freq=-1;
+//    float slope;
     voice(int sample_rate)
     {
         synth = new PolyBLEP(sample_rate);
-        is_active = false;
-        note_num = -1;
-        slope = 0;
+        synth->setWaveform(PolyBLEP::SAWTOOTH);
+        note.is_note_on = false;
+        note.note_num = -1;
+//        note.
+//        is_active = false;
+//        note_num = -1;
+//        slope = 0;
     }
 };
 

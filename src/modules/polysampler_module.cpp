@@ -44,6 +44,30 @@ void polysampler_module::show(){
     ImNodes::EndInputAttribute();
     
     
+    const char* waveform_names[] = {
+        "SINE", "COSINE", "TRIANGLE", "SQUARE", "RECTANGLE", "SAWTOOTH", "RAMP",
+        "MODIFIED_TRIANGLE", "MODIFIED_SQUARE", "HALF_WAVE_RECTIFIED_SINE",
+        "FULL_WAVE_RECTIFIED_SINE", "TRIANGULAR_PULSE", "TRAPEZOID_FIXED",
+        "TRAPEZOID_VARIABLE"
+    };
+
+//    static int current_waveform = 0;
+    ImGui::PushItemWidth(100.0f);
+    
+    if(ImGui::Combo("Waveform", &current_waveform, waveform_names,
+                 IM_ARRAYSIZE(waveform_names)))
+    {
+        print("yo!",current_waveform);
+        for(int i = 0; i < synth->voices.size(); i++)
+        {
+            synth->voices[i].synth->setWaveform((PolyBLEP::Waveform(current_waveform)));            
+        }
+    }
+
+    ImGui::PopItemWidth();
+//    Waveform selected_waveform = static_cast<Waveform>(current_waveform);
+    
+    
     ImNodes::BeginOutputAttribute( output_attrs[ 0 ] );
     ImGui::Text("output");
     ImNodes::EndOutputAttribute();
@@ -52,11 +76,16 @@ void polysampler_module::show(){
 };
 void polysampler_module::save_state(nlohmann::json& object)
 {
+    object["current_waveform"] = current_waveform;
+//    print(object);
     
 };
 void polysampler_module::load_state(nlohmann::json& object)
 {
-    
+    check_and_load(object, "current_waveform", &current_waveform);
+    current_waveform = object["current_waveform"];
+    print("polysynth",object,current_waveform);
+//    check_and_load(object, "resonance", &resonance);
 };
 
 xmodule* module_polysampler__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)

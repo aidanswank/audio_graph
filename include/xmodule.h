@@ -9,7 +9,7 @@
 using json = nlohmann::json;
 
 // if null set zero
-void check_and_set_zero(json& obj, const std::string& key);
+void check_and_load(json& obj, std::string key, void* data);
 
 #include "midi.h"
 

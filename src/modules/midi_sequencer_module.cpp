@@ -6,7 +6,21 @@ midi_sequencer::midi_sequencer(audio_graph<xmodule*>& graph, ImVec2 click_pos) :
     name = module_midi_sequencer__get_name();
     config(0,1);
     ImNodes::SetNodeScreenSpacePos(id, click_pos);
-
+    
+//    g_transport.midi_module_map[midi_sequencer::id];
+    
+//    g_transport.current_pattern++;
+    
+    for(int i = 0; i < 4; i++)
+    {
+        g_transport.pattern_map[midi_sequencer::id].push_back(0);
+    }
+    
+    current_pattern_open = 0;
+    
+//    g_transport.pattern_map[midi_sequencer::id];
+//    g_transport.midi_module_map[midi_sequencer::id];
+    
 //    MidiNoteMessage fakenote;
 //    fakenote.noteNum=65;
 //    fakenote.isNoteOn=true;
@@ -24,16 +38,17 @@ void midi_sequencer::show()
     ImGui::Text( "%s (%i)", xmodule::name.c_str(), id );
     ImNodes::EndNodeTitleBar();
     
-    if(ImGui::Button("open"))
-    {
-        is_piano_roll_open=!is_piano_roll_open;
-        print("yes?",is_piano_roll_open);
-    }
+//    if(ImGui::Button("open"))
+//    {
+//        is_piano_roll_open=!is_piano_roll_open;
+//        print("yes?",is_piano_roll_open);
+//    }
     
-    if(is_piano_roll_open)
-    {
-        piano_roll_window(&is_piano_roll_open, g_transport.midi_module_map, midi_sequencer::id);
-    }
+//    if(is_piano_roll_open)
+//    {
+////        g_transport.midi_module_map[midi_sequencer::id];
+//        piano_roll_window(&is_piano_roll_open, g_transport.midi_module_map[midi_sequencer::current_pattern_open], midi_sequencer::id);
+//    }
     
     
     ImNodes::BeginOutputAttribute( output_attrs[0] );
@@ -55,10 +70,13 @@ void midi_sequencer::process()
     float tick_end = tick_start + block_size_in_ticks;
     
 //    std::cout << tick_start << " " << tick_end << std::endl;
-    
     // if not refrence losses pitch bend for some reason
-    smf::MidiFile& midi_file = g_transport.midi_module_map[midi_sequencer::id];
+    
+    // super long what the heck is going on
+    smf::MidiFile& midi_file = g_transport.midi_module_map[g_transport.pattern_map[midi_sequencer::id][g_transport.current_pattern]];
     smf::MidiEventList& midi_events = midi_file[0];
+    
+    print("id",midi_sequencer::id,"cur pattern",g_transport.pattern_map[midi_sequencer::id][g_transport.current_pattern]);
 
     
     if(g_transport.is_playing)
@@ -69,6 +87,7 @@ void midi_sequencer::process()
             
             if(event.tick>=tick_start&&event.tick<=tick_end)
             {
+                //uhhhhh
                 midi_note_message note;
                 note.velocity = event.getVelocity();
                 note.note_num = event.getKeyNumber();
@@ -85,6 +104,7 @@ void midi_sequencer::process()
                     input_notes.push_back(note);
                 } else {
                     print("negative midi note?");
+                    print(note.note_num,note.pitch_bend_a,note.pitch_bend_b);
                 }
             }
         }
@@ -103,7 +123,10 @@ std::string module_midi_sequencer__get_name()
 
 void midi_sequencer::save_state(nlohmann::json &object)
 {
+//    print(g_transport.pattern_map[midi_sequencer::id].size());
     
+    object["pattern"] = g_transport.pattern_map[midi_sequencer::id];
+//    smf::MidiFile& midi_file = g_transport.midi_module_map[g_transport.pattern_map[midi_sequencer::id][g_transport.current_pattern]];
 };
 
 void midi_sequencer::load_state(nlohmann::json &object)

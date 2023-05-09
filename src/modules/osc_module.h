@@ -1,6 +1,8 @@
 //#pragma once;
 #include "xmodule.h"
 #include "PolyBLEP.h"
+#include "global_transport.h"
+extern global_transport g_transport;
 
 struct osc_module : xmodule {
     

@@ -1,5 +1,17 @@
 #include "audio_output_module.h"
 
+void clip_audio(float& samp)
+{
+    if(samp>1.0)
+    {
+        samp=1;
+    }
+    if(samp<-1.0)
+    {
+        samp=-1;
+    }
+}
+
 void audio_output_module::process()
 {
 //        std::cout <<  "id " << id << " final output" << std::endl;
@@ -25,6 +37,9 @@ void audio_output_module::process()
                     
 //                    print(exp_adjusted_slider);
                     
+                    clip_audio(xmodule::output_audio[0][i]);
+                    clip_audio(xmodule::output_audio[1][i]);
+                    
                     xmodule::output_audio[0][i] += mod->output_audio[0][i] * exp_adjusted_slider;
                     xmodule::output_audio[1][i] += mod->output_audio[1][i] * exp_adjusted_slider;
                 }
@@ -45,7 +60,12 @@ void audio_output_module::save_state(nlohmann::json &object)
 void audio_output_module::load_state(nlohmann::json &object)
 {
     print("audio output state load", object);
-    output_gain = object["output_gain"];
+    check_and_load(object, "output_gain", &output_gain);
+//    if (object.contains(std::string{ "output_gain" }))
+//    {
+//        output_gain = object["output_gain"];
+//    }
+//    does_param_exist(object, )
 };
 
 xmodule* module_audio_output__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)

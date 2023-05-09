@@ -5,6 +5,7 @@
 struct polysampler_module : xmodule {
     
     polysampler* synth;
+    int current_waveform = 0;
     
     polysampler_module(audio_graph<xmodule*>& graph, ImVec2 click_pos);
     void process() override;

@@ -13,16 +13,15 @@ void zero_audio(STEREO_AUDIO &audio, int len)
 //    }
 }
 
-void check_and_set_zero(json& obj, const std::string& key) {
-    // Check if the key exists in the object
-    if (obj.find(key) == obj.end()) {
-        // Key doesn't exist, create it with a value of zero
-        obj[key] = 0;
+void check_and_load(json& obj, std::string key, void* data) {
+    if (obj.contains(key))
+    {
+        data = &obj[key];
+        print(key," exist");
+//        print(data,obj[key]);
     } else {
-        // Key exists, check if it is null
-        if (obj[key].is_null()) {
-            // Key is null, set it to zero
-            obj[key] = 0;
-        }
+        print("param '",key,"' not found in file! setting to zero");
+        data = 0;
     }
+    
 }

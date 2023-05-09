@@ -26,8 +26,8 @@ void osc_module::save_state(nlohmann::json &object)
 void osc_module::load_state(nlohmann::json &object)
 {
     print("osc module state",object);
-    freq=object["freq"];
-    isLFO=object["isLFO"];
+    check_and_load(object, "freq", &freq);
+    check_and_load(object, "isLFO", &isLFO);
 //    current_item=object["current_item"];
 };
 
@@ -81,6 +81,11 @@ void osc_module::process() {
             freq = freq_input_mod->output_audio[0][i];
         }
         
+        if(g_transport.midi_tick_count==0)
+        {
+            blep->sync(0.0);
+            print("reset osc phase!");
+        }
         blep->setFrequency(freq);
         
         float samp = blep->getAndInc();

@@ -15,9 +15,13 @@ struct global_transport
     float ms_per_tick = 0;
     int sample_count = 0;
     int bar = 0;
-    
+    int current_pattern = 0;
+    int current_pattern_open = 0;
+
 //    smf::MidiFile midi_file; // not sure gonna keep this
     std::map<int, smf::MidiFile> midi_module_map;
+    std::vector<smf::MidiFile> midi_patterns; // all patterns
+    std::map<int, std::vector<int>> pattern_map; // map of node_id->vector of pattern indices
 
     smf::MidiFile *midifile; // not sure gonna keep this
 };

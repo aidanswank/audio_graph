@@ -85,6 +85,19 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
         g_transport.sample_count += framesPerBuffer;
         g_transport.current_seconds = g_transport.sample_count/44100.0f;
         
+        
+        if(g_transport.midi_tick_count>=96*4)
+        {
+            g_transport.midi_tick_count=0;
+            g_transport.current_seconds=0;
+            g_transport.current_pattern++;
+            if(g_transport.current_pattern>=4)
+            {
+                g_transport.current_pattern=0;
+            }
+//            print(g_transport.current_pattern);
+        }
+        
     }
 
     return 0;
@@ -344,6 +357,40 @@ public:
             graph->xmodules[i]->save_state(current_patch["nodes"][id]);
 
         }
+        
+        json tracks;
+        for ( auto it = g_transport.midi_module_map.begin(); it != g_transport.midi_module_map.end(); ++it  )
+        {
+            smf::MidiFile& midi_file = it->second;
+            smf::MidiEventList& midi_events = midi_file[0];
+            json events;
+            for(int i = 0; i < midi_events.size(); i++)
+            {
+                midi_note_message note;
+                smf::MidiEvent &event = midi_events[i];
+                note.velocity = event.getVelocity();
+                note.note_num = event.getKeyNumber();
+                note.is_note_on = event.isNoteOn();
+                note.pitch_bend_a = event.pitch_bend_a;
+                note.pitch_bend_b = event.pitch_bend_b;
+                note.duration = event.getTickDuration();
+                note.tick = event.tick;
+                
+                json myevent;
+                myevent["event"]["note_num"] = note.note_num;
+                myevent["event"]["is_note_on"] = note.is_note_on;
+                myevent["event"]["velocity"] = note.velocity;
+                myevent["event"]["pitch_bend_a"] = note.pitch_bend_a;
+                myevent["event"]["pitch_bend_b"] = note.pitch_bend_b;
+                myevent["event"]["tick"] = note.tick;
+                events.push_back(myevent);
+            }
+            std::string key = "node_" + std::to_string(it->first);
+            tracks[key].push_back(events);
+        }
+        print(tracks);
+        current_patch["tracks"] = tracks;
+
         // write prettified JSON to another file
         std::ofstream o(filepath);
         o << std::setw(4) << current_patch << std::endl;
@@ -353,18 +400,24 @@ public:
     void update()
     {
         
+        ImGuiStyle& style = ImGui::GetStyle();
+        style.ItemSpacing = ImVec2(4,4);
+        style.FrameBorderSize = 1;
+        
         ui.new_frame();
+
         audio_settings_gui(my_audio_interface);
         
 
 //        ui.update();
         
-//        ImGui::ShowDemoWindow();
+        ImGui::ShowDemoWindow();
         
 //        piano_roll_window(&isOpenSequencerWindow, g_transport.midi_file);
 //        piano_roll_window2(&isOpenSequencerWindow, g_transport.midi_track);
         sequencer_controls_window();
-        pattern_editor_window(&isOpenSequencerWindow);
+        pattern_editor_window(&isOpenSequencerWindow, graph);
+        piano_roll_window(&isOpenSequencerWindow, g_transport.midi_module_map[g_transport.current_pattern_open]);
         clip_timeline_window(&isOpenSequencerWindow);
         
         static bool node_editor_active = true;
