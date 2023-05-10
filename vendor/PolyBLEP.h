@@ -41,7 +41,8 @@ public:
         FULL_WAVE_RECTIFIED_SINE,
         TRIANGULAR_PULSE,
         TRAPEZOID_FIXED,
-        TRAPEZOID_VARIABLE
+        TRAPEZOID_VARIABLE,
+        WHITE_NOISE
     };
 
     PolyBLEP(double sampleRate, Waveform waveform = SINE, double initialFrequency = 440.0);

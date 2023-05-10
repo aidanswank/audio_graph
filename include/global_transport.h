@@ -24,6 +24,9 @@ struct global_transport
     std::map<int, std::vector<int>> pattern_map; // map of node_id->vector of pattern indices
 
     smf::MidiFile *midifile; // not sure gonna keep this
+    
+    //ahhhhh
+    float ticks_per_sample = 0;
 };
 
 float get_ms_per_tick(int bpm, int tpq);

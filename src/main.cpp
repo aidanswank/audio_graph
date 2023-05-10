@@ -17,6 +17,10 @@ global_transport g_transport;
 #include "add_sig_module.h"
 #include "polysampler.h"
 #include "polysampler_module.h"
+#include "parse_module.h"
+#include "map_sig_module.h"
+#include "tube_module.h"
+#include "mixer_module.h"
 
 //#include "graph.h"
 #include "audio_interface.h"
@@ -80,6 +84,7 @@ static int audio_callback( const void *inputBuffer, void *outputBuffer,
         
         g_transport.ms_per_tick = get_ms_per_tick(g_transport.tempo,g_transport.ticks_per_quarter_note);
         float midi_tick_inc = samples_to_ticks(framesPerBuffer, g_transport.ms_per_tick, 44100);
+        g_transport.ticks_per_sample = samples_to_ticks(1, g_transport.ms_per_tick, 44100);
         g_transport.midi_tick_count += midi_tick_inc;
         //        print("tick counter",g_transport.midi_tick_count);
         g_transport.sample_count += framesPerBuffer;
@@ -334,7 +339,59 @@ public:
             link_module(start, end, graph);
         }
         
-//        graph->xmodules.push_back( m );
+//        print("tracks!!",current_patch["tracks"]);
+        json j =current_patch["tracks"];
+        for (auto& [key, value] : j.items())
+        {
+//          std::cout << key << " : " << value << "\n";
+            if(value[0].is_null())
+            {
+                print("pattern 0 null ignore");
+            } else {
+                int node_id = std::stoi( key );
+                print("node id from track key str", node_id);
+                
+                
+                // THIS IS BAD!!
+                // since i changed event classes in lib i have to modify memory after i "add" it to add pitch bend stuff
+                // TODO REMOVE MIDI FILE LIBRARY AND MOVE EVERYTHING TO OWN CLASS OR SOMETHING
+                // I SPEND TOO MUCH TIME CONVERTING BETWEEN THESE
+                smf::MidiFile fake;
+                g_transport.midi_module_map[node_id] = fake;
+
+                for(int i = 0; i < value[0].size(); i++)
+                {
+//                    print(value[0][i]);
+                    json jevent=value[0][i]["event"];
+//                    midi_track.append(MidiEvent &event)
+                    print("jevent",jevent);
+                    int note_num = jevent["note_num"];
+                    int pitch_bend_a = jevent["pitch_bend_a"];
+                    int pitch_bend_b = jevent["pitch_bend_b"];
+//                    print("yuhhhhhh",note_num,pitch_bend_a,pitch_bend_b);
+                    smf::MidiEvent event;
+//                    event.key = jevent["note_num"];
+                    if(jevent["is_note_on"])
+                    {
+                        event.makeNoteOn(0, note_num, 60);
+                    } else {
+                        event.makeNoteOff(0, note_num, 60);
+                    }
+                    event.tick = jevent["tick"];
+                    event.track = 0;
+                    event.pitch_bend_a = pitch_bend_a;
+                    event.pitch_bend_b = pitch_bend_a;
+                    g_transport.midi_module_map[node_id].addEvent(event);
+                    g_transport.midi_module_map[node_id].linkNotePairs();
+                    //modify memory afterwards for custom things
+                    g_transport.midi_module_map[node_id][0][i].pitch_bend_a = pitch_bend_a;
+                    g_transport.midi_module_map[node_id][0][i].pitch_bend_b = pitch_bend_b;
+                    
+
+                }
+                
+            }
+        }
         
     }
     
@@ -355,6 +412,8 @@ public:
             current_patch["nodes"][id]["y"] = pos.y;
             
             graph->xmodules[i]->save_state(current_patch["nodes"][id]);
+            
+//            current_patch["tracks"] = tracks;
 
         }
         
@@ -385,7 +444,7 @@ public:
                 myevent["event"]["tick"] = note.tick;
                 events.push_back(myevent);
             }
-            std::string key = "node_" + std::to_string(it->first);
+            std::string key = std::to_string(it->first);
             tracks[key].push_back(events);
         }
         print(tracks);
@@ -472,6 +531,8 @@ public:
                         }
                         
                         graph->xmodules.push_back( m );
+                        
+                        print("name??",m->name);
                         
                         json mod_storage;
                         mod_storage["name"] = m->name;
@@ -649,6 +710,10 @@ int main()
     module_factory_map[module_multiply__get_name()]        = &module_multiply__create;
     module_factory_map[module_add__get_name()]             = &module_add__create;
     module_factory_map[module_polysampler__get_name()]     = &module_polysampler__create;
+    module_factory_map[module_parse__get_name()]           = &module_parse__create;
+    module_factory_map[module_map_sig__get_name()]         = &module_map_sig__create;
+    module_factory_map[module_tube__get_name()]            = &module_tube__create;
+    module_factory_map[module_mixer__get_name()]           = &module_mixer__create;
 
     // set up audio interface and open stream
     audio_interface interface;

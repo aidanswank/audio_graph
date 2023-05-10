@@ -8,6 +8,7 @@
 //#include "fVoice.hpp"
 //#include "json.hpp"
 //using nlohmann::json;
+#include "interpolation.h"
 
 struct voice
 {

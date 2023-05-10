@@ -1,0 +1,1170 @@
+{
+    "filepath": "/Users/aidan/dev/cpp/dfs_modules/build/Debug/meep.json",
+    "links": [
+        {
+            "end": 7,
+            "start": 0
+        },
+        {
+            "end": 13,
+            "start": 11
+        },
+        {
+            "end": 3,
+            "start": 14
+        },
+        {
+            "end": 9,
+            "start": 8
+        },
+        {
+            "end": 12,
+            "start": 19
+        },
+        {
+            "end": 18,
+            "start": 21
+        },
+        {
+            "end": 17,
+            "start": 23
+        },
+        {
+            "end": 22,
+            "start": 24
+        },
+        {
+            "end": 25,
+            "start": 5
+        },
+        {
+            "end": 27,
+            "start": 26
+        },
+        {
+            "end": 6,
+            "start": 33
+        },
+        {
+            "end": 35,
+            "start": 34
+        },
+        {
+            "end": 28,
+            "start": 36
+        }
+    ],
+    "nodes": [
+        {
+            "name": "midi sequencer",
+            "pattern": [
+                2,
+                3,
+                2,
+                3
+            ],
+            "x": -144.0,
+            "y": 215.0
+        },
+        {
+            "current_waveform": 0,
+            "name": "polysynth",
+            "x": -48.0,
+            "y": 335.0
+        },
+        {
+            "freq": 440.0,
+            "isLFO": false,
+            "name": "oscillator",
+            "x": 480.0,
+            "y": 263.0
+        },
+        {
+            "name": "audio output",
+            "output_gain": 0.0,
+            "x": 1080.0,
+            "y": 424.0
+        },
+        {
+            "current_mode": 0,
+            "name": "event parse",
+            "x": 24.0,
+            "y": 215.0
+        },
+        {
+            "freq": 440.0,
+            "isLFO": false,
+            "name": "oscillator",
+            "x": 192.0,
+            "y": 167.0
+        },
+        {
+            "name": "multiply signal",
+            "x": 360.0,
+            "y": 143.0
+        },
+        {
+            "data": 0.0,
+            "max": 1000.0,
+            "min": 0.0,
+            "name": "float signal",
+            "x": 528.0,
+            "y": -1.0
+        },
+        {
+            "name": "multiply signal",
+            "x": 96.0,
+            "y": 23.0
+        },
+        {
+            "data": 880.9520263671875,
+            "max": 2000.0,
+            "min": 0.0,
+            "name": "float signal",
+            "x": -72.0,
+            "y": 64.0
+        },
+        {
+            "current_mode": 1,
+            "name": "event parse",
+            "x": -72.0,
+            "y": -49.0
+        },
+        {
+            "name": "midi sequencer",
+            "pattern": [
+                1,
+                4,
+                1,
+                4
+            ],
+            "x": -264.0,
+            "y": -1.0
+        },
+        {
+            "gain": 3.059000015258789,
+            "name": "tube",
+            "x": 648.0,
+            "y": 280.0
+        },
+        {
+            "##slider_0": 0.7620000243186951,
+            "##slider_1": 0.6190000176429749,
+            "##slider_2": 0.0,
+            "##slider_3": 0.0,
+            "##slider_4": 0.0,
+            "##slider_5": 0.0,
+            "name": "mini mixer",
+            "x": 912.0,
+            "y": 376.0
+        },
+        {
+            "name": "midi sequencer",
+            "pattern": [
+                5,
+                6,
+                5,
+                6
+            ],
+            "x": 456.0,
+            "y": 448.0
+        },
+        {
+            "current_waveform": 3,
+            "name": "polysynth",
+            "x": 648.0,
+            "y": 448.0
+        }
+    ],
+    "root_id": 3,
+    "tracks": {
+        "0": [
+            [
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 56,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 0,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 56,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 47,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 49,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 120,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 49,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 167,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 56,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 6,
+                        "tick": 72,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 56,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 119,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 56,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 168,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 56,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 192,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 49,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 192,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 49,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 216,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 40,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 216,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 40,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 263,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 54,
+                        "pitch_bend_a": -2,
+                        "pitch_bend_b": 0,
+                        "tick": 288,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 54,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 336,
+                        "velocity": 60.0
+                    }
+                }
+            ]
+        ],
+        "1": [
+            [
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 70,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 44,
+                        "tick": 0,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 70,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 287,
+                        "velocity": 60.0
+                    }
+                }
+            ]
+        ],
+        "2": [
+            [
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 31,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 0,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 31,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 95,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 28,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 144,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 28,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 167,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 47,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 25,
+                        "tick": 96,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 47,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 119,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 67,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 120,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 67,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 143,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 60,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": -1,
+                        "tick": 168,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 60,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 191,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 28,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 192,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 28,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 239,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 47,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 240,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 47,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 287,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 48,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": -25,
+                        "tick": 288,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 48,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 335,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 47,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 336,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 47,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 359,
+                        "velocity": 60.0
+                    }
+                }
+            ]
+        ],
+        "3": [
+            [
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 36,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 0,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 36,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 119,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 36,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": -45,
+                        "tick": 240,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 36,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 311,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 36,
+                        "pitch_bend_a": -44,
+                        "pitch_bend_b": 0,
+                        "tick": 312,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 36,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 336,
+                        "velocity": 60.0
+                    }
+                }
+            ]
+        ],
+        "4": [
+            [
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 50,
+                        "pitch_bend_a": -33,
+                        "pitch_bend_b": 0,
+                        "tick": 0,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 50,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 119,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 66,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 240,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 66,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 263,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 20,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 72,
+                        "tick": 264,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 20,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 287,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 40,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 288,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 40,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 311,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 64,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": -47,
+                        "tick": 192,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 64,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 215,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 28,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 41,
+                        "tick": 120,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 28,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 167,
+                        "velocity": 60.0
+                    }
+                }
+            ]
+        ],
+        "5": [
+            [
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 59,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 0,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 59,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 47,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 62,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 48,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 62,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 71,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 59,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 96,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 59,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 119,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 55,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 144,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 55,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 167,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 59,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 192,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 59,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 215,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 62,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": -3,
+                        "tick": 264,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 62,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 287,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 59,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 288,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 59,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 335,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 54,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 336,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 54,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 383,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 66,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 72,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 66,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 96,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 67,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 120,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 67,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 144,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 66,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 168,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 66,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 191,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 64,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 216,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 64,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 240,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 62,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 240,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 62,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 263,
+                        "velocity": 60.0
+                    }
+                }
+            ]
+        ],
+        "6": [
+            [
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 59,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 0,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 59,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 47,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 62,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 48,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 62,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 71,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 66,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 72,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 66,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 95,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 59,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 96,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 59,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 119,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 67,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 120,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 67,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 143,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 55,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 144,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 55,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 167,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 71,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 168,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 71,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 215,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 64,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 216,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 64,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 239,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": true,
+                        "note_num": 60,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 240,
+                        "velocity": 60.0
+                    }
+                },
+                {
+                    "event": {
+                        "is_note_on": false,
+                        "note_num": 60,
+                        "pitch_bend_a": 0,
+                        "pitch_bend_b": 0,
+                        "tick": 264,
+                        "velocity": 60.0
+                    }
+                }
+            ]
+        ]
+    }
+}

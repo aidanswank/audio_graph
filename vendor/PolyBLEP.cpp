@@ -147,6 +147,8 @@ double PolyBLEP::get() const {
             return trap();
         case TRAPEZOID_VARIABLE:
             return trap2();
+        case WHITE_NOISE:
+            return ( float((rand() % 100)) / 100.0 ) * 2.0 - 1.0;
         default:
             return 0.0;
     }

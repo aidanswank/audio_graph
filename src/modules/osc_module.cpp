@@ -84,8 +84,9 @@ void osc_module::process() {
         if(g_transport.midi_tick_count==0)
         {
             blep->sync(0.0);
-            print("reset osc phase!");
+//            print("reset osc phase!");
         }
+        
         blep->setFrequency(freq);
         
         float samp = blep->getAndInc();
@@ -120,7 +121,7 @@ void osc_module::show() {
         ImGui::SliderFloat("freq", &freq, 0.0f, 1000.0f);
     }
     
-    const char* items[] = { "SINE", "COSINE", "TRIANGLE", "SQUARE", "RECTANGLE", "SAWTOOTH", "RAMP", "MODIFIED_TRIANGLE", "MODIFIED_SQUARE", "HALF_WAVE_RECTIFIED_SINE", "FULL_WAVE_RECTIFIED_SINE", "TRIANGULAR_PULSE", "TRAPEZOID_FIXED", "TRAPEZOID_VARIABLE" };
+    const char* items[] = { "SINE", "COSINE", "TRIANGLE", "SQUARE", "RECTANGLE", "SAWTOOTH", "RAMP", "MODIFIED_TRIANGLE", "MODIFIED_SQUARE", "HALF_WAVE_RECTIFIED_SINE", "FULL_WAVE_RECTIFIED_SINE", "TRIANGULAR_PULSE", "TRAPEZOID_FIXED", "TRAPEZOID_VARIABLE", "WHITE_NOISE" };
     
     if (ImGui::BeginCombo("##combo", current_item)) // The second parameter is the label previewed before opening the combo.
     {

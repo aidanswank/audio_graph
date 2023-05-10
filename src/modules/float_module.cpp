@@ -56,10 +56,14 @@ std::string module_float__get_name()
 
 void float_module::save_state(nlohmann::json &object)
 {
-    
+    object["data"] = data;
+    object["min"] = min;
+    object["max"] = max;
 };
 
 void float_module::load_state(nlohmann::json &object)
 {
-    
+    data = object["data"];
+    min = object["min"];
+    max = object["max"];
 };

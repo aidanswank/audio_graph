@@ -53,10 +53,6 @@ int polysampler::find_free_voice()
 }
 //
 
-float lerp(float a, float b, float t) {
-  return (1 - t) * a + t * b;
-}
-
 extern global_transport g_transport;
 
 void polysampler::generate_samples(float *stream, int len)
@@ -100,7 +96,8 @@ void polysampler::generate_samples(float *stream, int len)
 //                print(event.pitch_bend_a,event.pitch_bend_b,event.duration);
 //                +samples_to_ticks(i,get_ms_per_tick(g_transport.tempo,96.0),44100)
                 float t=(float)(g_transport.midi_tick_count-event.tick)/(float)event.duration;
-
+//                print("midi tick count",g_transport.midi_tick_count);
+//                print("t from ps",t);
 //                print(t+samples_to_ticks(j,get_ms_per_tick(120,96.0),44100));
 //                print(t);
 

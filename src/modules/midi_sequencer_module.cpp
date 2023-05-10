@@ -73,10 +73,10 @@ void midi_sequencer::process()
     // if not refrence losses pitch bend for some reason
     
     // super long what the heck is going on
-    smf::MidiFile& midi_file = g_transport.midi_module_map[g_transport.pattern_map[midi_sequencer::id][g_transport.current_pattern]];
+    smf::MidiFile& midi_file = g_transport.midi_module_map[ g_transport.pattern_map[midi_sequencer::id][g_transport.current_pattern] ];
     smf::MidiEventList& midi_events = midi_file[0];
     
-    print("id",midi_sequencer::id,"cur pattern",g_transport.pattern_map[midi_sequencer::id][g_transport.current_pattern]);
+//    print("id",midi_sequencer::id,"cur pattern",g_transport.pattern_map[midi_sequencer::id][g_transport.current_pattern]);
 
     
     if(g_transport.is_playing)
@@ -96,7 +96,7 @@ void midi_sequencer::process()
                 note.pitch_bend_b = event.pitch_bend_b;
                 note.duration = event.getTickDuration();
                 note.tick = event.tick;
-                
+                                
 //                print("bend a",event.pitch_bend_a,"b",event.pitch_bend_b);
 //                print("midi event",note.is_note_on,note.note_num,note.velocity);
                 if((note.note_num!=-1) && (note.velocity!=-1))
@@ -131,5 +131,8 @@ void midi_sequencer::save_state(nlohmann::json &object)
 
 void midi_sequencer::load_state(nlohmann::json &object)
 {
-    
+    check_and_load(object, "pattern", &g_transport.pattern_map[midi_sequencer::id]);
+    std::vector<int> test = object["pattern"];
+    g_transport.pattern_map[midi_sequencer::id] = test;
+
 };
