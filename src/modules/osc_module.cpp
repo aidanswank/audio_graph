@@ -4,6 +4,7 @@
 osc_module::osc_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule(graph, click_pos)
 {
     blep = new PolyBLEP(44100, PolyBLEP::SINE, 440.0f);
+//    blep->setWaveform((PolyBLEP::Waveform)current_mode);
     name = module_osc__get_name();
         
 //    float* secret_luv_uu = new float(0);
@@ -20,15 +21,18 @@ void osc_module::save_state(nlohmann::json &object)
 {
     object["freq"]=freq;
     object["isLFO"]=isLFO;
-//    object["current_item"]=current_item;
+    object["current_mode"]=current_mode;
 };
 
 void osc_module::load_state(nlohmann::json &object)
 {
     print("osc module state",object);
-    check_and_load(object, "freq", &freq);
-    check_and_load(object, "isLFO", &isLFO);
-//    current_item=object["current_item"];
+//    check_and_load(object, "freq", &freq);
+//    check_and_load(object, "isLFO", &isLFO);
+    freq=object["freq"];
+    isLFO=object["isLFO"];
+    current_mode=object["current_mode"];
+    blep->setWaveform((PolyBLEP::Waveform)current_mode);
 };
 
 void osc_module::process() {
@@ -123,20 +127,27 @@ void osc_module::show() {
     
     const char* items[] = { "SINE", "COSINE", "TRIANGLE", "SQUARE", "RECTANGLE", "SAWTOOTH", "RAMP", "MODIFIED_TRIANGLE", "MODIFIED_SQUARE", "HALF_WAVE_RECTIFIED_SINE", "FULL_WAVE_RECTIFIED_SINE", "TRIANGULAR_PULSE", "TRAPEZOID_FIXED", "TRAPEZOID_VARIABLE", "WHITE_NOISE" };
     
-    if (ImGui::BeginCombo("##combo", current_item)) // The second parameter is the label previewed before opening the combo.
+//    if (ImGui::BeginCombo("##combo", current_item)) // The second parameter is the label previewed before opening the combo.
+//    {
+//        for (int n = 0; n < IM_ARRAYSIZE(items); n++)
+//        {
+//            bool is_selected = (current_item == items[n]); // You can store your selection however you want, outside or inside your objects
+//            if (ImGui::Selectable(items[n], is_selected))
+//            {
+//                current_item = items[n];
+//                blep->setWaveform((PolyBLEP::Waveform)n);
+//            }
+//            if (is_selected)
+//                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
+//        }
+//        ImGui::EndCombo();
+//    }
+    
+    if(ImGui::Combo("##combo", &current_mode, items,
+                 IM_ARRAYSIZE(items)))
     {
-        for (int n = 0; n < IM_ARRAYSIZE(items); n++)
-        {
-            bool is_selected = (current_item == items[n]); // You can store your selection however you want, outside or inside your objects
-            if (ImGui::Selectable(items[n], is_selected))
-            {
-                current_item = items[n];
-                blep->setWaveform((PolyBLEP::Waveform)n);
-            }
-            if (is_selected)
-                ImGui::SetItemDefaultFocus();   // You may set the initial focus when opening the combo (scrolling + for keyboard navigation support)
-        }
-        ImGui::EndCombo();
+        print("set osc mode ",current_mode);
+        blep->setWaveform((PolyBLEP::Waveform)current_mode);
     }
     
     

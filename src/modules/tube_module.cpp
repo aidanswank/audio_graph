@@ -78,11 +78,15 @@ void tube_module::show(){
 void tube_module::save_state(nlohmann::json& object)
 {
     object["gain"] = gain;
+    object["shape1"] = shape1;
+    object["shape2"] = shape2;
 };
 
 void tube_module::load_state(nlohmann::json& object)
 {
     gain = object["gain"];
+    shape1 = object["shape1"];
+    shape2 = object["shape2"];
 };
 
 xmodule* module_tube__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)

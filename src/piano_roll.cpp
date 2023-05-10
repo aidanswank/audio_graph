@@ -1253,19 +1253,28 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
             // main selection
             if (note_idx != -1)
             {
-                // ((float)(track.tpq / ticksPerColum)/4)
-                int offset = (new_pos.x * ticks_per_colum);
-                int dur = midi_track[note_idx].getTickDuration();
-                int s = snap(last_event_clicked.tick + offset,grid_sz);
-                midi_track[note_idx].tick = s;
+                
+                bool shift_down = ImGui::GetIO().KeyShift;
+                if(shift_down)
+                {
+                    print("shift down main");
+                    print(snap(-new_pos.y,note_height)/note_height);
+                } else {
+                    // ((float)(track.tpq / ticksPerColum)/4)
+                    int offset = (new_pos.x * ticks_per_colum);
+                    int dur = midi_track[note_idx].getTickDuration();
+                    int s = snap(last_event_clicked.tick + offset,grid_sz);
+                    midi_track[note_idx].tick = s;
+                    
+                    // move other note
+                    midi_track[note_idx].getLinkedEvent()->tick = dur + s;
+                    // print(midiTrack[sel].tick,midiTrack[sel].getLinkedEvent()->tick);
+                    
+                    int new_key = last_event_clicked.getKeyNumber() + (round(new_pos.y / note_height) * -1);
+                    midi_track[note_idx].setKeyNumber(new_key);
+                    midi_track[note_idx].getLinkedEvent()->setKeyNumber(new_key);
+                }
 
-                // move other note
-                midi_track[note_idx].getLinkedEvent()->tick = dur + s;
-                // print(midiTrack[sel].tick,midiTrack[sel].getLinkedEvent()->tick);
-
-                int new_key = last_event_clicked.getKeyNumber() + (round(new_pos.y / note_height) * -1);
-                midi_track[note_idx].setKeyNumber(new_key);
-                midi_track[note_idx].getLinkedEvent()->setKeyNumber(new_key);
 
             } else {
                 

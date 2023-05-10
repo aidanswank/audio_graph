@@ -1,17 +1,17 @@
-//#pragma once;
+#pragma once
 #include "xmodule.h"
-#include "polysampler_module.h"
+#include "polysynth_module.h"
 
-polysampler_module::polysampler_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule(graph, click_pos)
+polysynth_module::polysynth_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule(graph, click_pos)
 {
     config(1,1);
     name = module_polysampler__get_name();
     ImNodes::SetNodeScreenSpacePos(id, click_pos);
     
-    synth = new polysampler(16);
+    synth = new polysynth(16);
 };
 
-void polysampler_module::process()
+void polysynth_module::process()
 {
     zero_audio(xmodule::output_audio,256);
     float *audio_output_left_ptr = xmodule::output_audio[0].data();
@@ -32,7 +32,7 @@ void polysampler_module::process()
         memcpy(audio_output_right_ptr, audio_output_left_ptr, 256*sizeof(float));
     }
 };
-void polysampler_module::show(){
+void polysynth_module::show(){
     ImNodes::BeginNode(xmodule::id);
     
     ImNodes::BeginNodeTitleBar();
@@ -74,23 +74,24 @@ void polysampler_module::show(){
     
     ImNodes::EndNode();
 };
-void polysampler_module::save_state(nlohmann::json& object)
+void polysynth_module::save_state(nlohmann::json& object)
 {
     object["current_waveform"] = current_waveform;
 //    print(object);
     
 };
-void polysampler_module::load_state(nlohmann::json& object)
+void polysynth_module::load_state(nlohmann::json& object)
 {
     check_and_load(object, "current_waveform", &current_waveform);
     current_waveform = object["current_waveform"];
     print("polysynth",object,current_waveform);
+    synth->set_waveform(current_waveform);
 //    check_and_load(object, "resonance", &resonance);
 };
 
 xmodule* module_polysampler__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)
 {
-    return new polysampler_module(graph, click_pos);
+    return new polysynth_module(graph, click_pos);
 };
 
 std::string module_polysampler__get_name()

@@ -10,7 +10,7 @@
 //using nlohmann::json;
 #include "interpolation.h"
 
-struct voice
+struct synth_voice
 {
 //    bool is_active;
 //    int note_num;
@@ -20,7 +20,7 @@ struct voice
     PolyBLEP *synth;
     float freq=-1;
 //    float slope;
-    voice(int sample_rate)
+    synth_voice(int sample_rate)
     {
         synth = new PolyBLEP(sample_rate);
         synth->setWaveform(PolyBLEP::SAWTOOTH);
@@ -34,21 +34,28 @@ struct voice
 };
 
 // for load single cycle waveforms or other samples
-class polysampler
+class polysynth
 {
 public:
 //    unsigned int voice_count = 16;
 //    std::vector<PolyBLEP> voices;
 //    std::vector<bool> voices_active;
 //    std::vector<int> voices_note_num;
-    std::vector<voice> voices;
+    std::vector<synth_voice> voices;
 
     float *mixed_stream;
 
     int buffer_size;
     int sample_rate;
 
-    polysampler(int voice_count);
+    polysynth(int voice_count);
+    void set_waveform(int waveform)
+    {
+        for(int i = 0; i < voices.size(); i++)
+        {
+            voices[i].synth->setWaveform(PolyBLEP::Waveform(waveform));
+        }
+    }
     void send_message(midi_note_message midi_message);
     int get_active_voices();
     int find_free_voice();

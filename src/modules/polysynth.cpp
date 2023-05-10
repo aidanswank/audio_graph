@@ -1,6 +1,6 @@
-#include "polysampler.h"
+#include "polysynth.h"
 
-polysampler::polysampler(int voice_count)
+polysynth::polysynth(int voice_count)
 {
     std::cout << "hello" << std::endl;
     buffer_size = 256;
@@ -8,14 +8,14 @@ polysampler::polysampler(int voice_count)
     
     for(int i = 0; i < voice_count; i++)
     {
-        voice new_voice(sample_rate);
+        synth_voice new_voice(sample_rate);
         voices.push_back(new_voice);
     }
     
     mixed_stream = new float[buffer_size*2];
 }
 
-int polysampler::get_active_voices()
+int polysynth::get_active_voices()
 {
     int num = 0;
     for(int i = 0; i < voices.size(); i++)
@@ -29,7 +29,7 @@ int polysampler::get_active_voices()
 }
 
 // returns pointer to current free voice when new note is needed
-int polysampler::find_free_voice()
+int polysynth::find_free_voice()
 {
 //    PolyBLEP* free_voice = NULL;
 //    PolyBLEP* last_active_voice = NULL;
@@ -55,7 +55,7 @@ int polysampler::find_free_voice()
 
 extern global_transport g_transport;
 
-void polysampler::generate_samples(float *stream, int len)
+void polysynth::generate_samples(float *stream, int len)
 {
 //    mixed_stream = new float[len*2]();
 //    print("hello");
@@ -136,7 +136,7 @@ float calculate_slope(float a, float b, float duration) {
 }
 
 // takes a in midi messages
-void polysampler::send_message(midi_note_message midi_message)
+void polysynth::send_message(midi_note_message midi_message)
 {
 //    int nBytes = midiMessage.size();
 
@@ -159,7 +159,7 @@ void polysampler::send_message(midi_note_message midi_message)
 //                freevoice->note = (int)midiMessage[1];
 //                freevoice->pitch = midi2Freq(((int)midiMessage[1])+24)*1;
             
-            voice &nvoice = voices[ freevoice_idx ];
+            synth_voice &nvoice = voices[ freevoice_idx ];
             nvoice.synth->setFrequency(midi2freq(midi_message.note_num));
             nvoice.synth->sync(0.0);
 //            nvoice.slope = 0;

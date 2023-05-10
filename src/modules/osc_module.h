@@ -10,6 +10,7 @@ struct osc_module : xmodule {
     float freq = 440.0f;
     bool isLFO = false;
     const char* current_item = "SINE";
+    int current_mode = 0;
     
     osc_module(audio_graph<xmodule*>& graph, ImVec2 click_pos);
     void process() override;

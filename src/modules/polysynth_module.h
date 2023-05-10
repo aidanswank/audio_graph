@@ -1,13 +1,13 @@
 //#pragma once;
 #include "xmodule.h"
-#include "polysampler.h"
+#include "polysynth.h"
 
-struct polysampler_module : xmodule {
+struct polysynth_module : xmodule {
     
-    polysampler* synth;
+    polysynth* synth;
     int current_waveform = 0;
     
-    polysampler_module(audio_graph<xmodule*>& graph, ImVec2 click_pos);
+    polysynth_module(audio_graph<xmodule*>& graph, ImVec2 click_pos);
     void process() override;
     void show() override;
     void save_state(nlohmann::json& object) override;

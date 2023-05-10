@@ -86,10 +86,10 @@ void cjfilter_module::save_state(nlohmann::json& object)
 
 void cjfilter_module::load_state(nlohmann::json& object)
 {
-//    cutoff = object["cutoff"];
-    check_and_load(object, "cutoff", &cutoff);
-//    resonance = object["resonance"];
-    check_and_load(object, "resonance", &resonance);
+    cutoff = object["cutoff"];
+//    check_and_load(object, "cutoff", &cutoff);
+    resonance = object["resonance"];
+//    check_and_load(object, "resonance", &resonance);
 //    print("loaded",object);
 };
 

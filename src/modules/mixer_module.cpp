@@ -85,13 +85,6 @@ void mixer_module::load_state(nlohmann::json& object)
         sprintf(label, "##slider_%d", i);
         slider_vals[i] = object[label];
     }
-//    slider_0=object["slider_0"];
-//    slider_1=object["slider_1"];
-//    slider_2=object["slider_2"];
-//    slider_3=object["slider_3"];
-//    slider_4=object["slider_4"];
-//    slider_5=object["slider_5"];
-
 };
 
 xmodule* module_mixer__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)
