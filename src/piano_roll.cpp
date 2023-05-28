@@ -115,16 +115,7 @@ std::vector<int> pattern_nums(16, 0);
 std::vector<int> pattern_nums2(16, 0);
 //int is_patterned_disabled[16] = {}; // init all to zero
 
-// imgui doesnt do this so i added it
-ImVec2 operator+(const ImVec2& a, const ImVec2& b)
-{
-    return ImVec2(a.x + b.x, a.y + b.y);
-}
-
-ImVec2 operator-(const ImVec2& a, const ImVec2& b)
-{
-    return ImVec2(a.x - b.x, a.y - b.y);
-}
+#include "imgui_utils.h"
 
 void notch_button(const char* label, ImVec2 btn_main_sz, ImVec2 btn_notches_sz)
 {
@@ -236,6 +227,13 @@ void pattern_editor_window(bool *is_open, audio_graph<xmodule*>* graph)
     for ( auto it = g_transport.pattern_map.begin(); it != g_transport.pattern_map.end(); ++it  )
     {
 //       std::cout << it->first << '\t' << it->second.size() << std::endl;
+        
+        ImVec2 pos = ImGui::GetCursorPos();
+        ImGui::SetCursorPos(pos+ImVec2(0,16));
+        ImGui::Text("%i",it->first);
+        
+        static std::vector<int> column_pattern_list = {0,0,0,0};
+
         for(int i = 0; i < it->second.size(); i++)
         {
             char pat_button_string[64];
@@ -244,7 +242,7 @@ void pattern_editor_window(bool *is_open, audio_graph<xmodule*>* graph)
             
             int pad = 2;
             ImVec2 pos;
-            pos.x = winpos.x + (i * (btn_main_sz.x + pad));
+            pos.x = 20+pad+winpos.x + (i * (btn_main_sz.x + pad));
             pos.y = winpos.y + (pattern_rows*(btn_main_sz.y + pad));
             bool flag=false;
             if(g_transport.current_pattern==i)
@@ -252,8 +250,12 @@ void pattern_editor_window(bool *is_open, audio_graph<xmodule*>* graph)
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
+                std::cout << it->second[i] << std::endl;
+                column_pattern_list[i] = it->second[i];
                 flag=true;
             }
+//            ImGui::Text("%i %i",it->first,it->second[i]);
+//            print(it->second[i]);
             if(inc_dec_button(pos, btn_main_sz, btn_notches_sz, it->second[i] ))
             {
                 print("open pattern!! ",it->second[i]);
@@ -262,6 +264,8 @@ void pattern_editor_window(bool *is_open, audio_graph<xmodule*>* graph)
 //                seq_mod->is_piano_roll_open=true;
 //                seq_mod->current_pattern_open=it->second[i];
                 g_transport.current_pattern_open = it->second[i];
+                g_transport.current_column_open = i;
+//                print("column",i);
             }
             if(flag)
             {
@@ -270,6 +274,13 @@ void pattern_editor_window(bool *is_open, audio_graph<xmodule*>* graph)
             
             ImGui::PopID();
         }
+        
+//        std::cout << std::endl;
+//        for(int i = 0; i < 4; i++)
+//        {
+//            print(column_pattern_list[i]);
+//        }
+
         pattern_rows++;
     }
 ////    ImVec2 pos;
@@ -1113,7 +1124,13 @@ void piano_roll_window(bool *is_open, smf::MidiFile& midi_file)
         );
     }
     
-    // draw playhead
+//    g_transport.current_pattern
+//    int ticks_per_pattern = 96*4;
+//    print(g_transport.midi_tick_count/(ticks_per_pattern));
+//    print(g_transport.current_pattern_open);
+//    print(g_transport.current_pattern,g_transport.current_column_open);
+
+//    if(g_transport.current_pattern==g_transport.current_column_open)
     {
         float x = g_transport.midi_tick_count * ticks_per_colum;
 //        ImGui::SetScrollX(x);

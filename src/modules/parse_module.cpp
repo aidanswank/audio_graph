@@ -57,6 +57,8 @@ void parse_module::process()
                 float lerp_note_nums = lerp(event2.note_num+(event2.pitch_bend_a),event2.note_num+(event2.pitch_bend_b),pow(t,2.0));
 //                print("lerp_note_nums",lerp_note_nums/127.0);
                 
+                float cosine_interp_note_nums = CosineInterpolate(event2.note_num+(event2.pitch_bend_a),event2.note_num+(event2.pitch_bend_b), t);
+                
                 float sig = (lerp_note_nums / 127) * 2.0 - 1.0;
                 
                 if(current_mode==event_parse_modes::frequency)

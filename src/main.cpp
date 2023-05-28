@@ -21,6 +21,10 @@ global_transport g_transport;
 #include "map_sig_module.h"
 #include "tube_module.h"
 #include "mixer_module.h"
+#include "polysampler.h"
+#include "polysampler_module.h"
+#include "downsampler_module.h"
+#include "envelope_plotter_module.h"
 
 //#include "graph.h"
 #include "audio_interface.h"
@@ -316,6 +320,8 @@ public:
         
         graph->root_id = current_patch["root_id"];
         
+//        g_transport.tempo = current_patch["bpm"];
+    
         for (auto& element : current_patch["nodes"])
         {
             float x = element["x"];
@@ -399,6 +405,9 @@ public:
     {
 
         current_patch["filepath"] = filepath;
+        
+        current_patch["bpm"] = g_transport.tempo;
+
 //        print( current_patch["name"] );
 
         // get current position of the modules and update json patch state
@@ -709,17 +718,20 @@ int main()
     module_factory_map[module_float__get_name()]           = &module_float__create;
     module_factory_map[module_multiply__get_name()]        = &module_multiply__create;
     module_factory_map[module_add__get_name()]             = &module_add__create;
-    module_factory_map[module_polysampler__get_name()]     = &module_polysampler__create;
+    module_factory_map[module_polysynth__get_name()]       = &module_polysynth__create;
     module_factory_map[module_parse__get_name()]           = &module_parse__create;
     module_factory_map[module_map_sig__get_name()]         = &module_map_sig__create;
     module_factory_map[module_tube__get_name()]            = &module_tube__create;
     module_factory_map[module_mixer__get_name()]           = &module_mixer__create;
+    module_factory_map[module_polysampler__get_name()]     = &module_polysampler__create;
+    module_factory_map[module_downsampler__get_name()]     = &module_downsampler__create;
+    module_factory_map[module_envelope_plotter__get_name()]= &module_envelope_plotter__create;
 
     // set up audio interface and open stream
     audio_interface interface;
     interface.scan_devices();
-    interface.sample_rate=44100;
-    interface.buffer_size=256;
+//    interface.sample_rate=44100;
+//    interface.buffer_size=256;
     interface.pass_userdata(&graph);
 
 ////    smf::MidiFile mymidifile;
@@ -731,14 +743,17 @@ int main()
 //    g_transport.midifile=&mymidifile;
 //    mymidifile.linkNotePairs();
     
-    user_interface ui(window, gl_context, &graph, &module_factory_map, &interface);
 //    ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/vst_example.json");
 //    ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/mypatch.json");
 //        ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/simple_fm.json");
 
     // only run on start up for debug
-    interface.init_devices(44100, 256, 2, 3);  //  sample rate, buffer size, input_device_id, output_device_id
-    interface.turn_on(audio_callback);
+    interface.init_devices(44100, 256, 2, 4);  //  sample rate, buffer size, input_device_id, output_device_id
+//    interface.turn_on(audio_callback);
+    
+    user_interface ui(window, gl_context, &graph, &module_factory_map, &interface);
+    
+    ui.load_patch("1plotter_example.json");
     
     bool is_running = true;
 //

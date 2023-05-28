@@ -5,7 +5,7 @@
 polysynth_module::polysynth_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule(graph, click_pos)
 {
     config(1,1);
-    name = module_polysampler__get_name();
+    name = module_polysynth__get_name();
     ImNodes::SetNodeScreenSpacePos(id, click_pos);
     
     synth = new polysynth(16);
@@ -89,12 +89,12 @@ void polysynth_module::load_state(nlohmann::json& object)
 //    check_and_load(object, "resonance", &resonance);
 };
 
-xmodule* module_polysampler__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)
+xmodule* module_polysynth__create(audio_graph<xmodule*>& graph, ImVec2 click_pos)
 {
     return new polysynth_module(graph, click_pos);
 };
 
-std::string module_polysampler__get_name()
+std::string module_polysynth__get_name()
 {
     return "polysynth";
 };

@@ -3,6 +3,7 @@
 
 #include <math.h>
 double midi2freq(int n);
+double midi2speed(int n);
 
 struct midi_note_message
 {

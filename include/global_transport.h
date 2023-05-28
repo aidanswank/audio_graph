@@ -17,6 +17,7 @@ struct global_transport
     int bar = 0;
     int current_pattern = 0;
     int current_pattern_open = 0;
+    int current_column_open = 0;
 
 //    smf::MidiFile midi_file; // not sure gonna keep this
     std::map<int, smf::MidiFile> midi_module_map;

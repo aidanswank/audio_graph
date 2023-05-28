@@ -26,10 +26,6 @@ struct synth_voice
         synth->setWaveform(PolyBLEP::SAWTOOTH);
         note.is_note_on = false;
         note.note_num = -1;
-//        note.
-//        is_active = false;
-//        note_num = -1;
-//        slope = 0;
     }
 };
 
@@ -37,10 +33,6 @@ struct synth_voice
 class polysynth
 {
 public:
-//    unsigned int voice_count = 16;
-//    std::vector<PolyBLEP> voices;
-//    std::vector<bool> voices_active;
-//    std::vector<int> voices_note_num;
     std::vector<synth_voice> voices;
 
     float *mixed_stream;

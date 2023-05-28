@@ -106,6 +106,8 @@ void polysynth::generate_samples(float *stream, int len)
                 float freq_a = midi2freq(event.note_num+(event.pitch_bend_a));
                 float freq_b = midi2freq(event.note_num+(event.pitch_bend_b));
                 float lerp_freq = lerp(freq_a,freq_b,pow(t,2.0));
+                
+                float cosine_interp_freq = CosineInterpolate(freq_a, freq_b, t);
 //                print(freq_a,freq_b,lerp_freq);
 //                                voices[i].synth->setFrequency(midi2freq(event.note_num)+freq);
 

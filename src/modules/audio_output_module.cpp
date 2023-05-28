@@ -42,10 +42,23 @@ void audio_output_module::process()
                     
                     xmodule::output_audio[0][i] += mod->output_audio[0][i] * exp_adjusted_slider;
                     xmodule::output_audio[1][i] += mod->output_audio[1][i] * exp_adjusted_slider;
+                    
+//                    xmodule::output_audio[0][i] += rand()%1000000000000/1000000000000;
+//                    xmodule::output_audio[1][i] += rand()%1000000000000/1000000000000;
                 }
                 //            mod->audio.clear();
                 //            std::cout <<  "summing " << i << std::endl;
             }
+        }
+    }
+    
+    for(int i = 0; i < 256; i++)
+    {
+        if(isnan(xmodule::output_audio[0][i])||isnan(xmodule::output_audio[1][i]))
+        {
+            print("NaN detected!");
+            xmodule::output_audio[0][i] += (float)(rand()%10000000000)/10000000000.0;
+            xmodule::output_audio[1][i] += (float)(rand()%10000000000)/10000000000.0;
         }
     }
 

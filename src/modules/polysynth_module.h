@@ -15,6 +15,6 @@ struct polysynth_module : xmodule {
 
 };
 
-xmodule* module_polysampler__create(audio_graph<xmodule*>& graph, ImVec2 click_pos);
-std::string module_polysampler__get_name();
+xmodule* module_polysynth__create(audio_graph<xmodule*>& graph, ImVec2 click_pos);
+std::string module_polysynth__get_name();
 

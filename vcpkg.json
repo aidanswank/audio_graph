@@ -5,6 +5,7 @@
         "sdl2",
         "portaudio",
         "rtmidi",
+        "libsndfile",
         "concurrentqueue",
         {
           "name": "imgui",
