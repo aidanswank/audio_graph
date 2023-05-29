@@ -3,12 +3,6 @@
 
 struct mixer_module : xmodule {
     
-//    float slider_0;
-//    float slider_1;
-//    float slider_2;
-//    float slider_3;
-//    float slider_4;
-//    float slider_5;
     std::vector<float> slider_vals;
     std::vector<STEREO_AUDIO> all_input_audio;
     int num_mixer_inputs;
