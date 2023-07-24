@@ -54,11 +54,17 @@ void audio_output_module::process()
     
     for(int i = 0; i < 256; i++)
     {
-        if(isnan(xmodule::output_audio[0][i])||isnan(xmodule::output_audio[1][i]))
+        if(isnan(xmodule::output_audio[0][i]))
         {
-            print("NaN detected!");
-            xmodule::output_audio[0][i] += (float)(rand()%10000000000)/10000000000.0;
-            xmodule::output_audio[1][i] += (float)(rand()%10000000000)/10000000000.0;
+            print("NaN on chan 0 detected!");
+            xmodule::output_audio[0][i] += 0.0;
+        }
+        
+        if(isnan(xmodule::output_audio[1][i]))
+        {
+            print("NaN on chan 1 detected!");
+            xmodule::output_audio[1][i] += 0.0;
+            
         }
     }
 

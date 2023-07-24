@@ -44,23 +44,7 @@ void osc_module::process() {
 
     if(input_ids[0][0]!=-1)
     {
-////        print("in 1");
-//        xmodule* input = (xmodule*)graph.xmodules[ input_ids[0][0] ];
-//        float* test_in = (float*)input->output_void_ptr;
-//        if(test_in==NULL)
-//        {
-//            print("CONNECTED INPUT IS NULL!");
-//        } else {
-//            print(*test_in);
-////            freq = midi2freq(*test_in);
-//            freq = *test_in;
-//
-////            blep->setFrequency(midi2freq(*test_in));
-//        }
-        
         freq_input_mod = (xmodule*)graph.xmodules[ input_ids[0][0] ];
-//        freq_input_mod->output_audio[i][0]
-        
 
     }
     
@@ -70,13 +54,13 @@ void osc_module::process() {
 //    }
 //
 //    blep->setFrequency(freq);
-
-//    if(freq_input_mod) {
-////        print(output_audio[0][0]);
-//        freq = freq_input_mod->output_audio[0][0];
+    
+//    float modified_freq = freq;
+//    if(freq<0.0)
+//    {
+//        modified_freq = freq * -1;
 //    }
-//
-    blep->setFrequency(freq);
+//    blep->setFrequency(modified_freq);
     
     for (unsigned long i = 0; i < 256; ++i) {
         
@@ -85,12 +69,21 @@ void osc_module::process() {
             freq = freq_input_mod->output_audio[0][i];
         }
         
-        if(g_transport.midi_tick_count==0)
-        {
-            blep->sync(0.0);
-//            print("reset osc phase!");
-        }
+//        if(g_transport.midi_tick_count==0)
+//        {
+//            blep->sync(0.0);
+
+////            print("reset osc phase!");
+//        }
         
+        
+//        float modified_freq = freq;
+//        if(freq<0.0)
+//        {
+//            modified_freq = freq * -1;
+//        }
+//        blep->setFrequency(modified_freq);
+//
         blep->setFrequency(freq);
         
         float samp = blep->getAndInc();

@@ -250,7 +250,7 @@ void pattern_editor_window(bool *is_open, audio_graph<xmodule*>* graph)
                 ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.4f, 0.4f, 0.4f, 1.0f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.5f, 0.5f, 0.5f, 1.0f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.6f, 0.6f, 0.6f, 1.0f));
-                std::cout << it->second[i] << std::endl;
+//                std::cout << it->second[i] << std::endl;
                 column_pattern_list[i] = it->second[i];
                 flag=true;
             }

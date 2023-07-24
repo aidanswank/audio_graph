@@ -25,6 +25,7 @@ global_transport g_transport;
 #include "polysampler_module.h"
 #include "downsampler_module.h"
 #include "envelope_plotter_module.h"
+#include "allpass_module.h"
 
 //#include "graph.h"
 #include "audio_interface.h"
@@ -290,8 +291,11 @@ public:
         isOpenSequencerWindow=true;
         
         ImNodesStyle& style = ImNodes::GetStyle();
-            style.Flags |= ImNodesStyleFlags_GridLinesPrimary | ImNodesStyleFlags_GridSnapping;
+//            style.Flags |= ImNodesStyleFlags_GridLinesPrimary | ImNodesStyleFlags_GridSnapping;
         // (optional) set browser properties
+        ImGui::StyleColorsClassic();
+        ImNodes::StyleColorsClassic();
+
         
         open_file_dialog = new ImGui::FileBrowser();
         open_file_dialog->SetTitle("open file");
@@ -726,6 +730,7 @@ int main()
     module_factory_map[module_polysampler__get_name()]     = &module_polysampler__create;
     module_factory_map[module_downsampler__get_name()]     = &module_downsampler__create;
     module_factory_map[module_envelope_plotter__get_name()]= &module_envelope_plotter__create;
+    module_factory_map[module_allpass__get_name()]         = &module_allpass__create;
 
     // set up audio interface and open stream
     audio_interface interface;
@@ -753,7 +758,7 @@ int main()
     
     user_interface ui(window, gl_context, &graph, &module_factory_map, &interface);
     
-    ui.load_patch("1plotter_example.json");
+//    ui.load_patch("1plotter_example.json");
     
     bool is_running = true;
 //

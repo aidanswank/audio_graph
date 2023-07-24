@@ -54,12 +54,37 @@ void envelope_plotter_module::process()
         is_counting=true;
     }
     
+    
+    if(input_ids[0][0]!=-1)
+    {
+        xmodule *midi_in_module = (xmodule*)xmodule::graph.xmodules[ input_ids[0][0] ];
+        
+        for(int i = 0; i < midi_in_module->input_notes.size(); i++)
+        {
+            midi_note_message event = midi_in_module->input_notes[i];
+            
+            
+            if(event.is_note_on)
+            {
+//                note_held = true;
+//                event2 = event;
+//                print("on!!");
+                reset();
+                trigger_flag=true;
+            } else {
+//                note_held = false;
+            }
+        }
+        
+        //while note held create an "audio signal" representing "automation" to be passed to other params
+    }
+    
     for (int i = 0; i < 256; ++i) {
                 
         if(is_counting)
         {
             float value = get_envelope();
-            current_amp = (value/100.0)*-2 + 1;
+            current_amp = (value/100.0)*-1.0 + 1.0;
 //            std::cout << "Sample: " << current_sample << ", Envelope Value: " << sample << std::endl;
             current_sample++;
             if(current_sample >= int(duration_seconds*44100.0))
@@ -106,14 +131,19 @@ void plotter_widget(std::vector<ImVec2> &points, int &current_button_idx, bool &
     
     ImVec2 relative_mouse_pos = relative - mouse_pos;
     
+    static std::vector<float> segment_curve_amount(16, 1);
+
     bool shift_down = ImGui::GetIO().KeyShift;
-    
+    bool alt_down = ImGui::IsKeyDown((ImGuiKey)SDL_SCANCODE_LALT);
+
+    ImGui::GetIO().ConfigWindowsMoveFromTitleBarOnly=true;
+        
     if(!shift_down)
     {
         current_button_idx = -1;
     }
 
-    if (widget_hovered && !shift_down)
+    if (widget_hovered && !shift_down && !alt_down)
     {
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
         {
@@ -130,7 +160,80 @@ void plotter_widget(std::vector<ImVec2> &points, int &current_button_idx, bool &
             points.insert(insert_iter, ImVec2(xabs, yabs));
         }
     }
+    
+    int highlighted_index = -1;
+    
+    // Iterate through the points to find the segment where the mouse is located
+    if(points.size()>=2)
+    {
+        for (int i = 0; i < points.size() - 1; i++)
+        {
+            ImVec2 p0 = points[i] + relative;
+            ImVec2 p1 = points[i + 1] + relative;
+            
+            if (mouse_pos.x >= p0.x && mouse_pos.x <= p1.x)
+            {
+                float segment_width = p1.x - p0.x;
+                float mouse_offset = mouse_pos.x - p0.x;
+                float t = mouse_offset / segment_width;
+                
+                // Check if the mouse is within a specific threshold
+                if (t >= 0.1f && t <= 0.9f)
+                {
+                    highlighted_index = i;
+//                    print("highlight idx", highlighted_index);
+                    break;
+                }
+            }
+        }
+    }
+    
+    static ImVec2 alt_delta = {0,0};
 
+
+    // Check if the mouse is inside the plotter rectangle
+//    if (mouse_pos.x >= rect_min.x && mouse_pos.x <= rect_max.x &&
+//        mouse_pos.y >= rect_min.y && mouse_pos.y <= rect_max.y)
+//    {
+        // Draw the highlight rectangle if a segment is highlighted
+        if (highlighted_index != -1)
+        {
+            ImVec2 p0 = points[highlighted_index] + relative;
+            ImVec2 p1 = points[highlighted_index + 1] + relative;
+            ImVec2 rect_min = ImVec2(p0.x, relative.y);
+            ImVec2 rect_max = ImVec2(p1.x, relative.y + plotter_size.y);
+            ImVec4 highlight_color = ImVec4(1.0f, 0.0f, 0.0f, 0.5f);  // RGBA color values
+            
+            if(alt_down)
+            {
+                if (ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+                {
+                    alt_delta = ImGui::GetMouseDragDelta();
+//                    float mod = (alt_delta.y / 100.0);
+//                    print("alt delta", alt_delta.y);
+                    float preview = alt_delta.y / 100;
+//                    segment_curve_amount[ highlighted_index ] = preview;
+                    
+//                    segment_curve_amount[ highlighted_index ] = alt_delta.y / 100.0;
+                }
+
+                if (ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+                {
+                    float mod = (alt_delta.y / 100.0);
+                    print("use", mod);
+                    segment_curve_amount[ highlighted_index ] += mod;
+                    alt_delta = {0.0,0.0};
+                    
+                }
+            }
+            
+//            segment_curve_amount[ highlighted_index ] = alt_delta.y;
+//            print( "index", highlighted_index, segment_curve_amount[ highlighted_index] , "delta", alt_delta.y);
+
+            draw_list->AddRectFilled(rect_min, rect_max, ImGui::GetColorU32(highlight_color));
+//        }
+    }
+    
     for(int i = 0; i < points.size(); i++)
     {
         ImVec2 point_screen_pos = points[i] + relative;
@@ -186,6 +289,26 @@ void plotter_widget(std::vector<ImVec2> &points, int &current_button_idx, bool &
                 {
                     pos.y = 0;
                 }
+                
+                // Get the x-coordinate of the previous point
+               float prev_x = (current_button_idx > 0) ? points[current_button_idx - 1].x : -INFINITY;
+               
+               // Get the x-coordinate of the next point
+               float next_x = (current_button_idx < points.size() - 1) ? points[current_button_idx + 1].x : INFINITY;
+               
+               // Restrict x-coordinate based on adjacent points
+               if (pos.x < prev_x)
+                   pos.x = prev_x;
+               else if (pos.x > next_x)
+                   pos.x = next_x;
+               
+               // Restrict y-coordinate of the dragged point
+               if (pos.y >= plotter_size.y)
+                   pos.y = plotter_size.y;
+               else if (pos.y <= 0)
+                   pos.y = 0;
+                       
+                
                 points[current_button_idx] = pos;
             }
         }
@@ -201,25 +324,42 @@ void plotter_widget(std::vector<ImVec2> &points, int &current_button_idx, bool &
         
         if (points.size() >= 2)
         {
+            const int num_samples = 32;  // Adjust the number of samples as needed
+
             for (int i = 0; i < points.size() - 1; i++)
             {
                 ImVec2 p0 = points[i] + relative;
                 ImVec2 p1 = points[i + 1] + relative;
-                
-                for (float x = p0.x; x < p1.x; x++)
+
+                for (int j = 0; j < num_samples; j++)
                 {
-                    float t = (x - p0.x) / (p1.x - p0.x);
+                    float t = static_cast<float>(j) / (num_samples - 1);
+//                    float t_curve = 1.0f - pow(1.0f - t, segment_curve_amount[i] );
                     
-//                    float envelopeValue = get_envelope2(x, points);
-                    
-                    float y = p0.y + (p1.y - p0.y) * (1.0f - pow(1.0f - t, curve_amount));
-                    
+                    float t_curve = 1.0f - pow(1.0f - t, curve_amount );
+
+                    float x = p0.x + (p1.x - p0.x) * t;
+                    float y = p0.y + (p1.y - p0.y) * t_curve;
+
                     ImVec2 pixel = ImVec2(x, y);
-                    draw_list->AddCircleFilled(pixel, 1.0f, ImGui::GetColorU32(color));
+
+                    if (j > 0)
+                    {
+//                        ImVec2 prev_pixel = ImVec2(p0.x + (p1.x - p0.x) * (static_cast<float>(j - 1) / (num_samples - 1)), p0.y + (p1.y - p0.y) * (1.0f - pow(1.0f - (static_cast<float>(j - 1) / (num_samples - 1)), segment_curve_amount[i] )));
+                        
+                        ImVec2 prev_pixel = ImVec2(p0.x + (p1.x - p0.x) * (static_cast<float>(j - 1) / (num_samples - 1)), p0.y + (p1.y - p0.y) * (1.0f - pow(1.0f - (static_cast<float>(j - 1) / (num_samples - 1)), curve_amount )));
+
+                        draw_list->AddLine(prev_pixel, pixel, ImGui::GetColorU32(color));
+                    }
+
+                    if (i == points.size() - 2 && j == num_samples - 1)
+                    {
+                        ImVec2 next_pixel = p1;
+                        draw_list->AddLine(pixel, next_pixel, ImGui::GetColorU32(color));
+                    }
                 }
             }
         }
-        
 //        if (points.size() >= 2)
 //        {
 //            for (int i = 0; i < points.size() - 1; i++)
@@ -262,6 +402,8 @@ void plotter_widget(std::vector<ImVec2> &points, int &current_button_idx, bool &
     ImGui::SetItemAllowOverlap();
     ImGui::SetCursorPos(cursor_pos);
     ImGui::Dummy(plotter_size);
+    ImGui::SetCursorPos(cursor_pos);
+    ImGui::InvisibleButton("test",plotter_size);
     
     if(ImGui::IsItemHovered())
     {
@@ -293,7 +435,14 @@ void envelope_plotter_module::show(){
     
     ImGui::PushItemWidth(100);
     ImGui::SliderFloat("duration", &duration_seconds, 0, 2);
-    ImGui::SliderFloat("curve", &curve_amount, 0.1, 10);
+    
+    // make slider feel linear
+    char val_str[64];
+    sprintf(val_str, "%.3f", curve_amount);
+    curve_amount = log(curve_amount);
+    ImGui::SliderFloat("curve", &curve_amount, log(0.01), log(100.0), val_str);
+    curve_amount = exp(curve_amount);
+    
     ImGui::PopItemWidth();
     
     
