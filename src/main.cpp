@@ -26,6 +26,7 @@ global_transport g_transport;
 #include "downsampler_module.h"
 #include "envelope_plotter_module.h"
 #include "allpass_module.h"
+#include "tapedelay_module.h"
 
 //#include "graph.h"
 #include "audio_interface.h"
@@ -753,6 +754,7 @@ int main()
     module_factory_map[module_downsampler__get_name()]     = &module_downsampler__create;
     module_factory_map[module_envelope_plotter__get_name()]= &module_envelope_plotter__create;
     module_factory_map[module_allpass__get_name()]         = &module_allpass__create;
+    module_factory_map[module_tapedelay__get_name()]       = &module_tapedelay__create;
 
     // set up audio interface and open stream
     audio_interface interface;
