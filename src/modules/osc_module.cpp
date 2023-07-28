@@ -42,12 +42,13 @@ void osc_module::process() {
     float *audio_output_right = xmodule::output_audio[1].data();
     xmodule* freq_input_mod = NULL;
 
-    if(input_ids[0][0]!=-1)
-    {
-        freq_input_mod = (xmodule*)graph.xmodules[ input_ids[0][0] ];
-
-    }
-    
+//    if(input_ids.size()>0)
+//    {
+        if(input_ids[0])
+        {
+            freq_input_mod = (xmodule*)graph.xmodules[ input_ids[0] ];
+        }
+//    }
 //    if(input_ids[1][0]!=-1)
 //    {
 //        print("in 2");

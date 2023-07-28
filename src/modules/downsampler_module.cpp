@@ -21,9 +21,9 @@ void downsampler_module::process()
 
 //    output_sample_rate = sample_rate * rate_adjustment;
 
-    if(input_ids[0][0]!=-1)
+    if(input_ids[0]!=-1)
     {
-        xmodule *midi_in_module = (xmodule*)xmodule::graph.xmodules[ input_ids[0][0] ];
+        xmodule *midi_in_module = (xmodule*)xmodule::graph.xmodules[ input_ids[0] ];
         
         for (int i = 0; i < 256; i += (int)(1 / rate_adjustment))
         {

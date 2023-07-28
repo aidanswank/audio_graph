@@ -22,9 +22,9 @@ void parse_module::process()
     xmodule::output_audio[0].clear();
     xmodule::output_audio[1].clear();
 
-    if(input_ids[0][0]!=-1)
+    if(input_ids[0])
     {
-        xmodule *midi_in_module = (xmodule*)xmodule::graph.xmodules[ input_ids[0][0] ];
+        xmodule *midi_in_module = (xmodule*)xmodule::graph.xmodules[ input_ids[0] ];
 
         for(int i = 0; i < midi_in_module->input_notes.size(); i++)
         {

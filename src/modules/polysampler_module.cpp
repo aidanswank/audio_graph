@@ -21,9 +21,9 @@ void polysampler_module::process()
     float *audio_output_left_ptr = xmodule::output_audio[0].data();
     float *audio_output_right_ptr = xmodule::output_audio[1].data();
     
-    if(input_ids[0][0]!=-1)
+    if(input_ids[0]!=-1)
     {
-        xmodule *midi_in_module = (xmodule*)xmodule::graph.xmodules[ input_ids[0][0] ];
+        xmodule *midi_in_module = (xmodule*)xmodule::graph.xmodules[ input_ids[0] ];
         
         for(int i = 0; i < midi_in_module->input_notes.size(); i++)
         {

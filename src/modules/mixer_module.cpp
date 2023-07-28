@@ -27,8 +27,8 @@ void mixer_module::process()
     
     for(int i = 0; i < num_mixer_inputs; i++)
     {
-        if(input_ids[i][0]!=-1) {
-            xmodule* module_input = (xmodule*)graph.xmodules[ input_ids[i][0] ];
+        if(input_ids[i]) {
+            xmodule* module_input = (xmodule*)graph.xmodules[ input_ids[i] ];
 //            print(i,"input connected");
             for(int j = 0; j < 256; j++)
             {

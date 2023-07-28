@@ -35,12 +35,12 @@ void add_module::process() {
 
     float summed_audio[256] = {0};
         
-    if(input_ids[0][0]!=-1) {
-        module_input_a = (xmodule*)graph.xmodules[ input_ids[0][0] ];
+    if(input_ids[0]) {
+        module_input_a = (xmodule*)graph.xmodules[ input_ids[0] ];
     }
     
-    if(input_ids[1][0]!=-1) {
-        module_input_b = (xmodule*)graph.xmodules[ input_ids[1][0] ];
+    if(input_ids[1]) {
+        module_input_b = (xmodule*)graph.xmodules[ input_ids[1] ];
     }
     
     for(int i = 0; i < 256; i++) {

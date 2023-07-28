@@ -45,11 +45,11 @@ struct xmodule
             input_attrs.push_back(graph.attr_counter);
             graph.attr2id[ graph.attr_counter ] = id;
             graph.attr2inslot[ graph.attr_counter ] = i;
-//            print("attr",graph.attr_counter,"slot",i);
-            
-            std::vector<int> ids;
-            ids.push_back(-1);
-            input_ids.push_back(ids);
+            print("in attr",graph.attr_counter,"slot",i);
+//
+//            std::vector<int> ids;
+//            ids.push_back(-1);
+//            input_ids.push_back(-1);
             
             graph.attr_counter++;
         }
@@ -58,35 +58,36 @@ struct xmodule
         {
             output_attrs.push_back(graph.attr_counter);
             graph.attr2id[ graph.attr_counter ] = id;
+            print("out attr",graph.attr_counter,"slot",i);
+
             graph.attr2outslot[ graph.attr_counter ] = i;
-//            print("attr",graph.attr_counter,"slot",i+num_inputs);
-            
-            std::vector<int> ids;
-            ids.push_back(-1);
-            output_ids.push_back(ids);
+////            print("attr",graph.attr_counter,"slot",i+num_inputs);
+//
+//            std::vector<int> ids;
+//            ids.push_back(-1);
+//            output_ids.push_back(-1);
 
             graph.attr_counter++;
         }
     }
 
-//    // Add an input to the xmodule
-//    void add_input(int p_input_id)
-//    {
+    // Add an input to the xmodule
+    void add_input(int p_input_id, int slot)
+    {
 //        input_ids.push_back(p_input_id);
+        input_ids[slot] = p_input_id;
+        print("in slot",slot,"id",p_input_id);
+//        input_ids[] = graph.attr_counter;
 //        print("[xmodule] id",id,"\tinput size ", input_ids.size(),"\tinput id  ",p_input_id,"\tid counter",graph.attr_counter);
-//    }
-    
-//    void add_input_slot(int attr, int slot)
-//    {
-//        attr2slot[attr] = slot;
-//    };
+    }
 
-//    // Add an output to the xmodule
-//    void add_output(int p_output_id)
-//    {
+    // Add an output to the xmodule
+    void add_output(int p_output_id, int slot)
+    {
+        output_ids[slot] = p_output_id;
 //        output_ids.push_back(p_output_id);
 //        print("[xmodule] id",id,"\toutput size", output_ids.size(),"\toutput id ",p_output_id,"\tid counter",graph.attr_counter);
-//    }
+    }
     
 
     // preprocess
@@ -110,11 +111,14 @@ struct xmodule
 
     // The input and output xmodule IDs
 //    std::vector<int> input_ids;
-    std::vector<std::vector<int>> input_ids;
+    std::map<int,int> input_ids;
+//    std::vector<std::vector<int>> input_ids;
     std::vector<int> input_attrs;
     
 //    std::vector<int> output_ids;
-    std::vector<std::vector<int>> output_ids;
+    std::map<int,int> output_ids;
+
+//    std::vector<std::vector<int>> output_ids;
     std::vector<int> output_attrs;
     
 //    std::map<int, int> attr2slot;

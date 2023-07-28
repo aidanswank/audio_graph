@@ -37,8 +37,8 @@ void multiply_module::process() {
     float input_b_audio[256] = {0};
     float final_audio[256] = {0};
         
-    if(input_ids[0][0]!=-1) {  //check if module is connected
-        module_input_a = (xmodule*)graph.xmodules[ input_ids[0][0] ];
+    if(input_ids[0]) {  //check if module is connected
+        module_input_a = (xmodule*)graph.xmodules[ input_ids[0] ];
 //        
 //        if(module_input_a->output_void_ptr) { //check is
 //            float single_number = *(float*)module_input_a->output_void_ptr;
@@ -53,8 +53,8 @@ void multiply_module::process() {
         memcpy(input_a_audio, module_input_a->output_audio[0].data(), 256*sizeof(float));
     }
     
-    if(input_ids[1][0]!=-1) {
-        module_input_b = (xmodule*)graph.xmodules[ input_ids[1][0] ];
+    if(input_ids[1]) {
+        module_input_b = (xmodule*)graph.xmodules[ input_ids[1] ];
         memcpy(input_b_audio, module_input_b->output_audio[0].data(), 256*sizeof(float));
     }
     

@@ -22,53 +22,97 @@ void audio_output_module::process()
     
     for(int i = 0; i < input_ids.size(); i++)
     {
-        for(int j = 0; j < input_ids[i].size(); j++)
+        xmodule *mod = graph.xmodules[ input_ids[i] ];
+        // TODO CHANGE FIXED BUFFER
+        for(int i = 0; i < 256; i++)
         {
-//            print(i,j,"id",input_ids[i][j]);
-            if(input_ids[i][j] != -1)
+//                xmodule::audio[i] += mod->audio[i];
+            clip_audio(xmodule::output_audio[0][i]);
+            clip_audio(xmodule::output_audio[1][i]);
+            
+            double exp_adjusted_slider = pow(output_gain,2); // make slider exponentional because volume intensity response of our ear is logarithmic
+
+            if(!isnan(xmodule::output_audio[0][i]))
             {
-                xmodule *mod = graph.xmodules[ input_ids[i][j] ];
-                // TODO CHANGE FIXED BUFFER
-                for(int i = 0; i < 256; i++)
-                {
-                    //                xmodule::audio[i] += mod->audio[i];
-                    
-                    double exp_adjusted_slider = pow(output_gain,2); // make slider exponentional because volume intensity response of our ear is logarithmic
-                    
-//                    print(exp_adjusted_slider);
-                    
-                    clip_audio(xmodule::output_audio[0][i]);
-                    clip_audio(xmodule::output_audio[1][i]);
-                    
-                    xmodule::output_audio[0][i] += mod->output_audio[0][i] * exp_adjusted_slider;
-                    xmodule::output_audio[1][i] += mod->output_audio[1][i] * exp_adjusted_slider;
-                    
-//                    xmodule::output_audio[0][i] += rand()%1000000000000/1000000000000;
-//                    xmodule::output_audio[1][i] += rand()%1000000000000/1000000000000;
-                }
-                //            mod->audio.clear();
-                //            std::cout <<  "summing " << i << std::endl;
+                xmodule::output_audio[0][i] += mod->output_audio[0][i] * exp_adjusted_slider;
+            }
+            if(!isnan(xmodule::output_audio[1][i]))
+            {
+                xmodule::output_audio[1][i] += mod->output_audio[1][i] * exp_adjusted_slider;
             }
         }
-    }
-    
-    for(int i = 0; i < 256; i++)
-    {
-        if(isnan(xmodule::output_audio[0][i]))
-        {
-            print("NaN on chan 0 detected!");
-            xmodule::output_audio[0][i] += 0.0;
-        }
-        
-        if(isnan(xmodule::output_audio[1][i]))
-        {
-            print("NaN on chan 1 detected!");
-            xmodule::output_audio[1][i] += 0.0;
-            
-        }
+//            mod->audio.clear();
+//            std::cout <<  "summing " << i << " audio size " << mod->audio.size() << std::endl;
     }
 
 };
+
+//void audio_output_module::process()
+//{
+////        std::cout <<  "id " << id << " final output" << std::endl;
+////        xmodule::audio.clear();
+//
+////        memset(xmodule::audio.data(), 0.0f, sizeof(float)*256);
+//    zero_audio(xmodule::output_audio,256);
+//
+//    for(int i = 0; i < input_ids.size(); i++)
+//    {
+//        xmodule *mod = graph.xmodules[ input_ids[i] ];
+//
+//        // TODO CHANGE FIXED BUFFER
+//        for(int i = 0; i < 256; i++)
+//        {
+////                xmodule::audio[i] += mod->audio[i];
+//            xmodule::output_audio[0][i] += mod->output_audio[0][i] * output_gain;
+//            xmodule::output_audio[1][i] += mod->output_audio[1][i] * output_gain;
+//        }
+//        for(int j = 0; j < input_ids[i].size(); j++)
+//        {
+////            print(i,j,"id",input_ids[i][j]);
+//            if(input_ids[i][j] != -1)
+//            {
+//                xmodule *mod = graph.xmodules[ input_ids[i][j] ];
+//                // TODO CHANGE FIXED BUFFER
+//                for(int i = 0; i < 256; i++)
+//                {
+//                    //                xmodule::audio[i] += mod->audio[i];
+//
+//                    double exp_adjusted_slider = pow(output_gain,2); // make slider exponentional because volume intensity response of our ear is logarithmic
+//
+////                    print(exp_adjusted_slider);
+//
+//                    clip_audio(xmodule::output_audio[0][i]);
+//                    clip_audio(xmodule::output_audio[1][i]);
+//
+//                    xmodule::output_audio[0][i] += mod->output_audio[0][i] * exp_adjusted_slider;
+//                    xmodule::output_audio[1][i] += mod->output_audio[1][i] * exp_adjusted_slider;
+//
+////                    xmodule::output_audio[0][i] += rand()%1000000000000/1000000000000;
+////                    xmodule::output_audio[1][i] += rand()%1000000000000/1000000000000;
+//                }
+//                //            mod->audio.clear();
+//                //            std::cout <<  "summing " << i << std::endl;
+//            }
+//        }
+//    }
+//
+//    for(int i = 0; i < 256; i++)
+//    {
+//        if(isnan(xmodule::output_audio[0][i]))
+//        {
+//            print("NaN on chan 0 detected!");
+//            xmodule::output_audio[0][i] += 0.0;
+//        }
+//
+//        if(isnan(xmodule::output_audio[1][i]))
+//        {
+//            print("NaN on chan 1 detected!");
+//            xmodule::output_audio[1][i] += 0.0;
+//
+//        }
+//    }
+//
+//};
 
 void audio_output_module::save_state(nlohmann::json &object)
 {

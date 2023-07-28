@@ -64,30 +64,26 @@ struct audio_graph
     void DFS(int rootId)
     {
         if (find(visited.begin(), visited.end(), rootId) != visited.end())
+        {            
             return;                // Return if the node has already been visited
+        }
+        
         visited.push_back(rootId); // Mark the node as visited
         // process the audio signal for the input xmodules of the current node
-        for (std::vector<int> ids : xmodules[rootId]->input_ids)
+//        for (std::vector<int> ids : xmodules[rootId]->input_ids)
+//        for (int input_id : xmodules[rootId]->input_ids)
+        for (auto x : xmodules[rootId]->input_ids)
         {
-            for(int i = 0; i < ids.size(); i++)
-            {
-                if(ids[i]!=-1)
-                    DFS(ids[i]);
-            }
+            
+            DFS(x.second);
         }
 //        print("processing",rootId,"...");
         xmodules[rootId]->process(); // process the audio signal for the current node
-//        process_order.push_back(rootId);
-        // process the audio signal for the output xmodules of the current node
-        for (std::vector<int> ids : xmodules[rootId]->output_ids)
+
+        for (auto x : xmodules[rootId]->output_ids)
+//        for (int output_id : xmodules[rootId]->output_ids)
         {
-//            if(output_id!=-1)
-//                DFS(output_id); // Recursively process the audio signal for the output nodes
-            for(int i = 0; i < ids.size(); i++)
-            {
-                if(ids[i]!=-1)
-                    DFS(ids[i]);
-            }
+            DFS(x.second); // Recursively process the audio signal for the
         }
     };
 };

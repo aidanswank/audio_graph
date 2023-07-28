@@ -29,8 +29,8 @@ void allpass_module::process()
     float input_audio[256] = {0};
 //    float output_audio[256] = {0};
         
-    if(input_ids[0][0]!=-1) {  //check if module is connected
-        module_input = (xmodule*)graph.xmodules[ input_ids[0][0] ];
+    if(input_ids[0]!=-1) {  //check if module is connected
+        module_input = (xmodule*)graph.xmodules[ input_ids[0] ];
         memcpy(input_audio, module_input->output_audio[0].data(), 256*sizeof(float));
     }
     

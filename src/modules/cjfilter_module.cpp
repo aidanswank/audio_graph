@@ -23,18 +23,37 @@ void cjfilter_module::process()
 //    {
 //        print(i, "ii", input_ids[i][0]);
 //    }
-        if(input_ids[0][0]!=-1)
+
+    int i=0;
+    for (auto x : input_ids)
+    {
+        print(i,"input ids",x.first,x.second);
+        i++;
+    }
+    
+    print("input sizee",input_ids.size());
+    if(input_ids[0])
+    {
+        print("input 1 plugged in", input_ids[0] );
+    }
+
+    if(input_ids[1])
+    {
+        print("input 2 plugged in", input_ids[1] );
+    }
+
+        if(input_ids[0])
         {
 //            print("?????");
-            xmodule* input_module = (xmodule*)graph.xmodules[ input_ids[0][0] ];
+            xmodule* input_module = (xmodule*)graph.xmodules[ input_ids[0] ];
             
             STEREO_AUDIO input_audio = input_module->output_audio;
             
             for(int i = 0; i < 256; ++i)
             {
-                if(input_ids[1][0]!=-1) // check if input 2 plugged in
+                if(input_ids[1]) // check if input 2 plugged in
                 {
-                    xmodule* input2_test = (xmodule*)graph.xmodules[ input_ids[1][0] ];
+                    xmodule* input2_test = (xmodule*)graph.xmodules[ input_ids[1] ];
                     float sig = input2_test->output_audio[0][i];
                     sig = (sig + 1.0) / 2.0; // scale -1.0 to 1.0 -> 0.0 to 1.0
 //                    sig = pow(sig,3);
