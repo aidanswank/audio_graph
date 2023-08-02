@@ -21,7 +21,7 @@ double tanh_distortion(double input, double gain, double shape1, double shape2)
 
 void tube_module::process()
 {
-    if(input_ids[0]!=-1)
+    if(input_ids[0])
     {
         xmodule* input_module = (xmodule*)graph.xmodules[ input_ids[0] ];
         STEREO_AUDIO new_input_audio = input_module->output_audio;

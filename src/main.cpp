@@ -27,6 +27,7 @@ global_transport g_transport;
 #include "envelope_plotter_module.h"
 #include "allpass_module.h"
 #include "tapedelay_module.h"
+#include "biquad_module.h"
 
 //#include "graph.h"
 #include "audio_interface.h"
@@ -278,8 +279,8 @@ void remove_link(int edge_id, audio_graph<xmodule*>* graph)
 ////        index++;
 ////    }
 //
-//    current_patch["links"].erase(current_patch["links"].begin() + edge_id);
-//    print("erased!, current",current_patch);
+    current_patch["links"].erase(current_patch["links"].begin() + edge_id);
+    print("erased!",edge_id,"current_patch",current_patch);
 
     // BREAKS WHEN DELETETING MULTIPLE NODES GOTTA FIX
     graph->links.erase(graph->links.begin() + edge_id);
@@ -755,6 +756,7 @@ int main()
     module_factory_map[module_envelope_plotter__get_name()]= &module_envelope_plotter__create;
     module_factory_map[module_allpass__get_name()]         = &module_allpass__create;
     module_factory_map[module_tapedelay__get_name()]       = &module_tapedelay__create;
+    module_factory_map[module_biquad__get_name()]          = &module_biquad__create;
 
     // set up audio interface and open stream
     audio_interface interface;
@@ -782,7 +784,7 @@ int main()
     
     user_interface ui(window, gl_context, &graph, &module_factory_map, &interface);
     
-//    ui.load_patch("1plotter_example.json");
+//    ui.load_patch("start_patch.json");
     
     bool is_running = true;
 //

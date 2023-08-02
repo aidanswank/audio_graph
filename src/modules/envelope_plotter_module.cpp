@@ -12,7 +12,7 @@ envelope_plotter_module::envelope_plotter_module(audio_graph<xmodule*>& graph, I
     trigger_flag = false;
     is_counting = false;
     current_sample = 0;
-    current_amp = -1.0;
+    current_amp = 0.0;
     curve_amount = 2.0;
     current_button_idx = -1;
     ImVec2 old_pos = {0,0};

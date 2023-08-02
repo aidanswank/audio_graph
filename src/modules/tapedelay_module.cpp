@@ -8,6 +8,7 @@ tapedelay_module::tapedelay_module(audio_graph<xmodule*>& graph, ImVec2 click_po
     name = module_tapedelay__get_name();
     tapespeed = 1.0;
     feedback = 0.0;
+    stop_recording = false;
     
 //    print("name!!",name);
     ImNodes::SetNodeScreenSpacePos(id, click_pos);
@@ -17,34 +18,36 @@ void tapedelay_module::process()
 {
     zero_audio(xmodule::output_audio, 256);
     
-//    for(int i = 0; i < num_mixer_inputs; i++)
-//    {
-        if(input_ids[0]) {
-            xmodule* module_input = (xmodule*)graph.xmodules[ input_ids[0] ];
+    if(input_ids[0]) {
+        xmodule* module_input = (xmodule*)graph.xmodules[ input_ids[0] ];
 //            print(i,"input connected");
-            for(int i = 0; i < 256; i++)
+        for(int i = 0; i < 256; i++)
+        {
+            int playhead = (int)floor(counter);
+            
+            if(!stop_recording)
             {
-                buffer[(int)floor(counter)] = module_input->output_audio[0][i];
-                
-                buffer[(int)floor(counter)] = buffer[(int)floor(counter)] + (buffer_copy[(int)counter]*feedback);
-
-                if(counter>=loop_length_samples-1)
-                {
-                    // smooth_loop(buffer, loop_length_samples-1);
-                    // crossfade(buffer, loop_length_samples-1, 500);
-                    memcpy(buffer_copy,buffer,(loop_length_samples-1)*sizeof(float));
-                    counter=0;
-                    print("end");
-                } else {
-                    counter += tapespeed;
-                }
-                
-                output_audio[0][i] += buffer[(int)floor(counter)];
-                output_audio[1][i] += buffer[(int)floor(counter)];
+                buffer[playhead] = module_input->output_audio[0][i];
             }
+    
+            buffer[playhead] += (buffer_copy[playhead]*feedback);
+
+            if(counter>=loop_length_samples-1)
+            {
+                // smooth_loop(buffer, loop_length_samples-1);
+                // crossfade(buffer, loop_length_samples-1, 500);
+                memcpy(buffer_copy,buffer,(loop_length_samples-1)*sizeof(float));
+                counter=0;
+                //                print("end");
+            } else {
+                counter += tapespeed;
+            }
+            
+            output_audio[0][i] += buffer[playhead];
+            output_audio[1][i] += buffer[playhead];
         }
+    }
         
-//    }
 };
 
 void tapedelay_module::show(){
@@ -60,10 +63,13 @@ void tapedelay_module::show(){
     ImGui::Text("input");
     ImNodes::EndInputAttribute();
     
+    ImGui::Checkbox("record", &stop_recording);
+
 //    char label[16];
 //    sprintf(label, "delay", tapespeed);
     ImGui::SliderFloat("label", &tapespeed, 0.0f, 2.0f);
     ImGui::SliderFloat("feedback", &feedback, 0.0f, 0.98f);
+    ImGui::SliderInt("loop", &loop_length_samples, 16, 10000);
 
     ImNodes::BeginOutputAttribute( output_attrs[ 0 ] );
     ImGui::Text("output");

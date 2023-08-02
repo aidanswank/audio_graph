@@ -9,6 +9,7 @@ struct tapedelay_module : xmodule {
     float counter = 0.0;
     float tapespeed;
     float feedback;
+    bool stop_recording;
     
     tapedelay_module(audio_graph<xmodule*>& graph, ImVec2 click_pos);
     void process() override;

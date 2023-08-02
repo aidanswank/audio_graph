@@ -2,6 +2,11 @@
 #include "xmodule.h"
 #include "map_sig_module.h"
 
+//https://gist.github.com/companje/29408948f1e8be54dd5733a74ca49bb9
+float map(float value, float min1, float max1, float min2, float max2) {
+  return min2 + (value - min1) * (max2 - min2) / (max1 - min1);
+}
+
 map_sig_module::map_sig_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) : xmodule(graph, click_pos)
 {
     config(1,1);
@@ -16,7 +21,19 @@ map_sig_module::map_sig_module(audio_graph<xmodule*>& graph, ImVec2 click_pos) :
 
 void map_sig_module::process()
 {
+    zero_audio(xmodule::output_audio, 256);
     
+    if(input_ids[0]) {
+        xmodule* module_input = (xmodule*)graph.xmodules[ input_ids[0] ];
+
+        for(int i = 0; i < 256; i++)
+        {
+            float input = module_input->output_audio[0][i];
+            float res = map(input, min_a, max_a, min_b, max_b);
+            output_audio[0][i] = res;
+            output_audio[1][i] = res;
+        }
+    }
 };
 
 void map_sig_module::show(){
@@ -50,7 +67,11 @@ void map_sig_module::show(){
 
 void map_sig_module::save_state(nlohmann::json& object)
 {
-    
+    object["min_a"] = min_a;
+    object["min_b"] = min_b;
+    object["max_a"] = max_b;
+    object["max_b"] = max_a;
+
 };
 
 void map_sig_module::load_state(nlohmann::json& object)
