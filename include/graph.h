@@ -69,21 +69,20 @@ struct audio_graph
         }
         
         visited.push_back(rootId); // Mark the node as visited
+        
         // process the audio signal for the input xmodules of the current node
-//        for (std::vector<int> ids : xmodules[rootId]->input_ids)
-//        for (int input_id : xmodules[rootId]->input_ids)
         for (auto x : xmodules[rootId]->input_ids)
         {
             
             DFS(x.second);
         }
-//        print("processing",rootId,"...");
+
         xmodules[rootId]->process(); // process the audio signal for the current node
 
+        // process the audio signal for the output xmodules of the current node
         for (auto x : xmodules[rootId]->output_ids)
-//        for (int output_id : xmodules[rootId]->output_ids)
         {
-            DFS(x.second); // Recursively process the audio signal for the
+            DFS(x.second); // Recursively process the audio
         }
     };
 };

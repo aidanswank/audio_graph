@@ -1,5 +1,6 @@
 #include "im_wrap.h"
 #include "vprint.h"
+#include "resource.h"
 
 void im_wrap::init(SDL_Window* p_window, SDL_GLContext p_context)
 {
@@ -22,15 +23,46 @@ void im_wrap::init(SDL_Window* p_window, SDL_GLContext p_context)
     ImGui_ImplSDL2_InitForOpenGL(window, p_context);
     ImGui_ImplOpenGL3_Init("#version 330 core"); // glsl version
 
-    font = io->Fonts->AddFontFromFileTTF("/Users/aidan/dev/cpp/node_editor/res/fonts/unifont-14.0.01.ttf", 16.0f);
+    font = io->Fonts->AddFontFromFileTTF(getResourcePath("unifont-14.0.01.ttf").c_str(), 16.0f);
     
     ImFontConfig config;
-    config.OversampleH = 2;
+//    config.OversampleH = 2;
 //    config.OversampleV = 1;
 //    config.GlyphExtraSpacing.x = 1.0f;
 //    font = io->Fonts->AddFontFromFileTTF("/Users/aidan/Downloads/fragment_mono/fonts/ttf/FragmentMono-Regular.ttf", 32.0f, &config);
+//    io->IniFilename = "imgui.ini";
+    
+    // Assuming "my_resource.txt" is in your app's bundle.
+    std::string resourceFileName = "imgui.ini";
+    
+    // Get the resource path using the getResourcePath function.
+    std::string resourcePath = getResourcePath(resourceFileName);
 
-    io->IniFilename = "/Users/aidan/imgui.ini";
+//    if (!resourcePath.empty()) {
+//        // Resource found, let's read and print its contents.
+//        std::ifstream file(resourcePath);
+//        if (file.is_open()) {
+//            std::string line;
+//            while (std::getline(file, line)) {
+//                std::cout << line << std::endl;
+//            }
+//            file.close();
+//        } else {
+//            std::cerr << "Error opening resource file: " << resourceFileName << std::endl;
+//        }
+//    } else {
+//        std::cerr << "Resource not found: " << resourceFileName << std::endl;
+//    }
+    
+//    if (!resourcePath.empty()) {
+//        io->IniFilename = resourcePath.c_str();
+//    } else {
+//        std::cerr << "Resource not found: " << resourceFileName << std::endl;
+//    }
+//    io->IniFilename = "/Users/aidan/dev/cpp/dfs_modules/build/Debug/audio_graph.app/Contents/Resources/imgui.ini";
+//    io->IniFilename = getResourcePath("imgui.ini").c_str();
+    ImGui::LoadIniSettingsFromDisk(getResourcePath("imgui.ini").c_str());
+    print("filepath",io->IniFilename);
 //    io->FontGlobalScale = 0.5f;
     // std::cout << &Window << std::endl;
 }

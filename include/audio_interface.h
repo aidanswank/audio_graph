@@ -10,7 +10,7 @@ public:
     audio_interface();
     ~audio_interface();
 
-    void init_devices(int sample_rate, int buffer_size, int input_device_id, int output_device_id);
+    void init_devices(int sample_rate, int buffer_size);
     void scan_devices();
     void turn_on(PaStreamCallback* callback);
     void close_stream();

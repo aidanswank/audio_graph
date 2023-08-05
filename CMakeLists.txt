@@ -62,9 +62,10 @@ include_directories(
 )
 add_executable(
     ${TARGET_EXE}
+    MACOSX_BUNDLE
     ${SOURCES}
     ${INCLUDES}
-	${MODULE_SOURCES}
+    ${MODULE_SOURCES}
     ${MODULE_INCLUDES}
 )
 
@@ -83,16 +84,17 @@ target_link_libraries(
 )
 
 # for imgui
-if (APPLE)
-    target_link_libraries(${TARGET_EXE} "-framework OpenGL")
-endif()
+target_link_libraries(${TARGET_EXE} "-framework OpenGL")
 
-# for xcode generator 
-if(CMAKE_GENERATOR STREQUAL Xcode)
-    set(CMAKE_C_FLAGS "-x objective-c")
-    set(CMAKE_CXX_FLAGS "-x objective-c++")
-    set(CMAKE_EXE_LINKER_FLAGS "-framework Cocoa -framework AppKit -framework CoreData -framework Foundation")
-    set_property (TARGET ${TARGET_EXE} APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc")
-else() #for unix makefiles 
-    set_property (TARGET ${TARGET_EXE} APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc -ObjC++")
-endif()
+install(TARGETS ${TARGET_EXE}
+    BUNDLE DESTINATION .
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+set(CMAKE_C_FLAGS "-x objective-c")
+set(CMAKE_CXX_FLAGS "-x objective-c++")
+set(CMAKE_EXE_LINKER_FLAGS "-framework Cocoa -framework AppKit -framework CoreData -framework Foundation")
+set_property (TARGET ${TARGET_EXE} APPEND_STRING PROPERTY COMPILE_FLAGS "-fobjc-arc")
+
+set(png_path "${PROJECT_SOURCE_DIR}/imgui.ini")
+set_source_files_properties(${png_path} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)

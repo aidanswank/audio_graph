@@ -7,7 +7,7 @@ global_transport g_transport;
 // modules
 #include "xmodule.h"
 #include "midi_in_module.h"
-#include "vst3_module.h"
+//#include "vst3_module.h"
 #include "cjfilter_module.h"
 #include "audio_output_module.h"
 #include "osc_module.h"
@@ -287,7 +287,7 @@ void remove_link(int edge_id, audio_graph<xmodule*>* graph)
 
 }
 
-
+#include "resource.h"
 #include <imfilebrowser.h>
 class user_interface
 {
@@ -328,6 +328,8 @@ public:
         save_file_dialog = new ImGui::FileBrowser(ImGuiFileBrowserFlags_EnterNewFilename);
         save_file_dialog->SetTitle("save file");
         save_file_dialog->SetTypeFilters({ ".json" });
+        
+        my_audio_interface->init_devices(44100, 256);  //  sample rate, buffer size, input_device_id, output_device_id
 
     }
     ~user_interface()
@@ -704,6 +706,7 @@ public:
 
 int main()
 {
+    
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
@@ -739,7 +742,7 @@ int main()
 
     module_factory_map[module_audio_output__get_name()]    = &module_audio_output__create;
     module_factory_map[module_midi_in__get_name()]         = &module_midi_in__create;
-    module_factory_map[module_vst3_instrument__get_name()] = &module_vst3_instrument__create;
+//    module_factory_map[module_vst3_instrument__get_name()] = &module_vst3_instrument__create;
     module_factory_map[module_cjfilter__get_name()]        = &module_cjfilter__create;
     module_factory_map[module_osc__get_name()]             = &module_osc__create;
     module_factory_map[module_midi_sequencer__get_name()]  = &module_midi_sequencer__create;
@@ -779,9 +782,10 @@ int main()
 //        ui.load_patch("/Users/aidan/dev/cpp/dfs_modules/build/Debug/simple_fm.json");
 
     // only run on start up for debug
-    interface.init_devices(44100, 256, 2, 4);  //  sample rate, buffer size, input_device_id, output_device_id
+//    interface.init_devices(44100, 256, 0, 4);  //  sample rate, buffer size, input_device_id, output_device_id
 //    interface.turn_on(audio_callback);
     
+    print("ok");
     user_interface ui(window, gl_context, &graph, &module_factory_map, &interface);
     
 //    ui.load_patch("start_patch.json");
@@ -814,14 +818,14 @@ int main()
                     }
                 }
             }
-            for(uint i = 0; i < graph.xmodules.size(); ++i)
-            {
-                if(graph.xmodules[i]->name=="vst instrument") // sdl2 polling for easyvst
-                {
-                    vst3_midi_instrument* vst_mid_inst_ptr = (vst3_midi_instrument*)graph.xmodules[i];
-                    vst_mid_inst_ptr->poll();
-                }
-            }
+//            for(uint i = 0; i < graph.xmodules.size(); ++i)
+//            {
+//                if(graph.xmodules[i]->name=="vst instrument") // sdl2 polling for easyvst
+//                {
+//                    vst3_midi_instrument* vst_mid_inst_ptr = (vst3_midi_instrument*)graph.xmodules[i];
+//                    vst_mid_inst_ptr->poll();
+//                }
+//            }
         }
                 
         ui.update();

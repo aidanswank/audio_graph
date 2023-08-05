@@ -19,18 +19,15 @@ envelope_plotter_module::envelope_plotter_module(audio_graph<xmodule*>& graph, I
     widget_hovered = false;
 };
 
-float envelope_plotter_module::get_envelope()
-{
+float envelope_plotter_module::get_envelope() {
     if (points.empty() || duration_seconds == 0.0f)
         return 0.0f;
 
-    float t = static_cast<float>(current_sample) / static_cast<float>(44100.0 * duration_seconds);
+    float t = (float)(current_sample) / (float)(44100.0 * duration_seconds);
     float x = t * (points.size() - 1);
-    int index = static_cast<int>(x);
+    int index = (int)(x);
     float frac = x - index;
     
-//    print("frac",frac);
-
     if (index >= points.size() - 1)
         return points.back().y;
 
@@ -55,7 +52,7 @@ void envelope_plotter_module::process()
     }
     
     
-    if(input_ids[0]!=-1)
+    if(input_ids[0])
     {
         xmodule *midi_in_module = (xmodule*)xmodule::graph.xmodules[ input_ids[0] ];
         
@@ -313,15 +310,6 @@ void plotter_widget(std::vector<ImVec2> &points, int &current_button_idx, bool &
             }
         }
         
-//        print("x",points[i].x/200,"y",points[i].y/100);
-        
-//        if(points.size()>=2 && (i != points.size()-1))
-//        {
-//            //            print("draw");
-//
-//            draw_list->AddLine(((points[i]+relative)), ((points[i+1]+relative)), ImGui::GetColorU32(color));
-//        }
-        
         if (points.size() >= 2)
         {
             const int num_samples = 32;  // Adjust the number of samples as needed
@@ -360,43 +348,6 @@ void plotter_widget(std::vector<ImVec2> &points, int &current_button_idx, bool &
                 }
             }
         }
-//        if (points.size() >= 2)
-//        {
-//            for (int i = 0; i < points.size() - 1; i++)
-//            {
-//                ImVec2 p0 = points[i] + relative;
-//                ImVec2 p1 = p0 + ImVec2(50, 0);  // Control point 1
-//                ImVec2 p2 = points[i + 1] + relative - ImVec2(50, 0);  // Control point 2
-//                ImVec2 p3 = points[i + 1] + relative;
-//
-//                int numSegments = 20;  // Number of line segments to approximate the curve
-//
-//                for (int j = 0; j <= numSegments; j++)
-//                {
-//                    float t = static_cast<float>(j) / static_cast<float>(numSegments);
-//                    float u = 1.0f - t;
-//
-//                    float b0 = u * u * u;
-//                    float b1 = 3.0f * u * u * t;
-//                    float b2 = 3.0f * u * t * t;
-//                    float b3 = t * t * t;
-//
-//                    float x = b0 * p0.x + b1 * p1.x + b2 * p2.x + b3 * p3.x;
-//                    float y = b0 * p0.y + b1 * p1.y + b2 * p2.y + b3 * p3.y;
-//                    ImVec2 pixel = ImVec2(x, y);
-//                    draw_list->AddRectFilled(pixel, pixel + ImVec2(1, 1), ImGui::GetColorU32(color));
-//
-//                }
-//            }
-//        }
-     
-        
-
-        
-        //        if(!(points.size() % 2))
-        //        {
-        //            print("is even");
-        //        }
     }
     
     ImGui::SetItemAllowOverlap();

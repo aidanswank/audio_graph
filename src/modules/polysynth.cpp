@@ -57,77 +57,37 @@ extern global_transport g_transport;
 
 void polysynth::generate_samples(float *stream, int len)
 {
-//    mixed_stream = new float[len*2]();
-//    print("hello");
+
     for(int i = 0; i < len*2; i++)
     {
         mixed_stream[i]=0;
     }
 
-    for(int i = 0; i < voices.size(); i++)
-    {
-        if(voices[i].note.is_note_on)
+for(int i = 0; i < voices.size(); i++) {
+    if(voices[i].note.is_note_on) {
+        for(int j = 0; j < len; j++)
         {
-//            voices[i].generateSamples(len);
-//            blep->setFrequency(freq);
+            midi_note_message event = voices[i].note;
+
+            float t=(float)(g_transport.midi_tick_count-event.tick)/(float)event.duration;
+
+            float freq_a = midi2freq(event.note_num+(event.pitch_bend_a));
+            float freq_b = midi2freq(event.note_num+(event.pitch_bend_b));
+            float lerp_freq = lerp(freq_a,freq_b,pow(t,2.0));
             
-//            float samp = blep->getAndInc();
-//            print("is active");
-
-
-            for(int j = 0; j < len; j++)
-            {
+            float cosine_interp_freq = CosineInterpolate(freq_a, freq_b, t);
+            voices[i].synth->setFrequency(lerp_freq);
             
-//                float bend = 0;
-//                if(voices[i].slope!=0);
-//                   bend = midi2freq(voices[i].slope);
-                
-//                voices[i].synth->setFrequency(voices[i].synth->getFreqInHz()+(voices[i].slope/10));
-//                voices[i].synth->setFrequency(voices[i].synth->getFreqInHz());
+            
+            float samp = voices[i].synth->getAndInc();
 
-//                print("samp",samp);
-//                float ms_per_tick = get_ms_per_tick(120,96);
-//                int samples = ms_per_tick * 44100.0 / 1000
-//                print("bend",bend);
-//                std::cout <<"sample"<<samp << std::endl;
-//                voices[i].synth->set
-                
-                midi_note_message event = voices[i].note;
-//                print(event.pitch_bend_a,event.pitch_bend_b,event.duration);
-//                +samples_to_ticks(i,get_ms_per_tick(g_transport.tempo,96.0),44100)
-                float t=(float)(g_transport.midi_tick_count-event.tick)/(float)event.duration;
-//                print("midi tick count",g_transport.midi_tick_count);
-//                print("t from ps",t);
-//                print(t+samples_to_ticks(j,get_ms_per_tick(120,96.0),44100));
-//                print(t);
-
-                
-//                print(event.pitch_bend_a,event.pitch_bend_b,lerp(midi2freq(event.pitch_bend_a),midi2freq(event.pitch_bend_b),t));
-                float freq_a = midi2freq(event.note_num+(event.pitch_bend_a));
-                float freq_b = midi2freq(event.note_num+(event.pitch_bend_b));
-                float lerp_freq = lerp(freq_a,freq_b,pow(t,2.0));
-                
-                float cosine_interp_freq = CosineInterpolate(freq_a, freq_b, t);
-//                print(freq_a,freq_b,lerp_freq);
-//                                voices[i].synth->setFrequency(midi2freq(event.note_num)+freq);
-
-                voices[i].synth->setFrequency(lerp_freq);
-                
-//                print(event.pitch_bend_a,event.pitch_bend_b,t);
-                
-                float samp = voices[i].synth->getAndInc();
-
-                mixed_stream[j] += samp * 0.5;
-//                mixed_stream[j*2+1] += samp * 0.5;
-
-            }
+            mixed_stream[j] += samp;
         }
     }
+}
     
     for(int i = 0; i < len; i++)
     {
-//        print(samples_to_ticks(i,get_ms_per_tick(120,96.0),44100));
-
         stream[i] = mixed_stream[i];
     }
 }

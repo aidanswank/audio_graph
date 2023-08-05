@@ -48,16 +48,16 @@ void audio_interface::try_params()
     }
 }
 
-void audio_interface::init_devices(int p_sample_rate, int p_buffer_size, int input_device_id, int output_device_id)
+void audio_interface::init_devices(int p_sample_rate, int p_buffer_size)
 {
     sample_rate = p_sample_rate;
     buffer_size = p_buffer_size;
     PaError err;
 
-    set_param(true,input_device_id);
-    set_param(false,output_device_id);
+//    set_param(true,input_device_id);
+//    set_param(false,output_device_id);
 
-    try_params();
+//    try_params();
 }
 
 void audio_interface::scan_devices()
