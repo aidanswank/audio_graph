@@ -397,32 +397,32 @@ void pattern_editor_window(bool *is_open, audio_graph<xmodule*>* graph)
     ImGui::End();
 }
 
-void clip_timeline_window(bool *is_open)
-{
-    ImGui::Begin("clip timeline", is_open, ImGuiWindowFlags_HorizontalScrollbar);
-    
-    ImVec2 cursor_pos = ImGui::GetCursorPos();
-    
-    ImDrawList* draw_list = ImGui::GetWindowDrawList();
-    
-    ImVec2 relative_win_pos = ImGui::GetWindowPos();
-    relative_win_pos.x -= ImGui::GetScrollX();
-    relative_win_pos.y -= ImGui::GetScrollY();
-    
-    ImVec2 rect_min = relative_win_pos+cursor_pos; // Adjust the values here to position the rectangle
-    ImVec2 rect_max = relative_win_pos+cursor_pos+ImVec2(50, 50); // Adjust the values here to position the rectangle
-
-    ImVec4 color = ImVec4(1.0f, 1.0f, 1.0f, 1.0); //RGBA color values ranging from 0 to 1
-
-    draw_list->AddRect(rect_min, rect_max, ImGui::GetColorU32(color));
-    
-    if(ImGui::Button("##test",ImVec2(50,50)))
-    {
-        print("yo!");
-    };
-    
-    ImGui::End();
-}
+//void clip_timeline_window(bool *is_open)
+//{
+//    ImGui::Begin("clip timeline", is_open, ImGuiWindowFlags_HorizontalScrollbar);
+//    
+//    ImVec2 cursor_pos = ImGui::GetCursorPos();
+//    
+//    ImDrawList* draw_list = ImGui::GetWindowDrawList();
+//    
+//    ImVec2 relative_win_pos = ImGui::GetWindowPos();
+//    relative_win_pos.x -= ImGui::GetScrollX();
+//    relative_win_pos.y -= ImGui::GetScrollY();
+//    
+//    ImVec2 rect_min = relative_win_pos+cursor_pos; // Adjust the values here to position the rectangle
+//    ImVec2 rect_max = relative_win_pos+cursor_pos+ImVec2(50, 50); // Adjust the values here to position the rectangle
+//
+//    ImVec4 color = ImVec4(1.0f, 1.0f, 1.0f, 1.0); //RGBA color values ranging from 0 to 1
+//
+//    draw_list->AddRect(rect_min, rect_max, ImGui::GetColorU32(color));
+//    
+//    if(ImGui::Button("##test",ImVec2(50,50)))
+//    {
+//        print("yo!");
+//    };
+//    
+//    ImGui::End();
+//}
 
 //void piano_roll_window2(bool *is_open, std::vector<midi_note_message> &midi_track)
 //{

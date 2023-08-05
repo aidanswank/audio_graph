@@ -1,3 +1,4 @@
+#pragma once
 #include "vprint.h"
 #include "portaudio.h"
 #include <vector>

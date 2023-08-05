@@ -5,6 +5,8 @@
 #include "midi.h"
 #include <map>
 
+// i dont like accessing this through extern all the time i think i might move to a different design
+
 struct global_transport
 {
     bool is_playing=false;
@@ -19,14 +21,10 @@ struct global_transport
     int current_pattern_open = 0;
     int current_column_open = 0;
 
-//    smf::MidiFile midi_file; // not sure gonna keep this
     std::map<int, smf::MidiFile> midi_module_map;
     std::vector<smf::MidiFile> midi_patterns; // all patterns
     std::map<int, std::vector<int>> pattern_map; // map of node_id->vector of pattern indices
-
-    smf::MidiFile *midifile; // not sure gonna keep this
     
-    //ahhhhh
     float ticks_per_sample = 0;
 };
 
